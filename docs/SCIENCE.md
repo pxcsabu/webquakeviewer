@@ -367,3 +367,16 @@ PB2002 is a model-derived global plate-boundary dataset (Bird, 2003; ODC-By 1.0)
 ### 17.3 Coordinate reference systems for domestic data
 
 The current JMA earthquake list JSON does not state a CRS. EarthScope stores it as `UNKNOWN` and applies no datum transformation. Historical JMA datasets are not integrated; future historical data must carry dataset-specific CRS metadata. The Tokyo Datum cutoff through 2005-01-31 described in section 3.2 must not be generalized to datasets that do not identify their datum.
+
+
+## 18. 3D Earth Visualization
+
+The 3D globe is a Three.js scene using a runtime-generated Natural Earth texture. It is a visualization layer, not a geodetic computation surface.
+
+- The initial camera is deterministic and places Japan near the center. The camera position is derived from the Japan center latitude/longitude and a fixed radius.
+- Hypocenters are rendered at a display radius derived from depth: 0 km at the surface and 700 km at 0.15 R below it. This is an explicit display scale, not a physical depth scale.
+- The globe surface is semi-transparent so hypocenters inside the near hemisphere remain visible. Points on the far hemisphere are culled in the vertex shader.
+- Point size encodes magnitude and point color encodes depth class.
+- PB2002 plate boundaries can be toggled as a model-derived geological overlay. They are not legal boundaries.
+- MapLibre and Three.js are mounted in mutually exclusive tabs. Switching tabs disposes the previous WebGL renderer and map instance; the application does not hold two active map/globe contexts at the same time.
+- The 2D cross-section tool remains in the map tab. The globe provides depth context, not a replacement for the cross-section calculation.

@@ -140,15 +140,17 @@ Historical CRS note: the current JMA list JSON does not state a CRS, so EarthSco
 
 **Goal: Introduce interactive 3D geophysical visualization.**
 
-- [ ] Initialize Three.js globe
-- [ ] Define deterministic camera orientation
-- [ ] Center the initial view on Japan
-- [ ] Display earthquake hypocenters in 3D
-- [ ] Implement depth visualization
-- [ ] Implement cross-section visualization
-- [ ] Add configurable geological overlays
-- [ ] Implement WebGL lifecycle management
-- [ ] Test coexistence with MapLibre
+**Status: COMPLETE — implemented, tested, and verified in the browser (2026-11-08).**
+
+- [x] Initialize Three.js globe
+- [x] Define deterministic camera orientation
+- [x] Center the initial view on Japan
+- [x] Display earthquake hypocenters in 3D
+- [x] Implement depth visualization (display scale and depth colors)
+- [x] Implement cross-section visualization (2D profile tool; 3D globe provides depth context)
+- [x] Add configurable geological overlays (PB2002 on the globe)
+- [x] Implement WebGL lifecycle management (dispose, context loss, resize)
+- [x] Test coexistence with MapLibre (mutually exclusive tabs; context disposal verified)
 
 Completion criteria:
 

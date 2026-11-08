@@ -260,3 +260,22 @@ Internal binary formats must include a version identifier.
 Do not change the interpretation of an existing format version without incrementing its version.
 
 Maintain compatibility or provide explicit migration logic where necessary.
+
+## 14. Geological and Hazard Overlay Formats
+
+### 14.1 PB2002 plate boundaries
+
+- Format: GeoJSON `FeatureCollection`
+- CRS: WGS84
+- Geometry: `LineString` / `MultiLineString`
+- Properties include plate-boundary metadata from the source dataset
+- The bundled file has a `metadata` foreign member with source, citation, license, retrieval time, and CRS
+- Model-derived boundaries, not legal boundaries
+
+### 14.2 J-SHIS WMS image
+
+- Format: PNG image returned by WMS `GetMap`
+- Source CRS: EPSG:4612
+- Extent: 30°N–46°N, 128°E–150°E
+- Displayed as a geographic image overlay with attribution
+- Not a raw-data redistribution and not a real-time observation

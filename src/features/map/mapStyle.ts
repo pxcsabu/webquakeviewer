@@ -10,6 +10,32 @@ import type { GeoPoint } from '../../analysis/geodesy/distance';
 import type { Earthquake } from '../../domain/earthquake/types';
 import { JAPAN_REGION_BOUNDS } from '../../domain/geography/japanRegion';
 
+
+export const JSHIS_HAZARD_IMAGE_URL =
+  'https://www.j-shis.bosai.go.jp/map/wms/pshm/Y2020?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&BBOX=30,128,46,150&CRS=EPSG:4612&WIDTH=1024&HEIGHT=1024&LAYERS=P-Y2020-MAP-AVR-TTL_MTTL-T30_I55_PS&FORMAT=image/png&TRANSPARENT=TRUE';
+
+export const JSHIS_HAZARD_COORDINATES: [
+  [number, number],
+  [number, number],
+  [number, number],
+  [number, number],
+] = [
+  [128, 46],
+  [150, 46],
+  [150, 30],
+  [128, 30],
+];
+
+export const JSHIS_ATTRIBUTION =
+  'J-SHIS 地震ハザードステーション（防災科研）';
+
+export const JSHIS_URL = 'https://www.j-shis.bosai.go.jp/map/';
+
+export const PB2002_ATTRIBUTION =
+  'PB2002 plate boundaries (Bird 2003; Nordpil, ODC-By 1.0)';
+
+export const PLATE_BOUNDARY_COLOR = '#7d3c98';
+
 export const MAP_BACKGROUND_COLOR = '#eef2f5';
 export const MAP_LAND_COLOR = '#e4e9ed';
 export const MAP_BOUNDARY_COLOR = '#aeb9c3';

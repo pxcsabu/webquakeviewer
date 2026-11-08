@@ -16,9 +16,13 @@ import {
   GSI_ATTRIBUTION,
   GSI_TILE_URLS,
   JAPAN_REGION_POLYGON,
+  JSHIS_HAZARD_COORDINATES,
+  JSHIS_HAZARD_IMAGE_URL,
   MAP_BOUNDARY_COLOR,
   MAP_LAND_COLOR,
   MAP_REGION_COLOR,
+  PB2002_ATTRIBUTION,
+  PLATE_BOUNDARY_COLOR,
   SELECTED_POINT_RADIUS,
   toEarthquakeFeatureCollection,
   toProfileFeatureCollection,
@@ -32,6 +36,8 @@ interface EarthquakeMapProps {
   profileStart: GeoPoint | null;
   profileEnd: GeoPoint | null;
   profileMode: boolean;
+  showPlateBoundaries: boolean;
+  showHazard: boolean;
   onProfilePoint: (point: GeoPoint) => void;
   onSelect: (id: string) => void;
 }
@@ -53,6 +59,8 @@ export function EarthquakeMap({
   profileStart,
   profileEnd,
   profileMode,
+  showPlateBoundaries,
+  showHazard,
   onProfilePoint,
   onSelect,
 }: EarthquakeMapProps) {
@@ -166,12 +174,15 @@ export function EarthquakeMap({
     map.on('load', () => {
       void (async () => {
         try {
-          const [land, boundaries] = await Promise.all([
+          const [land, boundaries, plateBoundaries] = await Promise.all([
             fetchFeatureCollection(
               `${import.meta.env.BASE_URL}geo/ne_110m_land.geojson`,
             ),
             fetchFeatureCollection(
               `${import.meta.env.BASE_URL}geo/ne_110m_admin_0_boundary_lines_land.geojson`,
+            ),
+            fetchFeatureCollection(
+              `${import.meta.env.BASE_URL}geo/PB2002_boundaries.json`,
             ),
           ]);
           if (cancelled) {
@@ -245,6 +256,42 @@ export function EarthquakeMap({
             },
             paint: {
               'raster-opacity': 1,
+            },
+          });
+
+          map.addSource('jshis-hazard', {
+            type: 'image',
+            url: JSHIS_HAZARD_IMAGE_URL,
+            coordinates: JSHIS_HAZARD_COORDINATES,
+          });
+          map.addLayer({
+            id: 'jshis-hazard-raster',
+            type: 'raster',
+            source: 'jshis-hazard',
+            layout: {
+              visibility: showHazard ? 'visible' : 'none',
+            },
+            paint: {
+              'raster-opacity': 0.5,
+            },
+          });
+
+          map.addSource('pb2002-boundaries', {
+            type: 'geojson',
+            data: plateBoundaries,
+            attribution: PB2002_ATTRIBUTION,
+          });
+          map.addLayer({
+            id: 'pb2002-boundaries-line',
+            type: 'line',
+            source: 'pb2002-boundaries',
+            layout: {
+              visibility: showPlateBoundaries ? 'visible' : 'none',
+            },
+            paint: {
+              'line-color': PLATE_BOUNDARY_COLOR,
+              'line-width': 1.3,
+              'line-opacity': 0.9,
             },
           });
 
@@ -412,6 +459,27 @@ export function EarthquakeMap({
     }
     map.getCanvas().style.cursor = profileMode ? 'crosshair' : '';
   }, [profileMode, mapReady]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!mapReady || map === null) {
+      return;
+    }
+    if (map.getLayer('pb2002-boundaries-line')) {
+      map.setLayoutProperty(
+        'pb2002-boundaries-line',
+        'visibility',
+        showPlateBoundaries ? 'visible' : 'none',
+      );
+    }
+    if (map.getLayer('jshis-hazard-raster')) {
+      map.setLayoutProperty(
+        'jshis-hazard-raster',
+        'visibility',
+        showHazard ? 'visible' : 'none',
+      );
+    }
+  }, [showPlateBoundaries, showHazard, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;

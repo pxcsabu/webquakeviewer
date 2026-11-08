@@ -61,6 +61,24 @@ describe('SOURCE_REGISTRY', () => {
     expect(kmoni?.dataLicense).toContain('転載');
   });
 
+  it('marks J-SHIS WMS READY but keeps raw-data redistribution disallowed', () => {
+    const jshis = getSourceRegistryEntry('j-shis');
+    expect(jshis).toBeDefined();
+    expect(jshis?.status).toBe('READY');
+    expect(jshis?.corsVerified).toBe(true);
+    expect(jshis?.redistributionAllowed).toBe(false);
+    expect(jshis?.dataLicense).toContain('J-SHIS');
+  });
+
+  it('marks PB2002 plate boundaries READY with ODC-By attribution', () => {
+    const pb = getSourceRegistryEntry('pb2002-plate-boundaries');
+    expect(pb).toBeDefined();
+    expect(pb?.status).toBe('READY');
+    expect(pb?.dataLicense).toContain('ODC-By');
+    expect(pb?.redistributionAllowed).toBe(true);
+    expect(pb?.attribution).toContain('Bird');
+  });
+
   it('does not claim READY without a verification timestamp and CORS check', () => {
     for (const entry of SOURCE_REGISTRY) {
       if (entry.status === 'READY') {

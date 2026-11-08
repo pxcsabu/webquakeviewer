@@ -26,6 +26,8 @@ The project is designed to be hosted on GitHub Pages without requiring a dedicat
 - 地震分布図 / 強震モニタ tabs
 - Cross-section tool with Slab2 depth contours
 - Strong-motion availability panel and JMA intensity summary
+- PB2002 plate-boundary overlay
+- J-SHIS 2020 probabilistic seismic-hazard WMS overlay
 - Surface and hypocentral distance modules; Aki–Utsu b-value module
 - Depth histogram, cumulative magnitude-frequency, temporal statistics, DBSCAN spatial clusters, and b-value analysis panel
 

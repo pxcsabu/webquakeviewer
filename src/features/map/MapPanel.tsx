@@ -15,6 +15,9 @@ import {
   DEFAULT_BASEMAP,
   DEPTH_CLASSES,
   GSI_TILE_LIST_URL,
+  JSHIS_ATTRIBUTION,
+  JSHIS_URL,
+  PB2002_ATTRIBUTION,
   type BasemapId,
 } from './mapStyle';
 
@@ -115,6 +118,8 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
   const [profileStart, setProfileStart] = useState<GeoPoint | null>(null);
   const [profileEnd, setProfileEnd] = useState<GeoPoint | null>(null);
   const [profileError, setProfileError] = useState<string | null>(null);
+  const [showPlateBoundaries, setShowPlateBoundaries] = useState(false);
+  const [showHazard, setShowHazard] = useState(false);
   const hasProfile = profileStart !== null && profileEnd !== null;
 
   const clearProfile = (): void => {
@@ -193,6 +198,37 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
       {profileError ? (
         <p className="map-toolbar-error">{profileError}</p>
       ) : null}
+      <div className="map-layer-controls">
+        <label>
+          <input
+            type="checkbox"
+            checked={showPlateBoundaries}
+            onChange={(event) =>
+              setShowPlateBoundaries(event.target.checked)
+            }
+          />
+          プレート境界（PB2002）
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={showHazard}
+            onChange={(event) => setShowHazard(event.target.checked)}
+          />
+          J-SHIS 地震ハザード
+        </label>
+      </div>
+      {showHazard ? (
+        <p className="map-layer-note">
+          {JSHIS_ATTRIBUTION} 2020年版。確率論的評価であり、現在の揺れではありません。{' '}
+          <a href={JSHIS_URL} target="_blank" rel="noreferrer">
+            J-SHIS 公式
+          </a>
+        </p>
+      ) : null}
+      {showPlateBoundaries ? (
+        <p className="map-layer-note">{PB2002_ATTRIBUTION}</p>
+      ) : null}
       <div className="map-frame">
         <Suspense
           fallback={<div className="map-overlay">地図モジュールを読み込み中…</div>}
@@ -202,6 +238,8 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
               events={events}
               selectedId={selectedId}
               basemap={basemap}
+              showPlateBoundaries={showPlateBoundaries}
+              showHazard={showHazard}
               profileStart={profileStart}
               profileEnd={profileEnd}
               profileMode={profileMode}

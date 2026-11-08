@@ -350,3 +350,20 @@ The centroid is an arithmetic mean of latitude and longitude for small regional 
 The current implementation is O(n²) over the filtered catalog. Large catalogs should move this calculation to a Web Worker or a spatially indexed implementation.
 
 The b-value panel uses the same filtered catalog and an explicit user-selected Mc. It does not evaluate completeness magnitude.
+
+
+## 17. Geological and Hazard Overlays
+
+### 17.1 J-SHIS probabilistic hazard map
+
+The J-SHIS 2020 probabilistic seismic hazard map is displayed as a WMS image overlay in EPSG:4612 for the extent 30°N–46°N, 128°E–150°E. It is a model-derived probabilistic evaluation, not current shaking, an earthquake prediction, or a site-specific engineering result. The map is shown with attribution to J-SHIS and must not be treated as a real-time observation layer.
+
+The J-SHIS terms permit derived display and processing with attribution but prohibit copying and redistributing the raw hazard data as-is. EarthScope does not redistribute the raw data.
+
+### 17.2 PB2002 plate boundaries
+
+PB2002 is a model-derived global plate-boundary dataset (Bird, 2003; ODC-By 1.0). The bundled GeoJSON contains 241 boundary features in WGS84. It is an optional map overlay and is not used for distance, hazard, or legal-boundary calculations.
+
+### 17.3 Coordinate reference systems for domestic data
+
+The current JMA earthquake list JSON does not state a CRS. EarthScope stores it as `UNKNOWN` and applies no datum transformation. Historical JMA datasets are not integrated; future historical data must carry dataset-specific CRS metadata. The Tokyo Datum cutoff through 2005-01-31 described in section 3.2 must not be generalized to datasets that do not identify their datum.

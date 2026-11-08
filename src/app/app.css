@@ -835,6 +835,33 @@ button:disabled {
 }
 
 
+
+.map-layer-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  padding: 0 16px 6px;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.map-layer-controls label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.map-layer-note {
+  margin: 0 16px 6px;
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.map-layer-note a {
+  color: var(--accent);
+}
+
 .map-toolbar {
   display: flex;
   flex-wrap: wrap;

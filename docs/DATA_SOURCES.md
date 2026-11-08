@@ -207,30 +207,34 @@ Potential formats include ASCII, binary, and CSV depending on the dataset.
 
 A future EarthScope waveform module may support user-provided files obtained under valid access conditions.
 
-## 9. J-SHIS
+## 9. J-SHIS Seismic Hazard Map
 
-**Status: CONDITIONAL**
+**Status: READY (WMS image overlay; raw-data redistribution prohibited)**
 
-Potential uses:
+J-SHIS provides probabilistic seismic hazard maps and related information.
 
-- Probabilistic seismic hazard maps
-- Ground-motion hazard information
-- Site amplification
-- Geological and subsurface information
+Implemented overlay:
 
-Official resource:
+- WMS service: `https://www.j-shis.bosai.go.jp/map/wms/pshm/Y2020`
+- Layer: `P-Y2020-MAP-AVR-TTL_MTTL-T30_I55_PS`
+- Image extent: 30°N–46°N, 128°E–150°E
+- CRS: EPSG:4612
+- CORS: `Access-Control-Allow-Origin: *` verified
+- The image is displayed as a derived overlay with attribution.
+- The J-SHIS terms permit editing, processing, and distribution of derived results with attribution, but prohibit copying and redistributing the seismic-hazard data as-is. EarthScope does not redistribute raw J-SHIS data.
+
+Limitations:
+
+- This is a probabilistic hazard evaluation, not current shaking or an earthquake prediction.
+- The 2020 map is a model-derived product with uncertainty.
+- It is not suitable for site-specific engineering decisions without consulting J-SHIS and the underlying models.
+- The WMS image is a fixed geographic image overlay; it is not a real-time layer.
+
+Official resources:
 
 - https://www.j-shis.bosai.go.jp/
-
-Before integration, verify:
-
-- Dataset-specific license
-- Download method
-- Coordinate reference system
-- Resolution
-- Units
-- Redistribution permission
-- Browser accessibility
+- https://www.j-shis.bosai.go.jp/wms-pshm
+- https://www.j-shis.bosai.go.jp/agreement
 
 ## 10. Geological Survey of Japan
 
@@ -367,3 +371,17 @@ EarthScope currently:
 - shows a clearly labeled JMA intensity summary, which is not a strong-motion monitor.
 
 K-NET/KiK-net waveform and strong-motion data remain registration-restricted.
+
+
+## 17. PB2002 Plate Boundaries
+
+**Status: READY**
+
+- Dataset: PB2002 plate boundaries, converted to GeoJSON by Nordpil/csterling.
+- Citation: Bird, P. (2003), An updated digital model of plate boundaries, Geochemistry Geophysics Geosystems, 4(3), 1027, doi:10.1029/2001GC000252.
+- License: Open Data Commons Attribution License 1.0 (ODC-By 1.0).
+- Attribution: Bird (2003) PB2002 / Hugo Ahlenius, Nordpil.
+- 241 boundary features, WGS84.
+- Bundled as `public/geo/PB2002_boundaries.json`.
+- This is a model-derived plate-boundary dataset, not a legal or administrative boundary.
+- It is displayed as an optional map overlay and is not used for distance or hazard calculations.

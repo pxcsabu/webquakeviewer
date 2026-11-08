@@ -116,6 +116,8 @@ Calculations have documented methods, assumptions, units, and automated tests.
 
 **Goal: Integrate domestic earthquake information.**
 
+**Status: COMPLETE — implemented, tested, and verified on GitHub Pages (2026-11-08).**
+
 - [x] Verify JMA endpoint browser accessibility
 - [x] Verify JMA CORS behavior
 - [x] Verify usage conditions
@@ -124,12 +126,14 @@ Calculations have documented methods, assumptions, units, and automated tests.
 - [x] Implement intensity ordinal ranking
 - [x] Implement JMA / USGS catalog source selector
 - [x] Verify JMA integration on GitHub Pages
-- [ ] Verify historical coordinate reference systems
-- [ ] Integrate permitted geological and hazard datasets
+- [x] Verify historical coordinate reference systems (current JMA list has no CRS; stored UNKNOWN; no historical dataset integrated)
+- [x] Integrate permitted geological and hazard datasets (PB2002 boundaries and J-SHIS WMS hazard overlay)
 
 This phase is conditional on endpoint availability and data usage conditions.
 
 Do not block the core application if a source is unavailable.
+
+Historical CRS note: the current JMA list JSON does not state a CRS, so EarthScope stores `UNKNOWN` and applies no datum transformation. Historical JMA datasets are not integrated. Any future historical dataset must carry dataset-specific CRS metadata (including the Tokyo Datum cutoff documented in `docs/SCIENCE.md`).
 
 ## Phase 5 — 3D Earth Visualization
 

@@ -321,3 +321,32 @@ The cross-section tool projects earthquake hypocenters onto a user-selected star
 Hypocentral distance uses WGS84 ECEF coordinates with depth positive downward. Surface distance uses the Haversine formula. These are different quantities and are not interchangeable.
 
 The Aki–Utsu b-value module is implemented with an explicit Mc and magnitude bin width. The analysis panel exposes b-value, a-value, sample count, and mean magnitude, but it does not claim that the selected Mc is a completeness magnitude. The user must provide and justify Mc.
+
+
+## 16. Temporal Statistics and Spatial Clustering
+
+### 16.1 Temporal statistics
+
+Daily event bins use UTC calendar days. The panel reports:
+
+- event count
+- first and last origin time
+- observation span in hours
+- median, mean, and maximum inter-event interval in hours
+
+Events with invalid origin times are excluded from the calculation. Daily bins are not a completeness-corrected seismicity rate.
+
+### 16.2 Spatial clustering
+
+The analysis panel uses DBSCAN with:
+
+- surface distance from the Haversine calculation
+- `eps = 50 km`
+- `minPts = 3`
+- events sorted by origin time before scanning for deterministic cluster IDs
+
+The centroid is an arithmetic mean of latitude and longitude for small regional clusters, not a geodetic centroid. DBSCAN clusters describe spatial density in the current filtered catalog; they do not identify faults, tectonic boundaries, or source regions.
+
+The current implementation is O(n²) over the filtered catalog. Large catalogs should move this calculation to a Web Worker or a spatially indexed implementation.
+
+The b-value panel uses the same filtered catalog and an explicit user-selected Mc. It does not evaluate completeness magnitude.

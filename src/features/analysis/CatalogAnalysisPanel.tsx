@@ -2,7 +2,17 @@ import { useMemo, useState } from 'react';
 import { buildDepthHistogram } from '../../analysis/depth/histogram';
 import { estimateBValue } from '../../analysis/magnitude/bValue';
 import { buildCumulativeMagnitudeFrequency } from '../../analysis/magnitude/frequency';
+import { clusterEvents } from '../../analysis/spatial/clustering';
+import {
+  buildDailyEventHistogram,
+  computeTemporalStatistics,
+} from '../../analysis/temporal/statistics';
 import type { Earthquake } from '../../domain/earthquake/types';
+import {
+  formatLatitude,
+  formatLongitude,
+  formatUtcTimestamp,
+} from '../../utils/format';
 
 interface CatalogAnalysisPanelProps {
   events: Earthquake[];
@@ -34,6 +44,18 @@ export function CatalogAnalysisPanel({
     () => buildDepthHistogram(events),
     [events],
   );
+  const dailyBins = useMemo(
+    () => buildDailyEventHistogram(events),
+    [events],
+  );
+  const temporal = useMemo(
+    () => computeTemporalStatistics(events),
+    [events],
+  );
+  const clustering = useMemo(
+    () => clusterEvents(events, { epsKm: 50, minPts: 3 }),
+    [events],
+  );
   const frequencies = useMemo(
     () => buildCumulativeMagnitudeFrequency(magnitudes, 0.5),
     [magnitudes],
@@ -50,6 +72,10 @@ export function CatalogAnalysisPanel({
   const maxFrequency = Math.max(
     1,
     ...frequencies.map((point) => point.count),
+  );
+  const maxDailyCount = Math.max(
+    1,
+    ...dailyBins.map((bin) => bin.count),
   );
   const missingDepth = events.filter(
     (event) => event.location.depthKm === undefined,
@@ -121,6 +147,94 @@ export function CatalogAnalysisPanel({
             ))}
           </ul>
         )}
+      </div>
+
+      <div className="analysis-block">
+        <h3>時系列統計（UTC）</h3>
+        {temporal.count === 0 ? (
+          <p className="empty-message">有効な時刻がありません。</p>
+        ) : (
+          <>
+            <dl className="analysis-result">
+              <div>
+                <dt>期間</dt>
+                <dd>{temporal.spanHours.toFixed(1)} h</dd>
+              </div>
+              <div>
+                <dt>イベント数</dt>
+                <dd>{temporal.count}</dd>
+              </div>
+              <div>
+                <dt>間隔中央値</dt>
+                <dd>
+                  {temporal.medianInterEventHours === null
+                    ? '—'
+                    : `${temporal.medianInterEventHours.toFixed(1)} h`}
+                </dd>
+              </div>
+              <div>
+                <dt>最大間隔</dt>
+                <dd>
+                  {temporal.maxInterEventHours === null
+                    ? '—'
+                    : `${temporal.maxInterEventHours.toFixed(1)} h`}
+                </dd>
+              </div>
+            </dl>
+            <div
+              className="analysis-timeline"
+              aria-label="UTC日別イベント数"
+            >
+              {dailyBins.map((bin) => (
+                <span
+                  key={bin.startUtc}
+                  className="analysis-timeline-bar"
+                  style={{
+                    height: `${(bin.count / maxDailyCount) * 100}%`,
+                  }}
+                  title={`${bin.label}: ${bin.count} 件`}
+                />
+              ))}
+            </div>
+            <p className="analysis-note">
+              日別UTC（{dailyBins[0]?.label ?? '—'}–
+              {dailyBins[dailyBins.length - 1]?.label ?? '—'}）。棒の高さは日別件数。
+            </p>
+          </>
+        )}
+      </div>
+
+      <div className="analysis-block">
+        <h3>空間クラスタ（DBSCAN）</h3>
+        <p className="analysis-note">eps 50 km / minPts 3 / 球面距離</p>
+        {clustering.clusters.length === 0 ? (
+          <p className="empty-message">
+            条件を満たすクラスタはありません。
+          </p>
+        ) : (
+          <ol className="analysis-clusters">
+            {clustering.clusters.slice(0, 5).map((cluster) => (
+              <li key={cluster.id}>
+                <div className="analysis-cluster-head">
+                  <strong>{cluster.events.length} 件</strong>
+                  <span>
+                    {formatLatitude(cluster.centroid.latitude)},{' '}
+                    {formatLongitude(cluster.centroid.longitude)}
+                  </span>
+                </div>
+                <span className="analysis-cluster-meta">
+                  最大 M {cluster.maxMagnitude?.toFixed(1) ?? '—'} /{' '}
+                  {formatUtcTimestamp(cluster.startTime)} –{' '}
+                  {formatUtcTimestamp(cluster.endTime)}
+                </span>
+              </li>
+            ))}
+          </ol>
+        )}
+        <p className="analysis-note">
+          ノイズ {clustering.noiseCount} 件。クラスタは活動の目安であり、
+          断層・プレート境界の同定ではありません。
+        </p>
       </div>
 
       <div className="analysis-block">

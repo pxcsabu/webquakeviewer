@@ -27,7 +27,7 @@ The project is designed to be hosted on GitHub Pages without requiring a dedicat
 - Cross-section tool with Slab2 depth contours
 - Strong-motion availability panel and JMA intensity summary
 - Surface and hypocentral distance modules; Aki–Utsu b-value module
-- Depth histogram, cumulative magnitude-frequency, and b-value analysis panel
+- Depth histogram, cumulative magnitude-frequency, temporal statistics, DBSCAN spatial clusters, and b-value analysis panel
 
 ### Planned
 

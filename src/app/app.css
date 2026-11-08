@@ -970,6 +970,56 @@ button:disabled {
 }
 
 
+
+.analysis-timeline {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 58px;
+  margin: 8px 0 4px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.analysis-timeline-bar {
+  flex: 1 1 0;
+  min-width: 2px;
+  max-width: 18px;
+  background: #2e86c1;
+}
+
+.analysis-clusters {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.analysis-clusters li {
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.analysis-cluster-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.74rem;
+}
+
+.analysis-cluster-head span {
+  color: var(--muted);
+}
+
+.analysis-cluster-meta {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
 .analysis-panel {
   font-size: 0.78rem;
 }

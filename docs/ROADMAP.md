@@ -98,8 +98,8 @@ The map displays the catalog without degrading data correctness, does not requir
 - [x] Implement depth distribution charts
 - [x] Implement magnitude-frequency distribution
 - [x] Implement b-value calculation with an explicit Mc input (Aki–Utsu module, tests, and UI)
-- [ ] Implement temporal event statistics
-- [ ] Implement spatial clustering
+- [x] Implement temporal event statistics (UTC daily histogram, inter-event intervals)
+- [x] Implement spatial clustering (DBSCAN, haversine surface distance)
 - [x] Implement cross-section selection with Slab2 depth contours
 - [x] Display sample count and analysis parameters
 - [x] Add a cross-section chart with depth, distance, and slab interface context

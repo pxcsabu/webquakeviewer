@@ -93,6 +93,8 @@ The map displays the catalog without degrading data correctness, does not requir
 
 **Goal: Add scientifically meaningful analysis tools.**
 
+**Status: COMPLETE — implemented, tested, and verified on GitHub Pages (2026-11-08).**
+
 - [x] Implement surface distance calculation
 - [x] Implement hypocentral distance calculation
 - [x] Implement depth distribution charts
@@ -104,6 +106,7 @@ The map displays the catalog without degrading data correctness, does not requir
 - [x] Display sample count and analysis parameters
 - [x] Add a cross-section chart with depth, distance, and slab interface context
 - [x] Verify cross-section and strong-motion tabs on GitHub Pages
+- [x] Verify temporal/spatial analysis on GitHub Pages
 
 Completion criteria:
 

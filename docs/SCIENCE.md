@@ -44,6 +44,8 @@ Do not assume that all records before or after a guessed cutoff use the same dat
 
 Use dataset-specific metadata.
 
+The current JMA earthquake list JSON (`bosai/quake/data/list.json`) does not state a coordinate reference system in the record. EarthScope normalizes its `cod` strings from mixed decimal-degree / degree-minute notation to decimal degrees without a datum transformation and stores `crs: UNKNOWN`. This is deliberate: the coordinates are displayed for situational awareness, not certified as a specific geodetic datum.
+
 ### 3.3 Coordinate preservation
 
 Always preserve original coordinates.

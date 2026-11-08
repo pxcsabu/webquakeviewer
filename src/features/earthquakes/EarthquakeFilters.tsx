@@ -1,3 +1,4 @@
+import type { CatalogProviderId } from '../../data/providers/catalogProviders';
 import { JAPAN_REGION_BOUNDS } from '../../domain/geography/japanRegion';
 import {
   DEFAULT_EARTHQUAKE_FILTERS,
@@ -8,9 +9,12 @@ import {
 
 interface EarthquakeFiltersProps {
   filters: EarthquakeFilterState;
+  providerId: CatalogProviderId;
+  providerOptions: readonly { id: CatalogProviderId; label: string }[];
   totalCount: number;
   visibleCount: number;
   onChange: (filters: EarthquakeFilterState) => void;
+  onProviderChange: (providerId: CatalogProviderId) => void;
 }
 
 const TIME_RANGES: TimeRange[] = ['all', '1h', '24h', '7d'];
@@ -33,9 +37,12 @@ const DEPTH_OPTIONS = [
 
 export function EarthquakeFilters({
   filters,
+  providerId,
+  providerOptions,
   totalCount,
   visibleCount,
   onChange,
+  onProviderChange,
 }: EarthquakeFiltersProps) {
   const setNumberFilter = (
     key: 'minMagnitude' | 'maxDepthKm',
@@ -64,6 +71,22 @@ export function EarthquakeFilters({
       </p>
 
       <div className="filter-grid">
+        <label className="filter-field">
+          <span>地震データ</span>
+          <select
+            value={providerId}
+            onChange={(event) =>
+              onProviderChange(event.target.value as CatalogProviderId)
+            }
+          >
+            {providerOptions.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
         <label className="filter-field">
           <span>期間</span>
           <select

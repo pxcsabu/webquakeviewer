@@ -10,7 +10,9 @@ The project is designed to be hosted on GitHub Pages without requiring a dedicat
 
 ### Core
 
-- USGS GeoJSON earthquake catalog restricted to the provisional Japan region
+- JMA earthquake information list (default, 30-day rolling list)
+- USGS GeoJSON catalog (switchable source)
+- Japanese seismic intensity display
 - Earthquake event list and detail panel
 - Time, magnitude, and depth filtering
 - IndexedDB catalog cache
@@ -55,7 +57,7 @@ Technology choices may be adjusted when a demonstrable technical reason exists.
 
 ## Data Sources
 
-USGS is currently integrated as the Phase 1 Japan-region catalog and is marked `READY`. Browser access, CORS, and 304 conditional requests have been verified. USGS is a U.S. federal agency and its works are generally public domain; attribution to the U.S. Geological Survey is retained.
+The default catalog is the JMA earthquake information list (`bosai/quake/data/list.json`), marked `READY` with PDL1.0 attribution to 気象庁. It is a 30-day rolling list; the UI defaults to a 24-hour view and can show the full list. The USGS GeoJSON feed is also integrated and selectable; browser access, CORS, and 304 conditional requests have been verified. USGS is a U.S. federal agency and its works are generally public domain; attribution to the U.S. Geological Survey is retained.
 
 The Phase 2 map uses GSI standard/pale raster tiles with attribution and no API key, plus bundled Natural Earth 1:110m vectors as an offline fallback. GSI tiles are fetched directly from the Geospatial Information Authority of Japan and are not bundled by EarthScope.
 

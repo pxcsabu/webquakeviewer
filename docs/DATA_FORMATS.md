@@ -56,6 +56,20 @@ The USGS summary feed uses a GeoJSON `FeatureCollection`.
 - `properties.type` may identify non-earthquake events such as quarry blasts. Preserve it as `eventType`.
 - `properties.place` is provider text. Preserve it without treating it as a structured location.
 
+### 3.2 JMA earthquake information list
+
+The JMA `bosai/quake/data/list.json` source is a JSON array of reports.
+
+- `eid` is the source event identifier. Multiple report types can share one `eid`.
+- `at` is the origin time with a `+09:00` offset. It is preserved as original time and normalized to UTC internally.
+- `rdt` is the report time. The latest report time is used as source update metadata.
+- `anm` is the Japanese place/area text.
+- `cod` is a coordinate string such as `+32.6+130.6-10000/` or `+3456.1+13739.5-41000/`. Latitude/longitude may be decimal degrees or DDMM.M / DDDMM.M. Depth is in metres and may be omitted.
+- `mag` is a string and may be empty. Do not fabricate a magnitude when it is unavailable.
+- `maxi` is the maximum seismic intensity display value. Store display and ordinal rank separately.
+- Reports are deduplicated by `eid`. The latest complete report supplies the hypocenter/magnitude, while the latest available maximum intensity is retained.
+- The source does not state its CRS. EarthScope stores `crs: UNKNOWN` and applies no datum transformation.
+
 ## 4. Time
 
 Use ISO 8601 timestamps.

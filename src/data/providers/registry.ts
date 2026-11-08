@@ -64,6 +64,26 @@ export const SOURCE_REGISTRY: readonly SourceRegistryEntry[] = [
       'GSI standard and pale raster tiles (z5-18) returned CORS-enabled PNGs. Attribution to 国土地理院 and a link to the GSI tile list are required. Tiles are fetched directly from the GSI service and are not bundled or redistributed by EarthScope.',
   },
   {
+    id: 'jma-earthquake-list-json',
+    name: 'JMA Earthquake Information List',
+    provider: 'Japan Meteorological Agency',
+    status: 'READY',
+    homepage: 'https://www.jma.go.jp/bosai/quake/',
+    documentationUrl:
+      'https://www.jma.go.jp/jma/kishou/info/coment.html',
+    dataLicense:
+      '公共データ利用規約（第1.0版） / PDL1.0 (attribution required)',
+    attribution: '気象庁',
+    accessMethod:
+      'HTTPS JSON (browser fetch, no API key, no conditional headers)',
+    requiresAuthentication: false,
+    corsVerified: true,
+    redistributionAllowed: true,
+    lastVerifiedAt: '2026-11-08T08:20:00Z',
+    notes:
+      'list.json returned 196 records / 154 unique Japan-region events over 30 days. CORS returned Access-Control-Allow-Origin: *. Coordinates use a mixed decimal-degree / degree-minute cod format and are stored as UNKNOWN CRS without datum transformation because the JSON does not state the CRS. Conditional requests are not sent because the JMA CORS allow-list is limited.',
+  },
+  {
     id: 'jma-disaster-prevention-xml',
     name: 'JMA Disaster Prevention XML',
     provider: 'Japan Meteorological Agency',

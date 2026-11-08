@@ -1,4 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
+import {
+  CATALOG_PROVIDER_OPTIONS,
+  DEFAULT_CATALOG_PROVIDER,
+  type CatalogProviderId,
+} from '../data/providers/catalogProviders';
 import { AppHeader } from '../components/AppHeader';
 import { SourceStatusPanel } from '../components/SourceStatusPanel';
 import { StatusBar } from '../components/StatusBar';
@@ -14,7 +19,10 @@ import {
 import { useCatalog } from './state/useCatalog';
 
 export function App() {
-  const catalog = useCatalog();
+  const [providerId, setProviderId] = useState<CatalogProviderId>(
+    DEFAULT_CATALOG_PROVIDER,
+  );
+  const catalog = useCatalog(providerId);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filters, setFilters] = useState<EarthquakeFilterState>(
     DEFAULT_EARTHQUAKE_FILTERS,
@@ -30,6 +38,10 @@ export function App() {
       window.clearInterval(intervalId);
     };
   }, []);
+
+  useEffect(() => {
+    setSelectedId(null);
+  }, [providerId]);
 
   const visibleEvents = useMemo(
     () => filterEarthquakes(catalog.events, filters, now),
@@ -58,9 +70,12 @@ export function App() {
         <div className="app-column app-column-left">
           <EarthquakeFilters
             filters={filters}
+            providerId={providerId}
+            providerOptions={CATALOG_PROVIDER_OPTIONS}
             totalCount={catalog.events.length}
             visibleCount={visibleEvents.length}
             onChange={setFilters}
+            onProviderChange={setProviderId}
           />
           <EarthquakeList
             events={visibleEvents}
@@ -81,6 +96,7 @@ export function App() {
         <div className="app-column app-column-right">
           <EarthquakeDetail event={selectedEvent} />
           <SourceStatusPanel
+            providerLabel={catalog.providerLabel}
             providerState={catalog.providerState}
             warnings={catalog.warnings}
           />

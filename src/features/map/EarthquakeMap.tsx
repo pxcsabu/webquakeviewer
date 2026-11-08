@@ -246,7 +246,7 @@ export function EarthquakeMap({
           map.addSource('earthquakes', {
             type: 'geojson',
             data: toEarthquakeFeatureCollection(eventsRef.current),
-            attribution: 'Earthquake data: USGS',
+            attribution: 'Earthquake data: JMA / USGS',
           });
           map.addLayer({
             id: 'earthquakes-circles',

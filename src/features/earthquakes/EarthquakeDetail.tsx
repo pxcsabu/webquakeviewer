@@ -122,7 +122,7 @@ export function EarthquakeDetail({ event }: EarthquakeDetailProps) {
           <dt>震度</dt>
           <dd>
             {event.intensity
-              ? `${event.intensity.display}（rank ${event.intensity.rank}）`
+              ? `震度 ${event.intensity.display}（rank ${event.intensity.rank}）`
               : '未取得'}
           </dd>
         </div>

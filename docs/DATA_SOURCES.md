@@ -115,7 +115,21 @@ Reference: [GSI tile list](https://maps.gsi.go.jp/development/ichiran.html),
 
 ## 6. Japan Meteorological Agency
 
-**Status: CONDITIONAL**
+**Status: READY for the earthquake information list; CONDITIONAL for disaster-prevention XML**
+
+Implemented source:
+
+- Endpoint: `https://www.jma.go.jp/bosai/quake/data/list.json`
+- Format: JSON array of earthquake information reports
+- Browser access: verified; `Access-Control-Allow-Origin: *`
+- Usage terms: 公共データ利用規約（第1.0版 / PDL1.0） with attribution to 気象庁
+- Observed data: 196 reports / 154 unique Japan-region events over 30 days
+- The list is a 30-day rolling window. The UI defaults to the last 24 hours and allows the full 30-day window.
+- The list contains multiple report types for the same `eid`. EarthScope deduplicates by `eid` and uses the latest complete report, while retaining the latest available maximum intensity.
+- JMA `cod` coordinates mix decimal-degree and degree-minute notation. They are normalized to decimal degrees without a datum transformation.
+- The JSON does not state a coordinate reference system. EarthScope stores these coordinates with `crs: UNKNOWN` rather than silently assuming WGS84.
+- Conditional requests are not sent because the JMA CORS allow-list does not include `If-None-Match` or `If-Modified-Since`. EarthScope uses its IndexedDB cache for offline/stale fallback.
+- Seismic intensity `maxi` is stored as the display value plus an explicit ordinal rank; the rank is not a linear physical quantity.
 
 Potential uses:
 
@@ -136,15 +150,6 @@ Important limitations:
 - Browser-side access depends on endpoint-specific CORS behavior.
 - Public availability does not guarantee browser accessibility.
 - Polling frequency and usage conditions must be checked.
-
-Before integration:
-
-1. Identify the exact endpoint.
-2. Test HTTPS access.
-3. Test CORS from the deployed browser environment.
-4. Inspect response format and encoding.
-5. Check update behavior.
-6. Check usage and redistribution conditions.
 
 Do not claim that an endpoint supports CORS without testing it.
 

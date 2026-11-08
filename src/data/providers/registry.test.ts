@@ -34,6 +34,16 @@ describe('SOURCE_REGISTRY', () => {
     expect(gsi?.attribution).toBe('国土地理院');
   });
 
+  it('marks the JMA earthquake list READY with CORS and attribution', () => {
+    const jma = getSourceRegistryEntry('jma-earthquake-list-json');
+    expect(jma).toBeDefined();
+    expect(jma?.status).toBe('READY');
+    expect(jma?.corsVerified).toBe(true);
+    expect(jma?.lastVerifiedAt).not.toBeNull();
+    expect(jma?.dataLicense).toContain('PDL1.0');
+    expect(jma?.attribution).toBe('気象庁');
+  });
+
   it('does not claim READY without a verification timestamp and CORS check', () => {
     for (const entry of SOURCE_REGISTRY) {
       if (entry.status === 'READY') {

@@ -9,7 +9,7 @@ export interface EarthquakeFilterState {
 }
 
 export const DEFAULT_EARTHQUAKE_FILTERS: EarthquakeFilterState = {
-  timeRange: 'all',
+  timeRange: '24h',
   minMagnitude: null,
   maxDepthKm: null,
 };

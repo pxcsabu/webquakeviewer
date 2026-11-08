@@ -4,11 +4,13 @@ import { formatCount, formatUtcTimestamp } from '../utils/format';
 import { ProviderStatusBadge } from './ProviderStatusBadge';
 
 interface SourceStatusPanelProps {
+  providerLabel: string;
   providerState: ProviderStateRecord | null;
   warnings: string[];
 }
 
 export function SourceStatusPanel({
+  providerLabel,
   providerState,
   warnings,
 }: SourceStatusPanelProps) {
@@ -16,11 +18,11 @@ export function SourceStatusPanel({
     <section className="panel source-status" aria-labelledby="source-status-heading">
       <div className="panel-heading">
         <h2 id="source-status-heading">データソース</h2>
-        <span>Phase 1</span>
+        <span>Data</span>
       </div>
       <p className="muted source-intro">
-        USGS all_day フィードから日本周辺の矩形範囲を抽出して表示します。
-        検証状態と取得状態を表示します。
+        選択中のデータソース（{providerLabel}）の取得状態を表示します。
+        日本周辺の矩形範囲で抽出しています。
       </p>
 
       {providerState !== null ? (
@@ -28,7 +30,7 @@ export function SourceStatusPanel({
           className="provider-runtime"
           aria-labelledby="provider-runtime-heading"
         >
-          <h3 id="provider-runtime-heading">USGS 取得状態</h3>
+          <h3 id="provider-runtime-heading">{providerLabel} 取得状態</h3>
           <dl className="runtime-grid">
             <div>
               <dt>最終試行</dt>
@@ -47,7 +49,7 @@ export function SourceStatusPanel({
               </dd>
             </div>
             <div>
-              <dt>フィード生成</dt>
+              <dt>フィード最新</dt>
               <dd>
                 {providerState.lastFeedGeneratedAt
                   ? formatUtcTimestamp(providerState.lastFeedGeneratedAt)

@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { sampleProvider } from '../../data/providers/sample/sampleProvider';
 import {
-  USGS_POLL_INTERVAL_MS,
-  USGS_SOURCE_PROVIDER,
-  usgsProvider,
-} from '../../data/providers/usgs/usgsProvider';
+  CATALOG_PROVIDERS,
+  DEFAULT_CATALOG_PROVIDER,
+  type CatalogProviderId,
+} from '../../data/providers/catalogProviders';
+import { sampleProvider } from '../../data/providers/sample/sampleProvider';
 import type { ProviderCacheState } from '../../data/providers/types';
 import { sortEarthquakesByTime } from '../../domain/earthquake/sort';
 import { filterEventsInJapanRegion } from '../../domain/geography/japanRegion';
@@ -37,6 +37,8 @@ export interface CatalogState {
   error: string | null;
   cacheWarning: string | null;
   providerState: ProviderStateRecord | null;
+  providerId: CatalogProviderId;
+  providerLabel: string;
   warnings: string[];
   notModified: boolean;
 }
@@ -49,6 +51,8 @@ const INITIAL_STATE: CatalogState = {
   error: null,
   cacheWarning: null,
   providerState: null,
+  providerId: DEFAULT_CATALOG_PROVIDER,
+  providerLabel: CATALOG_PROVIDERS[DEFAULT_CATALOG_PROVIDER].label,
   warnings: [],
   notModified: false,
 };
@@ -83,10 +87,14 @@ function createSuccessState(
   };
 }
 
-export function useCatalog(): CatalogState & { refresh: () => void } {
+export function useCatalog(
+  providerId: CatalogProviderId,
+): CatalogState & { refresh: () => void } {
+  const providerDefinition = CATALOG_PROVIDERS[providerId];
   const [state, setState] = useState<CatalogState>(INITIAL_STATE);
   const [reloadToken, setReloadToken] = useState(0);
   const loadingRef = useRef(false);
+  const currentProviderIdRef = useRef<CatalogProviderId | null>(null);
 
   const refresh = useCallback(() => {
     if (loadingRef.current) {
@@ -110,11 +118,25 @@ export function useCatalog(): CatalogState & { refresh: () => void } {
 
     const load = async (): Promise<void> => {
       loadingRef.current = true;
-      update((previous) => ({
-        ...previous,
-        status: 'loading',
-        error: null,
-      }));
+      const providerChanged =
+        currentProviderIdRef.current !== providerId;
+      currentProviderIdRef.current = providerId;
+      update((previous) => {
+        const base = providerChanged
+          ? {
+              ...INITIAL_STATE,
+              providerId,
+              providerLabel: providerDefinition.label,
+            }
+          : previous;
+        return {
+          ...base,
+          status: 'loading',
+          error: null,
+          providerId,
+          providerLabel: providerDefinition.label,
+        };
+      });
 
       let cacheWarning: string | null = null;
       let cachedEvents: Earthquake[] = [];
@@ -146,21 +168,27 @@ export function useCatalog(): CatalogState & { refresh: () => void } {
 
           try {
             const cached = await getCachedEarthquakes(db);
-            if (cached.length > 0) {
+            const cachedForProvider = cached.filter(
+              (record) =>
+                record.event.source.provider ===
+                providerDefinition.sourceProvider,
+            );
+            if (cachedForProvider.length > 0) {
               const cachedInJapan = filterEventsInJapanRegion(
-                cached.map((record) => record.event),
+                cachedForProvider.map((record) => record.event),
               );
               cacheContainsOutsideJapan =
-                cachedInJapan.length !== cached.length;
+                cachedInJapan.length !== cachedForProvider.length;
               cachedEvents = cachedInJapan;
               cachedAt =
-                cached[0]?.cachedAt ??
-                cached[0]?.event.source.retrievedAt ??
+                cachedForProvider[0]?.cachedAt ??
+                cachedForProvider[0]?.event.source.retrievedAt ??
                 null;
             }
 
             providerState =
-              (await getProviderState(db, usgsProvider.id)) ?? null;
+              (await getProviderState(db, providerDefinition.provider.id)) ??
+              null;
             if (cachedAt === null && providerState?.lastSuccessAt) {
               cachedAt = providerState.lastSuccessAt;
             }
@@ -185,6 +213,8 @@ export function useCatalog(): CatalogState & { refresh: () => void } {
             error: null,
             cacheWarning,
             providerState,
+            providerId,
+            providerLabel: providerDefinition.label,
             warnings: [],
             notModified: false,
           }));
@@ -209,6 +239,8 @@ export function useCatalog(): CatalogState & { refresh: () => void } {
             error: null,
             cacheWarning,
             providerState: null,
+            providerId,
+            providerLabel: providerDefinition.label,
             warnings: result.warnings,
             notModified: false,
           }));
@@ -227,7 +259,7 @@ export function useCatalog(): CatalogState & { refresh: () => void } {
             : null;
 
         try {
-          const result = await usgsProvider.fetch(undefined, {
+          const result = await providerDefinition.provider.fetch(undefined, {
             signal: controller.signal,
             now,
             cache: cacheState,
@@ -241,13 +273,13 @@ export function useCatalog(): CatalogState & { refresh: () => void } {
             const lastSuccessAt =
               providerState?.lastSuccessAt ?? now.toISOString();
             const nextProviderState: ProviderStateRecord = {
-              providerId: usgsProvider.id,
+              providerId: providerDefinition.provider.id,
               status: 'success',
               lastAttemptAt: now.toISOString(),
               lastSuccessAt,
               lastError: null,
               nextPollAt: new Date(
-                now.getTime() + USGS_POLL_INTERVAL_MS,
+                now.getTime() + providerDefinition.pollIntervalMs,
               ).toISOString(),
               etag: providerState?.etag ?? result.cache?.etag ?? null,
               lastModified:
@@ -292,26 +324,26 @@ export function useCatalog(): CatalogState & { refresh: () => void } {
             try {
               await replaceEarthquakesForProvider(
                 db,
-                USGS_SOURCE_PROVIDER,
+                providerDefinition.sourceProvider,
                 sortedEvents,
                 result.retrievedAt,
               );
               await setMeta(db, META_LAST_CATALOG_SYNC, result.retrievedAt);
             } catch (error) {
-              cacheWarning = `USGS のキャッシュ保存に失敗しました: ${toErrorMessage(
+              cacheWarning = `${providerDefinition.label} のキャッシュ保存に失敗しました: ${toErrorMessage(
                 error,
               )}`;
             }
           }
 
           const nextProviderState: ProviderStateRecord = {
-            providerId: usgsProvider.id,
+            providerId: providerDefinition.provider.id,
             status: 'success',
             lastAttemptAt: now.toISOString(),
             lastSuccessAt: result.retrievedAt,
             lastError: null,
             nextPollAt: new Date(
-              now.getTime() + USGS_POLL_INTERVAL_MS,
+              now.getTime() + providerDefinition.pollIntervalMs,
             ).toISOString(),
             etag: result.cache?.etag ?? null,
             lastModified: result.cache?.lastModified ?? null,
@@ -348,13 +380,13 @@ export function useCatalog(): CatalogState & { refresh: () => void } {
 
           const message = toErrorMessage(error);
           const nextProviderState: ProviderStateRecord = {
-            providerId: usgsProvider.id,
+            providerId: providerDefinition.provider.id,
             status: 'error',
             lastAttemptAt: now.toISOString(),
             lastSuccessAt: providerState?.lastSuccessAt ?? null,
             lastError: message,
             nextPollAt: new Date(
-              now.getTime() + USGS_POLL_INTERVAL_MS,
+              now.getTime() + providerDefinition.pollIntervalMs,
             ).toISOString(),
             etag: providerState?.etag ?? null,
             lastModified: providerState?.lastModified ?? null,
@@ -423,19 +455,19 @@ export function useCatalog(): CatalogState & { refresh: () => void } {
         db = null;
       }
     };
-  }, [reloadToken]);
+  }, [reloadToken, providerId, providerDefinition]);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
       if (document.visibilityState === 'visible') {
         refresh();
       }
-    }, USGS_POLL_INTERVAL_MS);
+    }, providerDefinition.pollIntervalMs);
 
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [refresh]);
+  }, [providerDefinition.pollIntervalMs, refresh]);
 
   return { ...state, refresh };
 }

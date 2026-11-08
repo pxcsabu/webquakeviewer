@@ -40,9 +40,17 @@ const events = [
 ];
 
 describe('filterEarthquakes', () => {
-  it('keeps all events by default', () => {
+  it('defaults to the last 24 hours', () => {
+    expect(DEFAULT_EARTHQUAKE_FILTERS.timeRange).toBe('24h');
+  });
+
+  it('keeps all events when the time range is all', () => {
     expect(
-      filterEarthquakes(events, DEFAULT_EARTHQUAKE_FILTERS, now).map(
+      filterEarthquakes(
+        events,
+        { ...DEFAULT_EARTHQUAKE_FILTERS, timeRange: 'all' },
+        now,
+      ).map(
         (event) => event.id,
       ),
     ).toEqual(['recent-shallow', 'older-deep', 'old-missing']);

@@ -109,12 +109,13 @@ Calculations have documented methods, assumptions, units, and automated tests.
 
 **Goal: Integrate domestic earthquake information.**
 
-- [ ] Verify JMA endpoint browser accessibility
-- [ ] Verify JMA CORS behavior
-- [ ] Verify usage conditions
-- [ ] Implement permitted JMA earthquake information
-- [ ] Implement Japanese seismic intensity display
-- [ ] Implement intensity ordinal ranking
+- [x] Verify JMA endpoint browser accessibility
+- [x] Verify JMA CORS behavior
+- [x] Verify usage conditions
+- [x] Implement permitted JMA earthquake information
+- [x] Implement Japanese seismic intensity display
+- [x] Implement intensity ordinal ranking
+- [x] Implement JMA / USGS catalog source selector
 - [ ] Verify historical coordinate reference systems
 - [ ] Integrate permitted geological and hazard datasets
 

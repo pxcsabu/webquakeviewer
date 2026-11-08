@@ -68,6 +68,9 @@ export function EarthquakeList({
                 <span className="event-row-meta">
                   <span>
                     {event.source.provider}
+                    {event.intensity
+                      ? ` / 最大震度 ${event.intensity.display}`
+                      : ''}
                     {event.eventType && event.eventType !== 'earthquake'
                       ? ` / ${event.eventType}`
                       : ''}

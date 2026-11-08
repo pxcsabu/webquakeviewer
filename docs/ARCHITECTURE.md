@@ -288,7 +288,9 @@ The left mouse button is reserved and does not manipulate the camera.
 
 ### Tab isolation and WebGL lifecycle
 
-The 2D MapLibre map and the Three.js block are mounted in mutually exclusive tabs. They are not displayed simultaneously. Switching tabs unmounts the inactive renderer.
+The 2D MapLibre map and the Three.js block share the 地震分布図 panel. The 3D block is an optional, lazy-mounted section that becomes available when the Slab2 overlay is enabled. The 2D GSI map remains mounted. Turning off Slab2 or the 3D option unmounts the 3D renderer and disposes its GPU resources.
+
+Both WebGL contexts can coexist while the 3D option is enabled. This is an explicit user action, not a default. Monitor context creation and disposal; do not assume an unlimited number of WebGL contexts.
 
 Implement:
 

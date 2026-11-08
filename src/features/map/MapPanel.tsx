@@ -2,6 +2,8 @@ import {
   Component,
   Suspense,
   lazy,
+  useEffect,
+  useRef,
   useState,
   type ErrorInfo,
   type ReactNode,
@@ -24,6 +26,12 @@ import {
 const LazyEarthquakeMap = lazy(() =>
   import('./EarthquakeMap').then((module) => ({
     default: module.EarthquakeMap,
+  })),
+);
+
+const LazyCrust3DPanel = lazy(() =>
+  import('../crust3d/Crust3DPanel').then((module) => ({
+    default: module.Crust3DPanel,
   })),
 );
 
@@ -60,6 +68,32 @@ class MapErrorBoundary extends Component<
       return (
         <div className="map-overlay map-overlay-error">
           地図モジュールの読み込みに失敗しました。カタログ表示は引き続き利用できます。
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+class Crust3DErrorBoundary extends Component<
+  MapErrorBoundaryProps,
+  MapErrorBoundaryState
+> {
+  state: MapErrorBoundaryState = { hasError: false };
+
+  static getDerivedStateFromError(): MapErrorBoundaryState {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    console.error('3D module error', error, errorInfo);
+  }
+
+  render(): ReactNode {
+    if (this.state.hasError) {
+      return (
+        <div className="map-3d-loading map-3d-error">
+          3Dモジュールの読み込みに失敗しました。2D地図は引き続き利用できます。
         </div>
       );
     }
@@ -121,7 +155,18 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
   const [showPlateBoundaries, setShowPlateBoundaries] = useState(false);
   const [showSlab2, setShowSlab2] = useState(false);
   const [showHazard, setShowHazard] = useState(false);
+  const [show3d, setShow3d] = useState(false);
+  const map3dRef = useRef<HTMLDivElement>(null);
   const hasProfile = profileStart !== null && profileEnd !== null;
+
+  useEffect(() => {
+    if (show3d) {
+      map3dRef.current?.scrollIntoView({
+        block: 'start',
+        behavior: 'smooth',
+      });
+    }
+  }, [show3d]);
 
   const clearProfile = (): void => {
     setProfileMode(false);
@@ -214,9 +259,24 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
           <input
             type="checkbox"
             checked={showSlab2}
-            onChange={(event) => setShowSlab2(event.target.checked)}
+            onChange={(event) => {
+              const checked = event.target.checked;
+              setShowSlab2(checked);
+              if (!checked) {
+                setShow3d(false);
+              }
+            }}
           />
           Slab2 等深線
+        </label>
+        <label className={showSlab2 ? '' : 'map-layer-disabled'}>
+          <input
+            type="checkbox"
+            checked={show3d}
+            disabled={!showSlab2}
+            onChange={(event) => setShow3d(event.target.checked)}
+          />
+          3D地殻ブロック
         </label>
         <label>
           <input
@@ -230,7 +290,8 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
       {showSlab2 ? (
         <p className="map-layer-note">
           Slab2 等深線は USGS のモデル（Hayes et al., 2018）です。
-          深さに応じて色分けしています。
+          深さに応じて色分けしています。3D地殻ブロックを表示するには、
+          上の「3D地殻ブロック」を有効にしてください。2D地図は地理院タイルのままです。
         </p>
       ) : null}
       {showHazard ? (
@@ -266,6 +327,19 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
         </Suspense>
         <MapLegend basemap={basemap} />
       </div>
+      {show3d && showSlab2 ? (
+        <div className="map-3d-section" ref={map3dRef}>
+          <Suspense
+            fallback={
+              <div className="map-3d-loading">3D地殻ブロックを読み込み中…</div>
+            }
+          >
+            <Crust3DErrorBoundary>
+              <LazyCrust3DPanel events={events} />
+            </Crust3DErrorBoundary>
+          </Suspense>
+        </div>
+      ) : null}
       {hasProfile && profileStart !== null && profileEnd !== null ? (
         <CrossSectionPanel
           events={events}

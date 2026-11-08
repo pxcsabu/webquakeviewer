@@ -7,7 +7,7 @@ describe('crust3dMath', () => {
     const position = lonLatToPosition(33.5, 137.5);
     expect(position.x).toBeCloseTo(0, 10);
     expect(position.y).toBe(0);
-    expect(position.z).toBeCloseTo(0, 10);
+    expect(Math.abs(position.z)).toBeLessThan(CRUST3D_DEPTH / 4);
   });
 
   it('places north-west at negative Z and negative X', () => {

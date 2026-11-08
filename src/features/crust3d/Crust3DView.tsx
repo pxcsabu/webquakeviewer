@@ -8,7 +8,11 @@ import {
   extractPlateLines,
   extractSlabLines,
 } from './crust3dData';
-import { createLandCanvas } from './crust3dTexture';
+import {
+  CRUST3D_GSI_ATTRIBUTION,
+  createGsiCanvas,
+  createLandCanvas,
+} from './crust3dTexture';
 import {
   CRUST3D_BOTTOM_Y,
   CRUST3D_DEPTH,
@@ -490,27 +494,39 @@ export function Crust3DView({
 
     const loadOverlays = async (): Promise<void> => {
       const base = import.meta.env.BASE_URL;
-      const [landResult, plateResult, slabResult] = await Promise.allSettled([
-        fetchJson(`${base}geo/ne_110m_land.geojson`),
-        fetchJson(`${base}geo/PB2002_boundaries.json`),
-        fetchJson(`${base}geo/slab2_japan_depth_contours.geojson`),
-      ]);
+      const [gsiResult, landResult, plateResult, slabResult] =
+        await Promise.allSettled([
+          createGsiCanvas(),
+          fetchJson(`${base}geo/ne_110m_land.geojson`),
+          fetchJson(`${base}geo/PB2002_boundaries.json`),
+          fetchJson(`${base}geo/slab2_japan_depth_contours.geojson`),
+        ]);
       if (cancelled) {
         return;
       }
       const warnings: string[] = [];
-      if (landResult.status === 'fulfilled') {
-        const texture = new THREE.CanvasTexture(
-          createLandCanvas(landResult.value),
+      let textureCanvas: HTMLCanvasElement | null = null;
+      if (gsiResult.status === 'fulfilled') {
+        textureCanvas = gsiResult.value;
+      } else {
+        console.error('GSI tiles failed', gsiResult.reason);
+        warnings.push(
+          `地理院タイルを取得できなかったため、Natural Earth を表示しています。${CRUST3D_GSI_ATTRIBUTION}`,
         );
+        if (landResult.status === 'fulfilled') {
+          textureCanvas = createLandCanvas(landResult.value);
+        } else {
+          console.error('Natural Earth land texture failed', landResult.reason);
+          warnings.push('Natural Earth の陸地テクスチャも取得できませんでした。');
+        }
+      }
+      if (textureCanvas !== null) {
+        const texture = new THREE.CanvasTexture(textureCanvas);
         texture.colorSpace = THREE.SRGBColorSpace;
         texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
         topMaterial.map = texture;
         topMaterial.color.set('#ffffff');
         topMaterial.needsUpdate = true;
-      } else {
-        console.error('Natural Earth land texture failed', landResult.reason);
-        warnings.push('Natural Earth の陸地テクスチャを取得できませんでした。');
       }
       if (plateResult.status === 'fulfilled') {
         addPlateLines(plateGroup, plateResult.value);

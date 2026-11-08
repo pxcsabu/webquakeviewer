@@ -199,7 +199,7 @@ Do not assume a fixed browser WebGL context limit.
 
 The initial 3D camera orientation must be explicitly defined. The initial view centers the operational Japan region on the crust block.
 
-Right-drag orbits, middle-drag pans, and the wheel zooms. The 2D map and 3D block are mounted in mutually exclusive tabs so that only one WebGL view is active at a time.
+Right-drag orbits, middle-drag pans, and the wheel zooms. The 2D GSI map remains visible; the 3D block is an optional section in the 地震分布図 panel, enabled only when Slab2 is on. The 3D renderer is lazy-mounted and disposed when hidden.
 
 ## 7. Performance
 

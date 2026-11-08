@@ -378,9 +378,8 @@ EarthScope provides a non-spherical 3D crust block for the operational Japan reg
 ### 18.1 Geometry and projection
 
 - Horizontal extent: the operational region 20°N–47°N, 120°E–155°E.
-- Longitude and latitude are mapped with an equirectangular display projection.
-- The horizontal aspect ratio uses cos(mid-latitude) so that one degree of longitude is scaled relative to one degree of latitude near central Japan.
-- The top surface uses Natural Earth 1:110m land polygons as a texture. No political boundaries or labels are drawn on the 3D top surface.
+- Longitude and latitude are mapped with the same Web Mercator projection as the GSI tiles.
+- The top surface uses GSI pale tiles cropped to the operational region. If the tiles cannot be loaded, Natural Earth 1:110m land polygons are rendered in the same Web Mercator projection as a fallback. No political boundaries are drawn by EarthScope on the 3D top surface.
 - The block depth is 0–700 km. 700 km is displayed as 0.9 local units against a 4-unit width; this is a near-physical display scale, not a geodetic or geological model.
 - Depths greater than 700 km are clamped to the bottom for display. Events with unknown or negative depth are placed on the top surface and drawn with the missing-depth colour.
 
@@ -401,12 +400,12 @@ EarthScope provides a non-spherical 3D crust block for the operational Japan reg
 - Double-click: reset the view.
 - Touch: one-finger orbit; two-finger pan/zoom.
 
-The MapLibre 2D map and the Three.js 3D block are mounted in mutually exclusive tabs. Switching tabs disposes the inactive renderer and its GPU resources.
+The 3D block is an optional section of the 地震分布図 panel. It becomes available when the Slab2 overlay is on; the 2D GSI map remains mounted. Turning off Slab2 or the 3D option disposes the 3D renderer and its GPU resources. Both WebGL contexts may coexist while the 3D option is explicitly enabled.
 
 ### 18.4 Limitations
 
 - The vertical scale is a display scale, not a measured depth profile.
-- The Natural Earth texture is a coarse 1:110m display background; it is not a topographic or bathymetric surface.
+- The GSI pale tiles are a display basemap; Natural Earth 1:110m is only a fallback. Neither is a topographic or bathymetric surface.
 - The block is not a geological structure, a plate interface, or a seismic velocity model.
 - The view must not be used for distance, depth, hazard, or engineering calculations.
 

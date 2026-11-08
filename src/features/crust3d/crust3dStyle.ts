@@ -17,17 +17,26 @@ export const CRUST3D_WIDTH = 4;
 export const CRUST3D_MAX_DEPTH_KM = 700;
 export const CRUST3D_HEIGHT = 0.9;
 
-const MID_LATITUDE_RAD =
-  ((JAPAN_REGION_BOUNDS.minLatitude + JAPAN_REGION_BOUNDS.maxLatitude) / 2) *
-  (Math.PI / 180);
 const LONGITUDE_SPAN =
   JAPAN_REGION_BOUNDS.maxLongitude - JAPAN_REGION_BOUNDS.minLongitude;
-const LATITUDE_SPAN =
-  JAPAN_REGION_BOUNDS.maxLatitude - JAPAN_REGION_BOUNDS.minLatitude;
 
+function mercatorY(latitude: number): number {
+  const clamped = Math.max(
+    -85.05112878,
+    Math.min(85.05112878, latitude),
+  );
+  const radians = clamped * (Math.PI / 180);
+  return Math.log(Math.tan(Math.PI / 4 + radians / 2));
+}
+
+const MERCATOR_MIN_Y = mercatorY(JAPAN_REGION_BOUNDS.minLatitude);
+const MERCATOR_MAX_Y = mercatorY(JAPAN_REGION_BOUNDS.maxLatitude);
+const MERCATOR_SPAN = MERCATOR_MAX_Y - MERCATOR_MIN_Y;
+
+// The top surface uses the same Web Mercator projection as the GSI tiles.
 export const CRUST3D_DEPTH =
-  (CRUST3D_WIDTH * LATITUDE_SPAN) /
-  (LONGITUDE_SPAN * Math.cos(MID_LATITUDE_RAD));
+  (CRUST3D_WIDTH * MERCATOR_SPAN) /
+  (LONGITUDE_SPAN * (Math.PI / 180));
 
 export const CRUST3D_TOP_Y = 0;
 export const CRUST3D_BOTTOM_Y = -CRUST3D_HEIGHT;
@@ -68,8 +77,7 @@ export function lonToX(longitude: number): number {
  * the natural view direction for a map on the horizontal plane.
  */
 export function latToZ(latitude: number): number {
-  const ratio =
-    (JAPAN_REGION_BOUNDS.maxLatitude - latitude) / LATITUDE_SPAN;
+  const ratio = (MERCATOR_MAX_Y - mercatorY(latitude)) / MERCATOR_SPAN;
   return (ratio - 0.5) * CRUST3D_DEPTH;
 }
 

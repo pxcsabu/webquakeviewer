@@ -74,13 +74,13 @@ A user can browse, filter, and inspect real earthquake events from a permitted p
 - [x] Add navigation and scale controls
 - [x] Add a GSI standard/pale basemap selector with attribution
 - [x] Retain Natural Earth as an offline basemap fallback
-- [x] Add 地震分布図 / 強震モニタ tabs (later expanded with 3D地殻 and 波形解析)
+- [x] Add 地震分布図 / 強震モニタ tabs (later expanded with 波形解析; 3D is an in-map option)
 - [x] Add a strong-motion tab with official-link fallback; embedding/relay/extraction is prohibited by NIED terms
 - [x] Handle WebGL lifecycle, including `map.remove()`
 - [x] Test map resize and responsive layout
 - [x] Implement map layer visibility controls
 - [ ] Test WebGL context loss and restoration
-- [x] Keep MapLibre and Three.js in mutually exclusive tabs
+- [x] Keep the 3D view lazy-mounted and dispose it when hidden
 - [x] Verify map rendering on GitHub Pages
 
 Basemap candidates must be evaluated against the static-first and no-embedded-API-key requirements. A static vector basemap or an explicitly permitted tile service may be used. Provider terms must be documented before implementation.
@@ -140,7 +140,7 @@ Historical CRS note: the current JMA list JSON does not state a CRS, so EarthSco
 
 **Goal: Add an interactive, Japan-limited 3D geophysical view without returning to a global Earth globe.**
 
-**Status: PARTIAL — implemented and locally verified.** The global 3D Earth/globe remains out of scope. The implemented view is a non-spherical crust block covering the operational Japan region, with hypocenters, PB2002 boundaries, and Slab2 depth contours.
+**Status: PARTIAL — implemented inside the 地震分布図 panel and locally verified.** The global 3D Earth/globe remains out of scope. The 3D view is enabled only when the Slab2 overlay is on; the 2D GSI map remains mounted. The implemented view is a non-spherical crust block covering the operational Japan region, with hypocenters, PB2002 boundaries, and Slab2 depth contours.
 
 - [x] Initialize a Three.js Japan-limited crust block (not a globe)
 - [x] Define deterministic camera position, target, and up vector
@@ -149,8 +149,9 @@ Historical CRS note: the current JMA list JSON does not state a CRS, so EarthSco
 - [x] Implement depth visualization (display scale and depth colors)
 - [x] Add right-drag orbit, middle-drag pan, wheel zoom, and double-click reset
 - [x] Add PB2002 and Slab2 context in 3D
+- [x] Use GSI pale tiles on the 3D top surface with a Natural Earth fallback
+- [x] Embed the 3D block in the map panel behind a Slab2-gated option
 - [x] Implement 3D WebGL lifecycle management and resource disposal
-- [x] Keep MapLibre and Three.js in mutually exclusive tabs
 - [ ] Implement cross-section visualization in 3D
 - [ ] Add a 3D Slab2 surface (only depth-contour lines are shown)
 - [ ] Verify the 3D block on GitHub Pages

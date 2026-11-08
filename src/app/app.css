@@ -749,6 +749,38 @@ button:disabled {
   color: var(--error);
 }
 
+.map-layer-disabled {
+  opacity: 0.55;
+}
+
+.map-3d-section {
+  flex: 0 0 auto;
+  height: 680px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.map-3d-section .crust3d-panel {
+  height: 100%;
+}
+
+.map-3d-loading {
+  display: flex;
+  height: 100%;
+  min-height: 420px;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.map-3d-error {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
 .map-basemap-warning {
   position: absolute;
   top: 12px;
@@ -829,6 +861,14 @@ button:disabled {
     min-height: 420px;
   }
 
+  .map-3d-section {
+    height: 640px;
+  }
+
+  .map-3d-section .crust3d-frame {
+    min-height: 420px;
+  }
+
   .map-legend {
     width: 180px;
     font-size: 0.68rem;
@@ -836,21 +876,6 @@ button:disabled {
 }
 
 
-
-.app-main.app-main-crust3d {
-  overflow: hidden;
-  background: var(--surface);
-}
-
-.crust3d-loading {
-  display: flex;
-  height: 100%;
-  min-height: 420px;
-  align-items: center;
-  justify-content: center;
-  color: var(--muted);
-  font-size: 0.85rem;
-}
 
 .crust3d-panel {
   display: flex;
@@ -1023,6 +1048,10 @@ button:disabled {
 
 .crust3d-panel > .crust3d-note:last-child {
   margin-bottom: 12px;
+}
+
+.crust3d-note a {
+  color: var(--accent);
 }
 
 @media (max-width: 760px) {

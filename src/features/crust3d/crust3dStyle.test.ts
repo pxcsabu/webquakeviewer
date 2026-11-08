@@ -21,7 +21,7 @@ describe('crust3dStyle', () => {
   it('maps north to negative Z and south to positive Z', () => {
     expect(latToZ(47)).toBeCloseTo(-CRUST3D_DEPTH / 2, 10);
     expect(latToZ(20)).toBeCloseTo(CRUST3D_DEPTH / 2, 10);
-    expect(latToZ(33.5)).toBeCloseTo(0, 10);
+    expect(Math.abs(latToZ(33.5))).toBeLessThan(CRUST3D_DEPTH / 4);
   });
 
   it('maps depth to the bottom of the block', () => {

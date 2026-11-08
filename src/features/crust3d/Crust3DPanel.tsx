@@ -92,11 +92,17 @@ export function Crust3DPanel({ events }: Crust3DPanelProps) {
         対象: 日本周辺（{JAPAN_REGION_BOUNDS.minLatitude}–
         {JAPAN_REGION_BOUNDS.maxLatitude}°N,{' '}
         {JAPAN_REGION_BOUNDS.minLongitude}–{JAPAN_REGION_BOUNDS.maxLongitude}
-        °E）。深さは 0–700 km を表示しています。水平方向は経緯度を正距円筒で
-        マッピングした表示用ブロックで、厳密な地質構造・速度構造ではありません。
+        °E）。深さは 0–700 km を表示しています。水平方向は地理院タイルと同じ
+        Web メルカトル投影でマッピングした表示用ブロックで、厳密な地質構造・
+        速度構造ではありません。
         地球全体の3D球体は提供していません。
       </p>
       <p className="crust3d-note">
+        3D上面は地理院 淡色タイル（
+        <a href="https://maps.gsi.go.jp/development/ichiran.html"
+          target="_blank" rel="noreferrer">国土地理院</a>
+        ）です。2D地図と同じ地理院タイルを使い、取得できない場合のみ
+        Natural Earth にフォールバックします。
         PB2002（Bird 2003; Nordpil, ODC-By 1.0）と Slab2（Hayes et al.,
         2018）はモデル由来の境界・等深線です。地震はカタログの震源情報を
         そのまま深さ方向に配置しています。深さ不明の地震は灰色で上面に表示します。

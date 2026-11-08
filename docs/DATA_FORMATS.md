@@ -274,8 +274,8 @@ Maintain compatibility or provide explicit migration logic where necessary.
 
 ### 14.2 J-SHIS WMS image
 
-- Format: PNG image returned by WMS `GetMap`
-- Source CRS: EPSG:4612
-- Extent: 30°N–46°N, 128°E–150°E
-- Displayed as a geographic image overlay with attribution
+- Format: PNG raster tiles returned by WMS `GetMap`
+- Source CRS: EPSG:3857
+- Tile template uses `{bbox-epsg-3857}`
+- Displayed as a raster overlay with attribution
 - Not a raw-data redistribution and not a real-time observation

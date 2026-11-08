@@ -184,7 +184,7 @@ export const SOURCE_REGISTRY: readonly SourceRegistryEntry[] = [
     dataLicense:
       'J-SHIS利用規約（出典明記、地震動予測地図データの無断複製・再配布禁止）',
     attribution: 'J-SHIS 地震ハザードステーション（防災科研）',
-    accessMethod: 'HTTPS WMS GetMap image (EPSG:4612, CORS enabled)',
+    accessMethod: 'HTTPS WMS raster tiles (EPSG:3857, CORS enabled)',
     requiresAuthentication: false,
     corsVerified: true,
     redistributionAllowed: false,

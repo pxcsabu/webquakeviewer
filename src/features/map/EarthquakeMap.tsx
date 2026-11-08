@@ -16,8 +16,8 @@ import {
   GSI_ATTRIBUTION,
   GSI_TILE_URLS,
   JAPAN_REGION_POLYGON,
-  JSHIS_HAZARD_COORDINATES,
-  JSHIS_HAZARD_IMAGE_URL,
+  JSHIS_ATTRIBUTION,
+  JSHIS_HAZARD_TILE_URL,
   MAP_BOUNDARY_COLOR,
   MAP_LAND_COLOR,
   MAP_REGION_COLOR,
@@ -266,9 +266,10 @@ export function EarthquakeMap({
           });
 
           map.addSource('jshis-hazard', {
-            type: 'image',
-            url: JSHIS_HAZARD_IMAGE_URL,
-            coordinates: JSHIS_HAZARD_COORDINATES,
+            type: 'raster',
+            tiles: [JSHIS_HAZARD_TILE_URL],
+            tileSize: 256,
+            attribution: JSHIS_ATTRIBUTION,
           });
           map.addLayer({
             id: 'jshis-hazard-raster',

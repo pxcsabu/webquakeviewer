@@ -217,8 +217,8 @@ Implemented overlay:
 
 - WMS service: `https://www.j-shis.bosai.go.jp/map/wms/pshm/Y2020`
 - Layer: `P-Y2020-MAP-AVR-TTL_MTTL-T30_I55_PS`
-- Image extent: 30°N–46°N, 128°E–150°E
-- CRS: EPSG:4612
+- Raster tiles: WMS GetMap with `{bbox-epsg-3857}`
+- CRS: EPSG:3857
 - CORS: `Access-Control-Allow-Origin: *` verified
 - The image is displayed as a derived overlay with attribution.
 - The WMS overlay was verified on GitHub Pages on 2026-11-08.
@@ -229,7 +229,7 @@ Limitations:
 - This is a probabilistic hazard evaluation, not current shaking or an earthquake prediction.
 - The 2020 map is a model-derived product with uncertainty.
 - It is not suitable for site-specific engineering decisions without consulting J-SHIS and the underlying models.
-- The WMS image is a fixed geographic image overlay; it is not a real-time layer.
+- The WMS layer is not a real-time layer.
 
 Official resources:
 

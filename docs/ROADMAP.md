@@ -156,7 +156,7 @@ Historical CRS note: the current JMA list JSON does not state a CRS, so EarthSco
 
 Completion criteria:
 
-The 3D view works without degrading the core map and event catalog.
+Not applicable while Phase 5 is deferred. The 2D map remains the primary geographic visualization.
 
 ## Phase 6 — Waveform Analysis
 

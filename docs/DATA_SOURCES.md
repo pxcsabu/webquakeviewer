@@ -221,6 +221,7 @@ Implemented overlay:
 - CRS: EPSG:4612
 - CORS: `Access-Control-Allow-Origin: *` verified
 - The image is displayed as a derived overlay with attribution.
+- The WMS overlay was verified on GitHub Pages on 2026-11-08.
 - The J-SHIS terms permit editing, processing, and distribution of derived results with attribution, but prohibit copying and redistributing the seismic-hazard data as-is. EarthScope does not redistribute raw J-SHIS data.
 
 Limitations:
@@ -385,3 +386,4 @@ K-NET/KiK-net waveform and strong-motion data remain registration-restricted.
 - Bundled as `public/geo/PB2002_boundaries.json`.
 - This is a model-derived plate-boundary dataset, not a legal or administrative boundary.
 - It is displayed as an optional map overlay and is not used for distance or hazard calculations.
+- The bundled overlay was verified on GitHub Pages on 2026-11-08.

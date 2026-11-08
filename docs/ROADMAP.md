@@ -128,6 +128,7 @@ Calculations have documented methods, assumptions, units, and automated tests.
 - [x] Verify JMA integration on GitHub Pages
 - [x] Verify historical coordinate reference systems (current JMA list has no CRS; stored UNKNOWN; no historical dataset integrated)
 - [x] Integrate permitted geological and hazard datasets (PB2002 boundaries and J-SHIS WMS hazard overlay)
+- [x] Verify Phase 4 overlays on GitHub Pages
 
 This phase is conditional on endpoint availability and data usage conditions.
 

@@ -7,6 +7,7 @@ import {
 } from '../../data/providers/usgs/usgsProvider';
 import type { ProviderCacheState } from '../../data/providers/types';
 import { sortEarthquakesByTime } from '../../domain/earthquake/sort';
+import { filterEventsInJapanRegion } from '../../domain/geography/japanRegion';
 import type { Earthquake } from '../../domain/earthquake/types';
 import {
   getCachedEarthquakes,
@@ -119,6 +120,7 @@ export function useCatalog(): CatalogState & { refresh: () => void } {
       let cachedEvents: Earthquake[] = [];
       let cachedAt: string | null = null;
       let providerState: ProviderStateRecord | null = null;
+      let cacheContainsOutsideJapan = false;
 
       try {
         try {
@@ -145,7 +147,12 @@ export function useCatalog(): CatalogState & { refresh: () => void } {
           try {
             const cached = await getCachedEarthquakes(db);
             if (cached.length > 0) {
-              cachedEvents = cached.map((record) => record.event);
+              const cachedInJapan = filterEventsInJapanRegion(
+                cached.map((record) => record.event),
+              );
+              cacheContainsOutsideJapan =
+                cachedInJapan.length !== cached.length;
+              cachedEvents = cachedInJapan;
               cachedAt =
                 cached[0]?.cachedAt ??
                 cached[0]?.event.source.retrievedAt ??
@@ -194,7 +201,9 @@ export function useCatalog(): CatalogState & { refresh: () => void } {
           }
           update(() => ({
             status: 'success',
-            events: sortEarthquakesByTime(result.records),
+            events: filterEventsInJapanRegion(
+              sortEarthquakesByTime(result.records),
+            ),
             source: 'sample',
             lastUpdated: result.retrievedAt,
             error: null,
@@ -208,7 +217,9 @@ export function useCatalog(): CatalogState & { refresh: () => void } {
 
         const now = new Date();
         const cacheState: ProviderCacheState | null =
-          cachedEvents.length > 0 && providerState
+          cachedEvents.length > 0 &&
+          providerState &&
+          !cacheContainsOutsideJapan
             ? {
                 etag: providerState.etag,
                 lastModified: providerState.lastModified,
@@ -273,7 +284,9 @@ export function useCatalog(): CatalogState & { refresh: () => void } {
             return;
           }
 
-          const sortedEvents = sortEarthquakesByTime(result.records);
+          const sortedEvents = filterEventsInJapanRegion(
+            sortEarthquakesByTime(result.records),
+          );
 
           if (db !== null) {
             try {

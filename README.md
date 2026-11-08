@@ -10,7 +10,7 @@ The project is designed to be hosted on GitHub Pages without requiring a dedicat
 
 ### Core
 
-- USGS GeoJSON global earthquake catalog
+- USGS GeoJSON earthquake catalog restricted to the provisional Japan region
 - Earthquake event list and detail panel
 - Time, magnitude, and depth filtering
 - IndexedDB catalog cache
@@ -51,7 +51,7 @@ Technology choices may be adjusted when a demonstrable technical reason exists.
 
 ## Data Sources
 
-USGS is currently integrated as the Phase 1 global catalog and is marked `READY`. Browser access, CORS, and 304 conditional requests have been verified. USGS is a U.S. federal agency and its works are generally public domain; attribution to the U.S. Geological Survey is retained.
+USGS is currently integrated as the Phase 1 Japan-region catalog and is marked `READY`. Browser access, CORS, and 304 conditional requests have been verified. USGS is a U.S. federal agency and its works are generally public domain; attribution to the U.S. Geological Survey is retained.
 
 Potential future sources include:
 
@@ -66,6 +66,10 @@ Data access is subject to each provider's technical and legal conditions.
 Some datasets require registration or authentication. Some prohibit redistribution. EarthScope must not bypass these restrictions.
 
 See [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md).
+
+### Japan region filter
+
+The Phase 1 catalog is restricted to the provisional rectangle 20°N–47°N, 120°E–155°E. This is an operational seismicity region that includes surrounding seas, not a political boundary. The USGS `all_day` feed is global and may be subject to provider limits, so the filtered subset is not guaranteed to be a complete regional catalog.
 
 ## Architecture
 

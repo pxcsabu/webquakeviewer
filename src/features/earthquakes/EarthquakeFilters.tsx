@@ -1,3 +1,4 @@
+import { JAPAN_REGION_BOUNDS } from '../../domain/geography/japanRegion';
 import {
   DEFAULT_EARTHQUAKE_FILTERS,
   TIME_RANGE_LABELS,
@@ -54,6 +55,13 @@ export function EarthquakeFilters({
           {visibleCount} / {totalCount} 件
         </span>
       </div>
+
+      <p className="filter-region-note">
+        対象範囲: 日本周辺（{JAPAN_REGION_BOUNDS.minLatitude}–
+        {JAPAN_REGION_BOUNDS.maxLatitude}°N,{' '}
+        {JAPAN_REGION_BOUNDS.minLongitude}–{JAPAN_REGION_BOUNDS.maxLongitude}
+        °E）のみ
+      </p>
 
       <div className="filter-grid">
         <label className="filter-field">

@@ -19,8 +19,8 @@ export function SourceStatusPanel({
         <span>Phase 1</span>
       </div>
       <p className="muted source-intro">
-        検証状態と取得状態を表示します。UNVERIFIED / CONDITIONAL
-        のソースは、検証完了まで実データとして扱いません。
+        USGS all_day フィードから日本周辺の矩形範囲を抽出して表示します。
+        検証状態と取得状態を表示します。
       </p>
 
       {providerState !== null ? (

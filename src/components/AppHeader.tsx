@@ -16,7 +16,7 @@ export function AppHeader({
       <div>
         <p className="eyebrow">EarthScope / Foundation</p>
         <h1>EarthScope</h1>
-        <p className="subtitle">地震観測・震源分布の基盤</p>
+        <p className="subtitle">日本周辺の地震観測・震源分布の基盤</p>
       </div>
       <div className="header-actions">
         {source === 'sample' ? (

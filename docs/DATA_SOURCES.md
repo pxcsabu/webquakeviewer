@@ -32,6 +32,8 @@ Verification notes (2026-11-08):
 - A browser run displayed 197 events and stored them in IndexedDB.
 - `Last-Modified` and `304 Not Modified` conditional requests were verified in the browser.
 - The feed did not return an `ETag` in the observed response; `Last-Modified` is therefore the primary validator.
+- Catalog display and cache are restricted to the provisional Japan region 20°N–47°N, 120°E–155°E. This is a seismicity rectangle, not a legal boundary.
+- The `all_day` feed is global and may be subject to provider limits. The filtered subset is not guaranteed to be a complete regional catalog.
 - USGS is a U.S. federal agency. Its works are generally public domain (U.S. Government Work). Attribution to the U.S. Geological Survey is retained.
 - The license page returned HTTP 403 to automated access. The public-domain determination was confirmed separately; do not treat the 403 as a redistribution prohibition.
 

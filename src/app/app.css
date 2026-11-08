@@ -179,6 +179,16 @@ button:disabled {
   margin: 0;
 }
 
+.filter-region-note {
+  margin: 0 0 10px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--muted);
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
+
 .filter-grid {
   display: flex;
   flex-direction: column;

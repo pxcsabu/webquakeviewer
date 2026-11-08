@@ -55,10 +55,11 @@ The application builds, deploys, and can display validated data without dependin
 - [x] Implement conditional HTTP requests using Last-Modified / 304
 - [x] Display acquisition warnings, including negative or missing depth
 - [x] Preserve event type and provider place text
+- [x] Restrict catalog display and cache to the documented Japan region
 
 Completion criteria:
 
-A user can browse, filter, and inspect real earthquake events from a permitted public source, with local caching, source status, and no backend dependency. Geographic rendering is explicitly out of scope for this phase.
+A user can browse, filter, and inspect real earthquake events from a permitted public source within the documented Japan region, with local caching, source status, and no backend dependency. Geographic rendering is explicitly out of scope for this phase.
 
 ## Phase 2 — Geographic Visualization and Monitoring
 

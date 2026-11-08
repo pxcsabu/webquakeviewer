@@ -274,3 +274,15 @@ Avoid false precision.
 The number of displayed decimal places must reflect the source resolution and calculation accuracy.
 
 A visualization must not imply a degree of certainty greater than the underlying data supports.
+## 13. Japan Region Filter
+
+The Phase 1 catalog restricts events to a provisional operational rectangle:
+
+- Latitude: 20°N to 47°N
+- Longitude: 120°E to 155°E
+
+This rectangle is a seismicity region that includes the Japanese archipelago and surrounding seas. It is **not** a legal, administrative, or territorial boundary. It may include events near neighboring countries.
+
+The USGS `all_day` summary feed is global and may be subject to provider limits. The filtered subset is therefore not guaranteed to be a complete catalog of all earthquakes in the region. Future work may replace this rectangle with a documented polygon or a regional FDSN query, but such a change must be recorded here and in the data-source documentation.
+
+Filtering must never silently alter source coordinates, magnitudes, depths, or provenance. It only selects records for display and caching.

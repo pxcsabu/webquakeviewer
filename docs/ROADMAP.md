@@ -140,7 +140,7 @@ Historical CRS note: the current JMA list JSON does not state a CRS, so EarthSco
 
 **Goal: Add an interactive, Japan-limited 3D geophysical view without returning to a global Earth globe.**
 
-**Status: PARTIAL — implemented inside the 地震分布図 panel and locally verified.** The global 3D Earth/globe remains out of scope. The 3D view is enabled only when the Slab2 overlay is on; the 2D GSI map remains mounted. The implemented view is a non-spherical crust block covering the operational Japan region, with hypocenters, PB2002 boundaries, and Slab2 depth contours.
+**Status: PARTIAL — implemented inside the 地震分布図 panel and verified on GitHub Pages (2026-11-08).** The global 3D Earth/globe remains out of scope. The 3D view is enabled only when the Slab2 overlay is on; the 2D GSI map remains mounted. The implemented view is a non-spherical crust block covering the operational Japan region, with hypocenters, PB2002 boundaries, and Slab2 depth contours.
 
 - [x] Initialize a Three.js Japan-limited crust block (not a globe)
 - [x] Define deterministic camera position, target, and up vector
@@ -154,7 +154,7 @@ Historical CRS note: the current JMA list JSON does not state a CRS, so EarthSco
 - [x] Implement 3D WebGL lifecycle management and resource disposal
 - [ ] Implement cross-section visualization in 3D
 - [ ] Add a 3D Slab2 surface (only depth-contour lines are shown)
-- [ ] Verify the 3D block on GitHub Pages
+- [x] Verify the 3D block on GitHub Pages
 
 Completion criteria:
 
@@ -164,7 +164,7 @@ The Japan-limited 3D block works without degrading the 2D map or event catalog. 
 
 **Goal: Support waveform visualization and basic processing.**
 
-**Status: PARTIAL — user-provided CSV/JSON files are implemented and tested.** MiniSEED, binary waveform storage, and NIED waveform feeds are not implemented.
+**Status: PARTIAL — user-provided CSV/JSON files are implemented, tested, and verified on GitHub Pages (2026-11-08).** MiniSEED, binary waveform storage, and NIED waveform feeds are not implemented.
 
 This phase depends on legally usable waveform data.
 
@@ -178,7 +178,7 @@ This phase depends on legally usable waveform data.
 - [x] Display sampling frequency and units
 - [x] Add station metadata
 - [ ] Add instrument-response correction
-- [ ] Verify waveform analysis on GitHub Pages
+- [x] Verify waveform analysis on GitHub Pages
 
 NIED waveform integration must follow the applicable access and redistribution conditions.
 

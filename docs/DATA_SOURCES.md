@@ -113,7 +113,7 @@ Conditions and limitations:
 Reference: [GSI tile list](https://maps.gsi.go.jp/development/ichiran.html),
 [GSI content terms](https://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html).
 
-The 3D crust block is available inside the 地震分布図 panel when Slab2 is enabled. Its top surface uses GSI pale tiles in Web Mercator with attribution; the 2D map remains on GSI tiles. If the tile requests fail, Natural Earth is used as a fallback.
+The 3D crust block is available inside the 地震分布図 panel when Slab2 is enabled. Its top surface uses GSI pale tiles in Web Mercator with attribution; the 2D map remains on GSI tiles. If the tile requests fail, Natural Earth is used as a fallback. The embedded 3D view and GSI tile top surface were verified on GitHub Pages on 2026-11-08.
 
 ## 6. Japan Meteorological Agency
 

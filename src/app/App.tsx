@@ -5,7 +5,7 @@ import { StatusBar } from '../components/StatusBar';
 import { EarthquakeDetail } from '../features/earthquakes/EarthquakeDetail';
 import { EarthquakeFilters } from '../features/earthquakes/EarthquakeFilters';
 import { EarthquakeList } from '../features/earthquakes/EarthquakeList';
-import { MapPlaceholder } from '../features/earthquakes/MapPlaceholder';
+import { MapPanel } from '../features/map/MapPanel';
 import {
   DEFAULT_EARTHQUAKE_FILTERS,
   filterEarthquakes,
@@ -68,18 +68,22 @@ export function App() {
             selectedId={selectedEvent?.id ?? null}
             onSelect={setSelectedId}
           />
-          <SourceStatusPanel
-            providerState={catalog.providerState}
-            warnings={catalog.warnings}
-          />
         </div>
 
         <div className="app-column app-column-center">
-          <MapPlaceholder />
+          <MapPanel
+            events={visibleEvents}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+          />
         </div>
 
         <div className="app-column app-column-right">
           <EarthquakeDetail event={selectedEvent} />
+          <SourceStatusPanel
+            providerState={catalog.providerState}
+            warnings={catalog.warnings}
+          />
         </div>
       </main>
 

@@ -16,10 +16,13 @@ The project is designed to be hosted on GitHub Pages without requiring a dedicat
 - IndexedDB catalog cache
 - Periodic catalog updates with conditional HTTP requests
 - Data source status, timestamps, and acquisition warnings
+- MapLibre GL JS hypocenter map
+- Static Natural Earth basemap (no API key or tile server)
+- List/map selection synchronization
+- Magnitude-sized and depth-colored event markers
 
 ### Planned
 
-- Interactive earthquake map
 - Seismic intensity information
 - Basic earthquake statistics
 - Hypocenter cross-sections
@@ -52,6 +55,8 @@ Technology choices may be adjusted when a demonstrable technical reason exists.
 ## Data Sources
 
 USGS is currently integrated as the Phase 1 Japan-region catalog and is marked `READY`. Browser access, CORS, and 304 conditional requests have been verified. USGS is a U.S. federal agency and its works are generally public domain; attribution to the U.S. Geological Survey is retained.
+
+The Phase 2 basemap uses bundled Natural Earth 1:110m land and boundary vectors. Natural Earth is public domain and requires no API key or tile server.
 
 Potential future sources include:
 

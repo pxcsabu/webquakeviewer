@@ -23,7 +23,7 @@ The data foundation and the rendering foundation are deliberately separated. Geo
 
 - [x] Initialize TypeScript, React, and Vite
 - [x] Configure GitHub Pages build and Actions deployment workflow
-- [ ] Verify GitHub Pages deployment on the live URL
+- [x] Verify GitHub Pages deployment on the live URL
 - [x] Establish application layout
 - [x] Establish data provider interface
 - [x] Establish normalized earthquake model
@@ -34,7 +34,7 @@ The data foundation and the rendering foundation are deliberately separated. Geo
 
 Completion criteria:
 
-The application builds, deploys, and can display validated data without depending on a backend. Live GitHub Pages verification remains pending until a remote repository is configured.
+The application builds, deploys, and displays validated data without depending on a backend. Live GitHub Pages deployment and browser verification have been completed.
 
 ## Phase 1 — Earthquake Data Foundation
 
@@ -65,16 +65,19 @@ A user can browse, filter, and inspect real earthquake events from a permitted p
 
 **Goal: Add geographic visualization without destabilizing the data foundation.**
 
-- [ ] Select and verify a no-API-key basemap source
-- [ ] Document basemap license, attribution, CORS, and tile usage policy
-- [ ] Introduce MapLibre GL JS with lazy initialization
-- [ ] Display earthquake hypocenters on the map
-- [ ] Display magnitude and depth with documented visual scales
-- [ ] Synchronize event-list selection with map selection
+- [x] Select and verify a no-API-key basemap source
+- [x] Document basemap license, attribution, CORS, and tile usage policy
+- [x] Introduce MapLibre GL JS with lazy initialization
+- [x] Display earthquake hypocenters on the map
+- [x] Display magnitude and depth with documented visual scales
+- [x] Synchronize event-list selection with map selection
+- [x] Add navigation and scale controls
+- [x] Handle WebGL lifecycle, including `map.remove()`
+- [x] Test map resize and responsive layout
 - [ ] Implement map layer visibility controls
-- [ ] Handle WebGL lifecycle, including `map.remove()`
-- [ ] Test resize, WebGL context loss, and restoration
+- [ ] Test WebGL context loss and restoration
 - [ ] Test coexistence with the future 3D module
+- [ ] Verify map rendering on GitHub Pages
 
 Basemap candidates must be evaluated against the static-first and no-embedded-API-key requirements. A static vector basemap or an explicitly permitted tile service may be used. Provider terms must be documented before implementation.
 

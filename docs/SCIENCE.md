@@ -286,3 +286,13 @@ This rectangle is a seismicity region that includes the Japanese archipelago and
 The USGS `all_day` summary feed is global and may be subject to provider limits. The filtered subset is therefore not guaranteed to be a complete catalog of all earthquakes in the region. Future work may replace this rectangle with a documented polygon or a regional FDSN query, but such a change must be recorded here and in the data-source documentation.
 
 Filtering must never silently alter source coordinates, magnitudes, depths, or provenance. It only selects records for display and caching.
+
+
+## 14. Basemap and Visualization Context
+
+The Phase 2 basemap uses Natural Earth 1:110m land and country-boundary vectors bundled as static public-domain assets. It provides geographic context only.
+
+- Do not use the basemap for distance, area, boundary, or legal determinations.
+- The basemap does not define the Japan region filter. The filter rectangle is defined separately in section 13.
+- Earthquake marker size encodes magnitude and marker color encodes depth class. The map legend documents the classes.
+- A visualization must not imply greater positional or boundary accuracy than the underlying basemap supports.

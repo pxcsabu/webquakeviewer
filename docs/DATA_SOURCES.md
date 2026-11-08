@@ -62,7 +62,29 @@ Implementation requirements:
 
 The feed is suitable for near-current catalog display, not guaranteed real-time seismic streaming.
 
-## 4. Japan Meteorological Agency
+## 4. Natural Earth Basemap
+
+**Status: READY**
+
+Natural Earth 1:110m land and country-boundary vectors are bundled as static
+GeoJSON assets for the MapLibre basemap.
+
+Bundled files:
+
+- `public/geo/ne_110m_land.geojson`
+- `public/geo/ne_110m_admin_0_boundary_lines_land.geojson`
+
+Conditions and limitations:
+
+- Natural Earth data is public domain.
+- Attribution: Natural Earth.
+- No tile server, API key, or cross-origin tile request is required.
+- The basemap provides geographic context only. It is not used for distance,
+  area, boundary, or legal determinations.
+- The 1:110m scale is intentionally coarse. It must not be presented as a
+  high-resolution coastline or administrative boundary.
+
+## 5. Japan Meteorological Agency
 
 **Status: CONDITIONAL**
 
@@ -99,7 +121,7 @@ Do not claim that an endpoint supports CORS without testing it.
 
 Do not claim that all JMA information is real-time.
 
-## 5. NIED Hi-net
+## 6. NIED Hi-net
 
 **Status: RESTRICTED / CONDITIONAL**
 
@@ -124,7 +146,7 @@ Do not assume that Hi-net waveforms are available through an unrestricted public
 
 Do not redistribute downloaded waveforms without explicit permission.
 
-## 6. NIED K-NET / KiK-net
+## 7. NIED K-NET / KiK-net
 
 **Status: RESTRICTED / CONDITIONAL**
 
@@ -150,7 +172,7 @@ Potential formats include ASCII, binary, and CSV depending on the dataset.
 
 A future EarthScope waveform module may support user-provided files obtained under valid access conditions.
 
-## 7. J-SHIS
+## 8. J-SHIS
 
 **Status: CONDITIONAL**
 
@@ -175,7 +197,7 @@ Before integration, verify:
 - Redistribution permission
 - Browser accessibility
 
-## 8. Geological Survey of Japan
+## 9. Geological Survey of Japan
 
 **Status: CONDITIONAL**
 
@@ -192,7 +214,7 @@ Official resource:
 
 Check dataset-specific licensing, attribution, scale, coordinate system, and update history.
 
-## 9. Published Geophysical Models
+## 10. Published Geophysical Models
 
 Potential sources include published:
 
@@ -208,7 +230,7 @@ Each model must have its own metadata and usage review.
 
 Do not combine models from different publications without recording their differences.
 
-## 10. Browser Compatibility Verification
+## 11. Browser Compatibility Verification
 
 For each provider, test the actual deployed browser environment.
 
@@ -227,7 +249,7 @@ Record:
 
 A successful command-line download does not prove that browser-side fetching works.
 
-## 11. Live Data Policy
+## 12. Live Data Policy
 
 EarthScope divides live information into three categories.
 
@@ -251,7 +273,7 @@ It may require specialized access, authentication, a relay service, or a separat
 
 The application must never simulate real-time observations and label them as live data.
 
-## 12. Source Registry
+## 13. Source Registry
 
 Each integrated source must have a registry entry containing:
 

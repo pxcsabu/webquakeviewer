@@ -26,6 +26,24 @@ export const SOURCE_REGISTRY: readonly SourceRegistryEntry[] = [
       'Browser fetch from the built app succeeded on 2026-11-08 (HTTP 200, 197 events). Last-Modified / 304 conditional requests work. USGS is a U.S. federal agency and its works are generally in the public domain. Attribution to the U.S. Geological Survey is retained. The license page returned HTTP 403 to automated access; the public-domain determination was confirmed separately.',
   },
   {
+    id: 'natural-earth-110m',
+    name: 'Natural Earth 1:110m Land and Boundaries',
+    provider: 'Natural Earth',
+    status: 'READY',
+    homepage: 'https://www.naturalearthdata.com/',
+    documentationUrl: 'https://github.com/nvkelso/natural-earth-vector',
+    dataLicense: 'Public Domain',
+    attribution: 'Natural Earth',
+    accessMethod:
+      'Bundled static GeoJSON assets (no tile server, no API key)',
+    requiresAuthentication: false,
+    corsVerified: true,
+    redistributionAllowed: true,
+    lastVerifiedAt: '2026-11-08T07:30:00Z',
+    notes:
+      'ne_110m_land.geojson and ne_110m_admin_0_boundary_lines_land.geojson are bundled under public/geo for the basemap. They provide geographic context only and are not a source of earthquake parameters.',
+  },
+  {
     id: 'jma-disaster-prevention-xml',
     name: 'JMA Disaster Prevention XML',
     provider: 'Japan Meteorological Agency',

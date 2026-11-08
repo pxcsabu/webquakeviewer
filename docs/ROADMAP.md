@@ -151,6 +151,7 @@ Historical CRS note: the current JMA list JSON does not state a CRS, so EarthSco
 - [x] Add configurable geological overlays (PB2002 on the globe)
 - [x] Implement WebGL lifecycle management (dispose, context loss, resize)
 - [x] Test coexistence with MapLibre (mutually exclusive tabs; context disposal verified)
+- [x] Verify 3D globe on GitHub Pages
 
 Completion criteria:
 

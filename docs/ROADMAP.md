@@ -75,7 +75,7 @@ A user can browse, filter, and inspect real earthquake events from a permitted p
 - [x] Add a GSI standard/pale basemap selector with attribution
 - [x] Retain Natural Earth as an offline basemap fallback
 - [x] Add 地震分布図 / 強震モニタ tabs
-- [x] Add a strong-motion availability/status tab without fabricating restricted data
+- [x] Add a strong-motion tab with official-link fallback and HTTP-development GIF display
 - [x] Handle WebGL lifecycle, including `map.remove()`
 - [x] Test map resize and responsive layout
 - [ ] Implement map layer visibility controls
@@ -95,9 +95,9 @@ The map displays the catalog without degrading data correctness, does not requir
 
 - [x] Implement surface distance calculation
 - [x] Implement hypocentral distance calculation
-- [ ] Implement depth distribution charts
-- [ ] Implement magnitude-frequency distribution
-- [x] Implement b-value calculation (Aki–Utsu module and tests; no UI exposure yet)
+- [x] Implement depth distribution charts
+- [x] Implement magnitude-frequency distribution
+- [x] Implement b-value calculation with an explicit Mc input (Aki–Utsu module, tests, and UI)
 - [ ] Implement temporal event statistics
 - [ ] Implement spatial clustering
 - [x] Implement cross-section selection with Slab2 depth contours

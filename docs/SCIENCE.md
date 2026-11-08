@@ -320,4 +320,4 @@ The cross-section tool projects earthquake hypocenters onto a user-selected star
 
 Hypocentral distance uses WGS84 ECEF coordinates with depth positive downward. Surface distance uses the Haversine formula. These are different quantities and are not interchangeable.
 
-The Aki–Utsu b-value module is implemented with an explicit Mc and magnitude bin width. It is not exposed in the UI until a completeness-magnitude workflow is available.
+The Aki–Utsu b-value module is implemented with an explicit Mc and magnitude bin width. The analysis panel exposes b-value, a-value, sample count, and mean magnitude, but it does not claim that the selected Mc is a completeness magnitude. The user must provide and justify Mc.

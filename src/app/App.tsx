@@ -7,6 +7,7 @@ import {
 import { AppHeader } from '../components/AppHeader';
 import { SourceStatusPanel } from '../components/SourceStatusPanel';
 import { StatusBar } from '../components/StatusBar';
+import { CatalogAnalysisPanel } from '../features/analysis/CatalogAnalysisPanel';
 import { EarthquakeDetail } from '../features/earthquakes/EarthquakeDetail';
 import { EarthquakeFilters } from '../features/earthquakes/EarthquakeFilters';
 import { EarthquakeList } from '../features/earthquakes/EarthquakeList';
@@ -106,6 +107,10 @@ export function App() {
             status={catalog.status}
             selectedId={selectedEvent?.id ?? null}
             onSelect={setSelectedId}
+          />
+          <CatalogAnalysisPanel
+            key={providerId}
+            events={visibleEvents}
           />
         </div>
 

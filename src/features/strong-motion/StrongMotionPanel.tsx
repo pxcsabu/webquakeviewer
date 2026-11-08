@@ -1,4 +1,9 @@
+import { useEffect, useState } from 'react';
 import { getSourceRegistryEntry } from '../../data/providers/registry';
+import {
+  buildKmoniImageUrl,
+  KMONI_REFERENCE_URL,
+} from '../../data/providers/nied/kmoni';
 import type { CatalogProviderId } from '../../data/providers/catalogProviders';
 import type { Earthquake } from '../../domain/earthquake/types';
 import { formatMagnitude, formatUtcTimestamp } from '../../utils/format';
@@ -19,6 +24,22 @@ export function StrongMotionPanel({
 }: StrongMotionPanelProps) {
   const kmoni = getSourceRegistryEntry('nied-kmoni');
   const knet = getSourceRegistryEntry('nied-knet-kiknet');
+  const isHttp = typeof window !== 'undefined' && window.location.protocol === 'http:';
+  const [kmoniImageUrl, setKmoniImageUrl] = useState(() =>
+    buildKmoniImageUrl(new Date(Date.now() - 10_000)),
+  );
+  const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    if (!isHttp) {
+      return;
+    }
+    const intervalId = window.setInterval(() => {
+      setKmoniImageUrl(buildKmoniImageUrl(new Date(Date.now() - 10_000)));
+    }, 5000);
+    return () => window.clearInterval(intervalId);
+  }, [isHttp]);
+
   const intensityEvents = events
     .filter((event) => event.intensity !== undefined)
     .sort(
@@ -35,7 +56,13 @@ export function StrongMotionPanel({
     >
       <div className="panel-heading">
         <h2 id="strong-motion-heading">強震モニタ</h2>
-        <span className="badge status-unavailable">利用不可</span>
+        <span
+          className={`badge ${
+            isHttp ? 'status-conditional' : 'status-unavailable'
+          }`}
+        >
+          {isHttp ? 'HTTP開発環境で表示' : 'HTTPSでは利用不可'}
+        </span>
       </div>
 
       <div className="strong-motion-grid">
@@ -50,10 +77,49 @@ export function StrongMotionPanel({
             EarthScope はプロキシ、再配布、模擬データで強震モニタを補完しません。
             公式サービスを新しいタブで確認してください。
           </p>
+          {isHttp ? (
+            <div className="kmoni-image-wrap">
+              <img
+                className="kmoni-image"
+                src={kmoniImageUrl}
+                alt="NIED 強震モニタの公式画像"
+                onLoad={() => setImageError(false)}
+                onError={() => setImageError(true)}
+              />
+              <p className="analysis-note">
+                開発環境（HTTP）では公式 GIF を直接表示します。5秒ごとに更新します。
+                GIF は NIED の強震モニタ画像（地図背景なし）です。
+              </p>
+              {imageError ? (
+                <p className="error-box">
+                  強震モニタ画像を取得できませんでした。時刻・URL・配信状況を確認してください。
+                </p>
+              ) : null}
+            </div>
+          ) : (
+            <p className="analysis-note">
+              HTTPS では mixed content のため GIF を埋め込めません。下のリンクから公式画像を開いてください。
+            </p>
+          )}
+
           <ul className="strong-motion-links">
             <li>
               <a href={KMONI_URL} target="_blank" rel="noreferrer">
                 NIED 強震モニタ（HTTP）
+              </a>
+            </li>
+            <li>
+              <a href={kmoniImageUrl} target="_blank" rel="noreferrer">
+                最新の強震モニタ画像を開く（HTTP）
+              </a>
+            </li>
+            <li>
+              <a
+                href={KMONI_REFERENCE_URL}
+                target="_blank"
+                rel="noreferrer"
+              >
+                参照実装: KyoshinEewViewerIngen (MIT)
               </a>
             </li>
             <li>

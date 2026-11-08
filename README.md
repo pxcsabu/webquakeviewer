@@ -27,6 +27,7 @@ The project is designed to be hosted on GitHub Pages without requiring a dedicat
 - Cross-section tool with Slab2 depth contours
 - Strong-motion availability panel and JMA intensity summary
 - Surface and hypocentral distance modules; Aki–Utsu b-value module
+- Depth histogram, cumulative magnitude-frequency, and b-value analysis panel
 
 ### Planned
 
@@ -158,7 +159,7 @@ The Slab2 contours are model context, not direct observations. Horizontal and ve
 
 ### Strong-motion tab
 
-The 強震モニタ tab intentionally does not fabricate live strong-motion data. The NIED kmoni service is HTTP-only from the verified environment and cannot be embedded in an HTTPS GitHub Pages application; K-NET/KiK-net data requires registration and has usage restrictions. The tab shows the availability status, official links, and a clearly labeled JMA intensity summary.
+The 強震モニタ tab uses the same official image URL pattern as `KyoshinEewViewerIngen` / `KyoshinMonitorLib`. The NIED kmoni service is HTTP-only; it can be displayed by the HTTP development server, but the HTTPS GitHub Pages build cannot embed it (mixed content). The tab shows the availability status, the official link, the latest-image link, and a clearly labeled JMA intensity summary. K-NET/KiK-net data requires registration and has usage restrictions.
 
 ### Local caches
 

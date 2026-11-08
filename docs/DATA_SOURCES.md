@@ -350,6 +350,8 @@ The USGS Slab2 depth contours are used only for cross-section context. They are 
 **Status: UNAVAILABLE for direct embedding; K-NET/KiK-net RESTRICTED**
 
 - The NIED kmoni site is available over HTTP, but its HTTPS endpoint did not respond during verification.
+- The image URL pattern was cross-checked against `ingen084/KyoshinEewViewerIngen` and `KyoshinMonitorLib`: `http://www.kmoni.bosai.go.jp/data/map_img/RealTimeImg/jma_s/YYYYMMDD/YYYYMMDDHHmmss.jma_s.gif`.
+- In the HTTP development server, EarthScope can display the official GIF; the HTTPS GitHub Pages build shows the official link instead.
 - An HTTPS GitHub Pages application cannot embed or fetch HTTP resources without creating mixed content.
 - The K-NET/KiK-net strong-motion data requires registration and has usage/redistribution conditions.
 - EarthScope does not proxy these services, does not bundle restricted images, and does not fabricate a strong-motion monitor.

@@ -26,10 +26,17 @@ export interface SourceRegistryEntry {
   notes: string;
 }
 
+export interface ProviderCacheState {
+  etag: string | null;
+  lastModified: string | null;
+}
+
 export interface ProviderRequestContext {
   signal: AbortSignal;
   /** Injectable clock for deterministic tests. */
   now: Date;
+  /** Conditional request state supplied by the application cache. */
+  cache?: ProviderCacheState | null;
 }
 
 export interface ProviderResult<TRecord> {
@@ -39,6 +46,10 @@ export interface ProviderResult<TRecord> {
   /** Provider-supplied update time, when available. */
   sourceUpdatedAt?: string;
   warnings: string[];
+  /** True when the provider returned 304 and cached records remain valid. */
+  notModified?: boolean;
+  /** Cache validators returned by the provider response. */
+  cache?: ProviderCacheState | null;
 }
 
 export interface DataProvider<TQuery, TRecord> {

@@ -11,20 +11,24 @@ const STATUS_LABELS: Record<CatalogState['status'], string> = {
 const SOURCE_LABELS: Record<CatalogState['source'], string> = {
   none: '未接続',
   cache: 'IndexedDB キャッシュ',
+  network: 'USGS ネットワーク',
   sample: '開発用サンプル',
 };
 
 interface StatusBarProps {
   catalog: CatalogState;
+  visibleCount: number;
 }
 
-export function StatusBar({ catalog }: StatusBarProps) {
+export function StatusBar({ catalog, visibleCount }: StatusBarProps) {
   const updatedLabel =
     catalog.source === 'sample'
       ? 'サンプル読込'
       : catalog.source === 'cache'
         ? 'キャッシュ更新'
-        : '最終更新';
+        : catalog.source === 'network'
+          ? '取得時刻'
+          : '最終更新';
 
   return (
     <footer className="status-bar" aria-label="アプリケーション状態">
@@ -43,8 +47,14 @@ export function StatusBar({ catalog }: StatusBarProps) {
         </strong>
       </span>
       <span>
-        表示件数: <strong>{catalog.events.length}</strong>
+        表示件数: <strong>{visibleCount}</strong> / {catalog.events.length}
       </span>
+      {catalog.notModified ? <span>前回取得から更新なし</span> : null}
+      {catalog.warnings.length > 0 ? (
+        <span className="warning-text">
+          取得警告: {catalog.warnings.length} 件
+        </span>
+      ) : null}
       {catalog.cacheWarning ? (
         <span className="warning-text">{catalog.cacheWarning}</span>
       ) : null}

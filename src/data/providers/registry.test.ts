@@ -13,12 +13,14 @@ describe('SOURCE_REGISTRY', () => {
     }
   });
 
-  it('keeps USGS UNVERIFIED until a browser fetch is verified', () => {
+  it('marks USGS as conditional after browser verification but before license review', () => {
     const usgs = getSourceRegistryEntry('usgs-earthquake-feed');
     expect(usgs).toBeDefined();
-    expect(usgs?.status).toBe('UNVERIFIED');
-    expect(usgs?.corsVerified).toBe(false);
-    expect(usgs?.lastVerifiedAt).toBeNull();
+    expect(usgs?.status).toBe('CONDITIONAL');
+    expect(usgs?.corsVerified).toBe(true);
+    expect(usgs?.lastVerifiedAt).not.toBeNull();
+    expect(usgs?.dataLicense).toBeNull();
+    expect(usgs?.redistributionAllowed).toBeNull();
   });
 
   it('does not claim READY without a verification timestamp and CORS check', () => {

@@ -43,6 +43,19 @@ If altitude is used to represent depth, document the sign convention. Prefer kee
 
 Preserve source event IDs.
 
+### 3.1 USGS GeoJSON feed
+
+The USGS summary feed uses a GeoJSON `FeatureCollection`.
+
+- `geometry.coordinates` order is `[longitude, latitude, depth]`.
+- Depth is expressed in kilometres and is positive downwards. Negative depths can occur for shallow or anomalous events; preserve them and report a warning rather than silently clamping to zero.
+- `geometry.coordinates[2]` may be `null`. Treat it as unavailable, not as 0 km.
+- `properties.time` and `properties.updated` are Unix epoch milliseconds. Convert them to UTC ISO 8601 internally and preserve `updated` as source metadata.
+- `feature.id` is the original source event ID. The normalized internal ID uses a provider prefix to avoid collisions.
+- `properties.mag` may be `null`. Do not fabricate a magnitude.
+- `properties.type` may identify non-earthquake events such as quarry blasts. Preserve it as `eventType`.
+- `properties.place` is provider text. Preserve it without treating it as a structured location.
+
 ## 4. Time
 
 Use ISO 8601 timestamps.

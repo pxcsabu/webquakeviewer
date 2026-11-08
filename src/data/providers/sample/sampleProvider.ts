@@ -47,6 +47,8 @@ export const sampleProvider: DataProvider<void, Earthquake> = {
       warnings: [
         'ILLUSTRATIVE: 開発用サンプルです。実際の地震観測データではありません。',
       ],
+      notModified: false,
+      cache: null,
     };
   },
 };

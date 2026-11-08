@@ -10,16 +10,18 @@ The project is designed to be hosted on GitHub Pages without requiring a dedicat
 
 ### Core
 
-- Global earthquake catalog
-- Interactive earthquake map
-- Magnitude and depth visualization
-- Earthquake search and filtering
-- Seismic intensity information
-- Basic earthquake statistics
-- Data source status and timestamps
+- USGS GeoJSON global earthquake catalog
+- Earthquake event list and detail panel
+- Time, magnitude, and depth filtering
+- IndexedDB catalog cache
+- Periodic catalog updates with conditional HTTP requests
+- Data source status, timestamps, and acquisition warnings
 
 ### Planned
 
+- Interactive earthquake map
+- Seismic intensity information
+- Basic earthquake statistics
 - Hypocenter cross-sections
 - Magnitude-frequency analysis
 - b-value calculation
@@ -49,9 +51,10 @@ Technology choices may be adjusted when a demonstrable technical reason exists.
 
 ## Data Sources
 
-Potential sources include:
+USGS is currently integrated as the Phase 1 global catalog. Browser access has been verified, but the USGS usage/license page returned HTTP 403 during review, so the source remains `CONDITIONAL` until license and redistribution terms are confirmed manually.
 
-- USGS earthquake feeds
+Potential future sources include:
+
 - Japan Meteorological Agency
 - NIED
 - J-SHIS
@@ -138,7 +141,15 @@ On this workstation, development and build caches are kept on the G drive:
 
 ### Sample data
 
-Phase 0 can display explicitly labeled `ILLUSTRATIVE` development fixtures when no cached catalog is available. Sample data is enabled by default only in Vite development mode. Production builds require an explicit `VITE_ENABLE_SAMPLE_DATA=true` and always display a warning banner. Sample records are never written to IndexedDB.
+Sample data is disabled by default. It can be explicitly enabled with `VITE_ENABLE_SAMPLE_DATA=true` for a UI demonstration; it is always labeled `ILLUSTRATIVE`, displays a warning banner, and is never written to IndexedDB. It is not a fallback for a failed USGS request.
+
+### USGS feed behavior
+
+- Feed: `summary/all_day.geojson`
+- Refresh interval: 5 minutes while the page is visible
+- Conditional requests: `If-Modified-Since` using the stored `Last-Modified` value; `304 Not Modified` keeps the cached catalog
+- Cache: events are replaced per provider snapshot, so events leaving the rolling feed do not remain indefinitely
+- Revised events with the same normalized id replace the previous version
 
 ## Deployment
 

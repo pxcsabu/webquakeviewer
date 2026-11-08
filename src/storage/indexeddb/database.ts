@@ -24,6 +24,10 @@ export interface ProviderStateRecord {
   lastSuccessAt: string | null;
   lastError: string | null;
   nextPollAt: string | null;
+  etag: string | null;
+  lastModified: string | null;
+  lastFeedGeneratedAt: string | null;
+  lastEventCount: number | null;
 }
 
 function assertIndexedDbAvailable(): void {

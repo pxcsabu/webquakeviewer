@@ -8,6 +8,7 @@ import {
   getProviderState,
   META_LAST_CATALOG_SYNC,
   putEarthquakes,
+  replaceEarthquakesForProvider,
   setMeta,
   setProviderState,
 } from './catalogCache';
@@ -18,11 +19,15 @@ import {
   openEarthScopeDatabase,
 } from './database';
 
-function makeEvent(id: string, originTime: string): Earthquake {
+function makeEvent(
+  id: string,
+  originTime: string,
+  provider = 'Test Provider',
+): Earthquake {
   return {
     id,
     source: {
-      provider: 'Test Provider',
+      provider,
       dataset: 'test-dataset',
       originalId: id,
       retrievedAt: '2026-11-08T05:00:00Z',
@@ -92,6 +97,39 @@ describe('IndexedDB catalog cache', () => {
     expect(await getCachedEarthquakes(db)).toEqual([]);
   });
 
+  it('replaces a provider snapshot without removing other providers', async () => {
+    await putEarthquakes(db, [
+      makeEvent('usgs-old', '2026-11-08T01:00:00Z', 'USGS'),
+      makeEvent('other-1', '2026-11-08T02:00:00Z', 'Other Provider'),
+    ]);
+
+    await replaceEarthquakesForProvider(db, 'USGS', [
+      makeEvent('usgs-new', '2026-11-08T03:00:00Z', 'USGS'),
+    ]);
+
+    const records = await getCachedEarthquakes(db);
+    expect(records.map((record) => record.event.id)).toEqual([
+      'usgs-new',
+      'other-1',
+    ]);
+  });
+
+  it('replaces a revised event with the same id', async () => {
+    await putEarthquakes(db, [
+      makeEvent('usgs-revised', '2026-11-08T01:00:00Z', 'USGS'),
+    ]);
+    await replaceEarthquakesForProvider(db, 'USGS', [
+      {
+        ...makeEvent('usgs-revised', '2026-11-08T01:00:00Z', 'USGS'),
+        magnitude: { value: 6.1, type: 'mww' },
+      },
+    ]);
+
+    const records = await getCachedEarthquakes(db);
+    expect(records).toHaveLength(1);
+    expect(records[0]?.event.magnitude?.value).toBe(6.1);
+  });
+
   it('stores and reads metadata', async () => {
     await setMeta(db, META_LAST_CATALOG_SYNC, '2026-11-08T05:00:00Z');
     expect(await getMeta<string>(db, META_LAST_CATALOG_SYNC)).toBe(
@@ -108,6 +146,10 @@ describe('IndexedDB catalog cache', () => {
       lastSuccessAt: '2026-11-08T05:00:00Z',
       lastError: null,
       nextPollAt: null,
+      etag: '"test-etag"',
+      lastModified: 'Sun, 08 Nov 2026 05:00:00 GMT',
+      lastFeedGeneratedAt: '2026-11-08T04:59:00Z',
+      lastEventCount: 1,
     });
 
     const state = await getProviderState(db, 'usgs-earthquake-feed');

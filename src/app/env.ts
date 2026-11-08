@@ -7,12 +7,12 @@ function parseBoolean(value: string | undefined, fallback: boolean): boolean {
 
 export const appConfig = Object.freeze({
   /**
-   * Sample data is enabled by default only in Vite development mode.
-   * A production build requires an explicit VITE_ENABLE_SAMPLE_DATA=true.
+   * Sample data is never a fallback for missing observations. It must be
+   * explicitly enabled for a demonstration, in development or production.
    */
   enableSampleData: parseBoolean(
     import.meta.env.VITE_ENABLE_SAMPLE_DATA,
-    import.meta.env.DEV,
+    false,
   ),
   appVersion: import.meta.env.VITE_APP_VERSION ?? '0.1.0',
 });

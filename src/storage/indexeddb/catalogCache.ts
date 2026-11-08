@@ -1,5 +1,6 @@
 import type { Earthquake } from '../../domain/earthquake/types';
 import {
+  EVENTS_BY_PROVIDER_INDEX,
   EVENTS_STORE,
   META_STORE,
   PROVIDER_STATE_STORE,
@@ -67,6 +68,47 @@ export async function getCachedEarthquake(
   );
   await transactionToPromise(transaction);
   return record;
+}
+
+async function getProviderEventKeys(
+  db: IDBDatabase,
+  provider: string,
+): Promise<IDBValidKey[]> {
+  const transaction = db.transaction(EVENTS_STORE, 'readonly');
+  const store = transaction.objectStore(EVENTS_STORE);
+  const index = store.index(EVENTS_BY_PROVIDER_INDEX);
+  const keys = await requestToPromise(
+    index.getAllKeys(IDBKeyRange.only(provider)),
+  );
+  await transactionToPromise(transaction);
+  return keys;
+}
+
+/**
+ * Replaces the cached snapshot for one provider while preserving other
+ * providers' records. Used for rolling-window feeds where events leave the
+ * feed over time. Individual events are still keyed by their normalized id, so
+ * a revised event with the same id is replaced by its latest version.
+ */
+export async function replaceEarthquakesForProvider(
+  db: IDBDatabase,
+  provider: string,
+  events: readonly Earthquake[],
+  cachedAt: string = new Date().toISOString(),
+): Promise<void> {
+  const existingKeys = await getProviderEventKeys(db, provider);
+  const transaction = db.transaction(EVENTS_STORE, 'readwrite');
+  const store = transaction.objectStore(EVENTS_STORE);
+
+  for (const key of existingKeys) {
+    store.delete(key);
+  }
+  for (const event of events) {
+    const record: CachedEarthquake = { event, cachedAt };
+    store.put(record);
+  }
+
+  await transactionToPromise(transaction);
 }
 
 export async function clearCachedEarthquakes(

@@ -22,9 +22,18 @@ Do not mark a source READY without actual verification.
 
 ## 3. USGS Earthquake Feeds
 
-**Status: READY candidate for core integration**
+**Status: CONDITIONAL — browser access verified, license review pending**
 
 USGS provides earthquake GeoJSON feeds suitable for automated event display.
+
+Verification notes (2026-11-08):
+
+- `summary/all_day.geojson` returned HTTP 200 with `Access-Control-Allow-Origin: *` from the built application in a browser.
+- A browser run displayed 197 events and stored them in IndexedDB.
+- `Last-Modified` and `304 Not Modified` conditional requests were verified in the browser.
+- The feed did not return an `ETag` in the observed response; `Last-Modified` is therefore the primary validator.
+- The USGS usage/license page returned HTTP 403 during this review. License and redistribution terms are not yet confirmed.
+- The source must remain `CONDITIONAL` until those terms are reviewed. Do not relabel it `READY` solely because CORS works.
 
 Official resources:
 

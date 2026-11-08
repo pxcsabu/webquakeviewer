@@ -179,7 +179,45 @@ button:disabled {
   margin: 0;
 }
 
-.event-list {
+.filter-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.filter-field select {
+  width: 100%;
+  padding: 5px 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: 3px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.filter-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.filter-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.event-list { 
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -212,6 +250,15 @@ button:disabled {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+}
+
+.event-place {
+  overflow: hidden;
+  color: var(--text);
+  font-size: 0.8rem;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .event-time {
@@ -267,6 +314,10 @@ button:disabled {
   overflow-wrap: anywhere;
   font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
+}
+
+.detail-grid a {
+  color: var(--accent);
 }
 
 .badge {
@@ -350,6 +401,64 @@ button:disabled {
 .source-intro {
   margin: 0 0 10px;
   font-size: 0.78rem;
+}
+
+.provider-runtime {
+  padding: 8px 0 10px;
+  border-top: 1px solid var(--border);
+}
+
+.provider-runtime h3 {
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+}
+
+.runtime-grid {
+  display: grid;
+  grid-template-columns: minmax(84px, auto) minmax(0, 1fr);
+  margin: 0;
+}
+
+.runtime-grid > div {
+  display: contents;
+}
+
+.runtime-grid dt,
+.runtime-grid dd {
+  margin: 0;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.76rem;
+}
+
+.runtime-grid dt {
+  padding-right: 8px;
+  color: var(--muted);
+}
+
+.runtime-grid dd {
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.source-warnings {
+  margin: 0 0 10px;
+  font-size: 0.76rem;
+}
+
+.source-warnings summary {
+  cursor: pointer;
+  color: var(--warning);
+}
+
+.source-warnings ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
+
+.source-warnings li + li {
+  margin-top: 4px;
 }
 
 .source-list {

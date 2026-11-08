@@ -576,6 +576,13 @@ export function validateEarthquake(
     input.intensity === undefined || input.intensity === null
       ? undefined
       : parseIntensity(input.intensity, errors);
+  const place = readOptionalString(input, 'place', 'place', errors);
+  const eventType = readOptionalString(
+    input,
+    'eventType',
+    'eventType',
+    errors,
+  );
 
   if (
     source !== undefined &&
@@ -611,6 +618,8 @@ export function validateEarthquake(
   };
   if (magnitude !== undefined) earthquake.magnitude = magnitude;
   if (intensity !== undefined) earthquake.intensity = intensity;
+  if (place !== undefined) earthquake.place = place;
+  if (eventType !== undefined) earthquake.eventType = eventType;
 
   return { ok: true, value: earthquake, warnings };
 }

@@ -56,12 +56,22 @@ export function EarthquakeList({
                     {formatMagnitude(event.magnitude)}
                   </span>
                 </span>
+                {event.place ? (
+                  <span className="event-place" title={event.place}>
+                    {event.place}
+                  </span>
+                ) : null}
                 <span className="event-row-bottom">
                   <span>{formatCoordinates(event.location)}</span>
                   <span>深さ {formatDepthKm(event.location.depthKm)}</span>
                 </span>
                 <span className="event-row-meta">
-                  <span>{event.source.provider}</span>
+                  <span>
+                    {event.source.provider}
+                    {event.eventType && event.eventType !== 'earthquake'
+                      ? ` / ${event.eventType}`
+                      : ''}
+                  </span>
                   <ClassificationBadge classification={event.classification} />
                 </span>
               </button>

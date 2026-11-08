@@ -105,6 +105,10 @@ export interface Earthquake {
   location: EarthquakeLocation;
   magnitude?: EarthquakeMagnitude;
   intensity?: SeismicIntensity;
+  /** Provider-supplied place description, preserved as text. */
+  place?: string;
+  /** Provider-supplied event type, for example earthquake or quarry blast. */
+  eventType?: string;
   classification: DataClassification;
 }
 

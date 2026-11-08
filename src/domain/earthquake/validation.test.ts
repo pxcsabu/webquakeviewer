@@ -140,6 +140,20 @@ describe('validateEarthquake', () => {
     }
   });
 
+  it('preserves place and event type text from the provider', () => {
+    const result = validateEarthquake(
+      makeValid({
+        place: 'Test region',
+        eventType: 'earthquake',
+      }),
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.place).toBe('Test region');
+      expect(result.value.eventType).toBe('earthquake');
+    }
+  });
+
   it('preserves original coordinates and depth metadata', () => {
     const result = validateEarthquake(
       makeValid({

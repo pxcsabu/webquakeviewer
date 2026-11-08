@@ -51,6 +51,14 @@ export function EarthquakeDetail({ event }: EarthquakeDetailProps) {
           <dd>{formatMagnitude(event.magnitude)}</dd>
         </div>
         <div>
+          <dt>場所</dt>
+          <dd>{event.place ?? '不明'}</dd>
+        </div>
+        <div>
+          <dt>イベント種別</dt>
+          <dd>{event.eventType ?? '不明'}</dd>
+        </div>
+        <div>
           <dt>深さ</dt>
           <dd>{formatDepthKm(event.location.depthKm)}</dd>
         </div>
@@ -81,6 +89,26 @@ export function EarthquakeDetail({ event }: EarthquakeDetailProps) {
               ? formatUtcTimestamp(event.source.retrievedAt)
               : 'なし（ILLUSTRATIVE）'}
           </dd>
+        </div>
+        <div>
+          <dt>出典 URL</dt>
+          <dd>
+            {event.source.sourceUrl ? (
+              <a
+                href={event.source.sourceUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                イベントページを開く
+              </a>
+            ) : (
+              '不明'
+            )}
+          </dd>
+        </div>
+        <div>
+          <dt>帰属</dt>
+          <dd>{event.source.attribution ?? '不明'}</dd>
         </div>
         <div>
           <dt>更新時刻</dt>

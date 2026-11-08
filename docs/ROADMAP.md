@@ -103,6 +103,7 @@ The map displays the catalog without degrading data correctness, does not requir
 - [x] Implement cross-section selection with Slab2 depth contours
 - [x] Display sample count and analysis parameters
 - [x] Add a cross-section chart with depth, distance, and slab interface context
+- [x] Verify cross-section and strong-motion tabs on GitHub Pages
 
 Completion criteria:
 

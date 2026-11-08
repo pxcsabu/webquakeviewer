@@ -20,6 +20,7 @@ import { latLonToVector3 } from './globeMath';
 interface EarthGlobeProps {
   events: Earthquake[];
   showPlateBoundaries: boolean;
+  showSlab2: boolean;
   resetToken: number;
 }
 
@@ -244,6 +245,76 @@ function buildPlateLineGeometry(
   return buffer;
 }
 
+function buildSlabLineGeometry(
+  collection: FeatureCollection,
+): THREE.BufferGeometry | null {
+  const positions: number[] = [];
+  const colors: number[] = [];
+
+  const addLine = (coordinates: number[][], depthKm: number): void => {
+    const radius = depthToRadius(depthKm);
+    const color = new THREE.Color(depthColorHex(depthKm));
+    const points = coordinates
+      .filter(
+        (position) =>
+          position.length >= 2 &&
+          Number.isFinite(position[0]) &&
+          Number.isFinite(position[1]),
+      )
+      .map(([longitude, latitude]) =>
+        latLonToVector3(latitude ?? 0, longitude ?? 0, radius),
+      );
+    for (let index = 0; index < points.length - 1; index += 1) {
+      const start = points[index];
+      const end = points[index + 1];
+      if (start === undefined || end === undefined) {
+        continue;
+      }
+      positions.push(start.x, start.y, start.z, end.x, end.y, end.z);
+      colors.push(
+        color.r,
+        color.g,
+        color.b,
+        color.r,
+        color.g,
+        color.b,
+      );
+    }
+  };
+
+  for (const feature of collection.features) {
+    const depthKm = Number(feature.properties?.depth);
+    if (!Number.isFinite(depthKm)) {
+      continue;
+    }
+    const geometry = feature.geometry;
+    if (geometry === null) {
+      continue;
+    }
+    if (geometry.type === 'LineString') {
+      addLine(geometry.coordinates, depthKm);
+    } else if (geometry.type === 'MultiLineString') {
+      for (const line of geometry.coordinates) {
+        addLine(line, depthKm);
+      }
+    }
+  }
+
+  if (positions.length === 0) {
+    return null;
+  }
+  const buffer = new THREE.BufferGeometry();
+  buffer.setAttribute(
+    'position',
+    new THREE.Float32BufferAttribute(positions, 3),
+  );
+  buffer.setAttribute(
+    'color',
+    new THREE.Float32BufferAttribute(colors, 3),
+  );
+  return buffer;
+}
+
 function createEarthquakePoints(
   events: readonly Earthquake[],
 ): THREE.Points | null {
@@ -322,6 +393,7 @@ function createEarthquakePoints(
 export function EarthGlobe({
   events,
   showPlateBoundaries,
+  showSlab2,
   resetToken,
 }: EarthGlobeProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -331,6 +403,7 @@ export function EarthGlobe({
   const controlsRef = useRef<OrbitControls | null>(null);
   const pointsGroupRef = useRef<THREE.Group | null>(null);
   const plateGroupRef = useRef<THREE.Group | null>(null);
+  const slabGroupRef = useRef<THREE.Group | null>(null);
   const textureRef = useRef<THREE.CanvasTexture | null>(null);
   const resetCameraRef = useRef<(() => void) | null>(null);
   const contextLostRef = useRef(false);
@@ -356,8 +429,11 @@ export function EarthGlobe({
     let globe: THREE.Mesh;
     let pointsGroup: THREE.Group;
     let plateGroup: THREE.Group;
+    let slabGroup: THREE.Group;
     let plateGeometry: THREE.BufferGeometry | null = null;
     let plateMaterial: THREE.LineBasicMaterial | null = null;
+    let slabGeometry: THREE.BufferGeometry | null = null;
+    let slabMaterial: THREE.LineBasicMaterial | null = null;
     let resizeObserver: ResizeObserver | null = null;
 
     const handleContextLost = (event: Event): void => {
@@ -424,6 +500,8 @@ export function EarthGlobe({
       scene.add(pointsGroup);
       plateGroup = new THREE.Group();
       scene.add(plateGroup);
+      slabGroup = new THREE.Group();
+      scene.add(slabGroup);
 
       controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = false;
@@ -475,6 +553,7 @@ export function EarthGlobe({
       controlsRef.current = controls;
       pointsGroupRef.current = pointsGroup;
       plateGroupRef.current = plateGroup;
+      slabGroupRef.current = slabGroup;
       setStatus('ready');
 
       void (async () => {
@@ -517,6 +596,34 @@ export function EarthGlobe({
             });
             plateGroup.add(new THREE.LineSegments(plateGeometry, plateMaterial));
           }
+
+          void (async () => {
+            try {
+              const slabContours = await fetchFeatureCollection(
+                `${import.meta.env.BASE_URL}geo/slab2_japan_depth_contours.geojson`,
+                controller.signal,
+              );
+              if (cancelled) {
+                return;
+              }
+              slabGeometry = buildSlabLineGeometry(slabContours);
+              if (slabGeometry !== null) {
+                slabMaterial = new THREE.LineBasicMaterial({
+                  vertexColors: true,
+                  transparent: true,
+                  opacity: 0.9,
+                  depthTest: false,
+                  depthWrite: false,
+                });
+                slabGroup.add(new THREE.LineSegments(slabGeometry, slabMaterial));
+              }
+            } catch (error) {
+              if (!cancelled && !controller.signal.aborted) {
+                console.error('Slab2 3D load failed', error);
+                setWarning('Slab2 等深線を3D表示できませんでした。');
+              }
+            }
+          })();
         } catch (error) {
           if (!cancelled && !controller.signal.aborted) {
             console.error('Globe texture load failed', error);
@@ -582,8 +689,19 @@ export function EarthGlobe({
           }
         }
       }
+      for (const child of [...slabGroup.children]) {
+        slabGroup.remove(child);
+        if (child instanceof THREE.LineSegments) {
+          child.geometry.dispose();
+          if (child.material instanceof THREE.Material) {
+            child.material.dispose();
+          }
+        }
+      }
       plateGeometry?.dispose();
       plateMaterial?.dispose();
+      slabGeometry?.dispose();
+      slabMaterial?.dispose();
       const globeMaterial = globe.material as THREE.MeshPhongMaterial;
       globe.geometry.dispose();
       globeMaterial.map?.dispose();
@@ -599,6 +717,7 @@ export function EarthGlobe({
       controlsRef.current = null;
       pointsGroupRef.current = null;
       plateGroupRef.current = null;
+      slabGroupRef.current = null;
       scene.clear();
     };
   }, []);
@@ -633,6 +752,13 @@ export function EarthGlobe({
       group.visible = showPlateBoundaries;
     }
   }, [showPlateBoundaries]);
+
+  useEffect(() => {
+    const group = slabGroupRef.current;
+    if (group !== null) {
+      group.visible = showSlab2;
+    }
+  }, [showSlab2]);
 
   useEffect(() => {
     if (resetToken > 0) {

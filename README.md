@@ -30,6 +30,7 @@ The project is designed to be hosted on GitHub Pages without requiring a dedicat
 - J-SHIS 2020 probabilistic seismic-hazard WMS overlay
 - Three.js 3D globe with depth-colored hypocenters
 - PB2002 plate-boundary overlay on the 3D globe
+- Slab2 depth-contour overlay on the 3D globe
 - Surface and hypocentral distance modules; Aki–Utsu b-value module
 - Depth histogram, cumulative magnitude-frequency, temporal statistics, DBSCAN spatial clusters, and b-value analysis panel
 

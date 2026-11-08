@@ -378,5 +378,6 @@ The 3D globe is a Three.js scene using a runtime-generated Natural Earth texture
 - The globe surface is semi-transparent so hypocenters inside the near hemisphere remain visible. Points on the far hemisphere are culled in the vertex shader.
 - Point size encodes magnitude and point color encodes depth class.
 - PB2002 plate boundaries can be toggled as a model-derived geological overlay. They are not legal boundaries.
+- Slab2 depth contours can be toggled in the 3D globe. Contours are placed at the same display radius scale as hypocenters and colored by depth. They are a model-derived subduction interface, not a direct observation or a unique plate boundary.
 - MapLibre and Three.js are mounted in mutually exclusive tabs. Switching tabs disposes the previous WebGL renderer and map instance; the application does not hold two active map/globe contexts at the same time.
 - The 2D cross-section tool remains in the map tab. The globe provides depth context, not a replacement for the cross-section calculation.

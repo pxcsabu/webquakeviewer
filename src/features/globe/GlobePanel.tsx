@@ -75,6 +75,9 @@ function GlobeLegend() {
         0.15R に対応させた表示スケールで、物理的な縮尺ではありません。
       </p>
       <p className="map-legend-note">
+        Slab2 等深線は USGS のモデル（Hayes et al., 2018）です。
+      </p>
+      <p className="map-legend-note">
         ドラッグで回転、ホイールで拡大縮小できます。
       </p>
     </aside>
@@ -83,6 +86,7 @@ function GlobeLegend() {
 
 export function GlobePanel({ events }: GlobePanelProps) {
   const [showPlateBoundaries, setShowPlateBoundaries] = useState(false);
+  const [showSlab2, setShowSlab2] = useState(false);
   const [resetToken, setResetToken] = useState(0);
 
   return (
@@ -102,6 +106,14 @@ export function GlobePanel({ events }: GlobePanelProps) {
           />
           プレート境界（PB2002）
         </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={showSlab2}
+            onChange={(event) => setShowSlab2(event.target.checked)}
+          />
+          Slab2 等深線
+        </label>
         <button
           type="button"
           onClick={() => setResetToken((token) => token + 1)}
@@ -119,6 +131,7 @@ export function GlobePanel({ events }: GlobePanelProps) {
             <LazyEarthGlobe
               events={events}
               showPlateBoundaries={showPlateBoundaries}
+              showSlab2={showSlab2}
               resetToken={resetToken}
             />
           </GlobeErrorBoundary>

@@ -149,6 +149,7 @@ Historical CRS note: the current JMA list JSON does not state a CRS, so EarthSco
 - [x] Implement depth visualization (display scale and depth colors)
 - [x] Implement cross-section visualization (2D profile tool; 3D globe provides depth context)
 - [x] Add configurable geological overlays (PB2002 on the globe)
+- [x] Add 3D Slab2 interface depth contours (post-Phase-5 extension)
 - [x] Implement WebGL lifecycle management (dispose, context loss, resize)
 - [x] Test coexistence with MapLibre (mutually exclusive tabs; context disposal verified)
 - [x] Verify 3D globe on GitHub Pages

@@ -328,3 +328,28 @@ Each integrated source must have a registry entry containing:
 - `notes`
 
 Unknown values must remain explicitly unknown rather than being guessed.
+
+## 15. USGS Slab2 Depth Contours
+
+**Status: READY (model-derived)**
+
+The USGS Slab2 depth contours are used only for cross-section context. They are not direct observations of a plate interface.
+
+- Source: USGS Slab2 depth service (`eq/slab2_depth`), derived from Hayes et al. (2018).
+- License: Public Domain (U.S. Government Work) / CC0 1.0.
+- Attribution: USGS Slab2 (Hayes et al., 2018).
+- The Japan-region contours were retrieved for 120°E–155°E, 20°N–47°N.
+- The static GeoJSON asset was simplified with Douglas–Peucker 0.01° and rounded to 4 decimal places for display.
+- Depth values are in kilometres. The model includes the Izu-Bonin, Kuril, Manila, and Ryukyu regions.
+- The cross-section tool intersects these contours with the user-selected profile. It does not interpolate or claim a unique plate interface where multiple slabs overlap.
+- Do not use the contours for legal boundaries, hazard zoning, or quantitative plate reconstruction.
+
+## 16. NIED Strong Motion Monitor
+
+**Status: UNAVAILABLE for direct embedding; K-NET/KiK-net RESTRICTED**
+
+- The NIED kmoni site is available over HTTP, but its HTTPS endpoint did not respond during verification.
+- An HTTPS GitHub Pages application cannot embed or fetch HTTP resources without creating mixed content.
+- The K-NET/KiK-net strong-motion data requires registration and has usage/redistribution conditions.
+- EarthScope does not proxy these services, does not bundle restricted images, and does not fabricate a strong-motion monitor.
+- The strong-motion tab therefore displays availability, source restrictions, official links, and a clearly labeled JMA intensity summary (which is not a strong-motion monitor).

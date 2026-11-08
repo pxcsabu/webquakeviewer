@@ -304,3 +304,20 @@ Both basemaps provide geographic context only.
 - GSI tiles are not bundled or redistributed by EarthScope. Attribution and a link to the GSI tile list are displayed with the map.
 - Earthquake marker size encodes magnitude and marker color encodes depth class. The map legend documents the classes.
 - A visualization must not imply greater positional or boundary accuracy than the underlying basemap supports.
+
+
+## 15. Cross-Section Analysis and Slab2
+
+The cross-section tool projects earthquake hypocenters onto a user-selected start–end profile.
+
+- Surface distance and profile coordinates use a spherical Earth with the IUGG mean radius 6371.0088 km.
+- The profile uses a local tangent-plane approximation for the regional distance range. It is not a global map projection.
+- Events within ±100 km perpendicular to the profile are included. Events with unknown depth are excluded and counted.
+- The horizontal axis is distance from the start point in km. The vertical axis is depth in km, positive downward. Horizontal and vertical scales are independent.
+- The Slab2 depth contours are model-derived subduction-zone geometry (Hayes et al., 2018; USGS; public domain/CC0). They are displayed as model context, not as observed plate boundaries.
+- Contour intersections are computed in the same local profile coordinates. Multiple slab regions may appear; EarthScope does not force them into a single interface.
+- The displayed contours were simplified for the static web asset. This simplification is documented in `docs/DATA_SOURCES.md`.
+
+Hypocentral distance uses WGS84 ECEF coordinates with depth positive downward. Surface distance uses the Haversine formula. These are different quantities and are not interchangeable.
+
+The Aki–Utsu b-value module is implemented with an explicit Mc and magnitude bin width. It is not exposed in the UI until a completeness-magnitude workflow is available.

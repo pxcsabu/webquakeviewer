@@ -11,6 +11,7 @@ import { EarthquakeDetail } from '../features/earthquakes/EarthquakeDetail';
 import { EarthquakeFilters } from '../features/earthquakes/EarthquakeFilters';
 import { EarthquakeList } from '../features/earthquakes/EarthquakeList';
 import { MapPanel } from '../features/map/MapPanel';
+import { StrongMotionPanel } from '../features/strong-motion/StrongMotionPanel';
 import {
   DEFAULT_EARTHQUAKE_FILTERS,
   filterEarthquakes,
@@ -18,7 +19,10 @@ import {
 } from '../features/earthquakes/filters';
 import { useCatalog } from './state/useCatalog';
 
+type MainTab = 'map' | 'strong-motion';
+
 export function App() {
+  const [activeTab, setActiveTab] = useState<MainTab>('map');
   const [providerId, setProviderId] = useState<CatalogProviderId>(
     DEFAULT_CATALOG_PROVIDER,
   );
@@ -66,7 +70,27 @@ export function App() {
         onRefresh={catalog.refresh}
       />
 
-      <main className="app-main">
+      <nav className="main-tabs" role="tablist" aria-label="表示切り替え">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'map'}
+          onClick={() => setActiveTab('map')}
+        >
+          地震分布図
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'strong-motion'}
+          onClick={() => setActiveTab('strong-motion')}
+        >
+          強震モニタ
+        </button>
+      </nav>
+
+      {activeTab === 'map' ? (
+        <main className="app-main">
         <div className="app-column app-column-left">
           <EarthquakeFilters
             filters={filters}
@@ -101,7 +125,12 @@ export function App() {
             warnings={catalog.warnings}
           />
         </div>
-      </main>
+        </main>
+      ) : (
+        <main className="app-main app-main-single">
+          <StrongMotionPanel events={visibleEvents} providerId={providerId} />
+        </main>
+      )}
 
       <StatusBar catalog={catalog} visibleCount={visibleEvents.length} />
     </div>

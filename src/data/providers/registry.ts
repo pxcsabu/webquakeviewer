@@ -64,6 +64,44 @@ export const SOURCE_REGISTRY: readonly SourceRegistryEntry[] = [
       'GSI standard and pale raster tiles (z5-18) returned CORS-enabled PNGs. Attribution to 国土地理院 and a link to the GSI tile list are required. Tiles are fetched directly from the GSI service and are not bundled or redistributed by EarthScope.',
   },
   {
+    id: 'usgs-slab2',
+    name: 'USGS Slab2 Depth Contours',
+    provider: 'United States Geological Survey',
+    status: 'READY',
+    homepage: 'https://earthquake.usgs.gov/slab2/',
+    documentationUrl:
+      'https://earthquake.usgs.gov/arcgis/rest/services/eq/slab2_depth/MapServer',
+    dataLicense: 'Public Domain (U.S. Government Work) / CC0 1.0',
+    attribution: 'USGS Slab2 (Hayes et al., 2018)',
+    accessMethod:
+      'Bundled static GeoJSON contours derived from the USGS Slab2 depth service',
+    requiresAuthentication: false,
+    corsVerified: true,
+    redistributionAllowed: true,
+    lastVerifiedAt: '2026-11-08T08:30:00Z',
+    notes:
+      'Japan-region depth contours (20–640 km) were retrieved from the USGS Slab2 depth service and simplified with Douglas-Peucker 0.01° for display. Slab2 is a model-derived subduction geometry, not direct observation. It is used for cross-section context only.',
+  },
+  {
+    id: 'nied-kmoni',
+    name: 'NIED Strong Motion Monitor (kmoni)',
+    provider:
+      'National Research Institute for Earth Science and Disaster Resilience',
+    status: 'UNAVAILABLE',
+    homepage: 'http://www.kmoni.bosai.go.jp/',
+    documentationUrl: null,
+    dataLicense: null,
+    attribution: 'NIED',
+    accessMethod:
+      'HTTP web service; HTTPS endpoint did not respond and HTTP cannot be embedded in an HTTPS GitHub Pages app',
+    requiresAuthentication: false,
+    corsVerified: false,
+    redistributionAllowed: null,
+    lastVerifiedAt: '2026-11-08T08:30:00Z',
+    notes:
+      'The HTTPS kmoni endpoint was unreachable; the HTTP endpoint is mixed content for an HTTPS app. K-NET/KiK-net data access remains restricted. EarthScope does not proxy, bundle, or fabricate strong-motion data.',
+  },
+  {
     id: 'jma-earthquake-list-json',
     name: 'JMA Earthquake Information List',
     provider: 'Japan Meteorological Agency',

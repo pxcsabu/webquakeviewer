@@ -7,6 +7,7 @@ import maplibregl, {
   type MapLibreMap,
 } from 'maplibre-gl';
 import type { FeatureCollection } from 'geojson';
+import type { GeoPoint } from '../../analysis/geodesy/distance';
 import type { Earthquake } from '../../domain/earthquake/types';
 import {
   BASE_MAP_STYLE,
@@ -20,6 +21,7 @@ import {
   MAP_REGION_COLOR,
   SELECTED_POINT_RADIUS,
   toEarthquakeFeatureCollection,
+  toProfileFeatureCollection,
   type BasemapId,
 } from './mapStyle';
 
@@ -27,6 +29,10 @@ interface EarthquakeMapProps {
   events: Earthquake[];
   selectedId: string | null;
   basemap: BasemapId;
+  profileStart: GeoPoint | null;
+  profileEnd: GeoPoint | null;
+  profileMode: boolean;
+  onProfilePoint: (point: GeoPoint) => void;
   onSelect: (id: string) => void;
 }
 
@@ -44,12 +50,18 @@ export function EarthquakeMap({
   events,
   selectedId,
   basemap,
+  profileStart,
+  profileEnd,
+  profileMode,
+  onProfilePoint,
   onSelect,
 }: EarthquakeMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const eventsRef = useRef(events);
   const onSelectRef = useRef(onSelect);
+  const profileModeRef = useRef(profileMode);
+  const onProfilePointRef = useRef(onProfilePoint);
   const lastFlownIdRef = useRef<string | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>(
@@ -66,6 +78,14 @@ export function EarthquakeMap({
   useEffect(() => {
     onSelectRef.current = onSelect;
   }, [onSelect]);
+
+  useEffect(() => {
+    profileModeRef.current = profileMode;
+  }, [profileMode]);
+
+  useEffect(() => {
+    onProfilePointRef.current = onProfilePoint;
+  }, [onProfilePoint]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -280,6 +300,9 @@ export function EarthquakeMap({
           });
 
           map.on('click', 'earthquakes-circles', (event: MapLayerMouseEvent) => {
+            if (profileModeRef.current) {
+              return;
+            }
             event.preventDefault();
             const feature = event.features?.[0];
             const id = feature?.properties?.id;
@@ -287,11 +310,52 @@ export function EarthquakeMap({
               onSelectRef.current(id);
             }
           });
+          map.on('click', (event) => {
+            if (!profileModeRef.current) {
+              return;
+            }
+            onProfilePointRef.current({
+              latitude: event.lngLat.lat,
+              longitude: event.lngLat.lng,
+            });
+          });
           map.on('mouseenter', 'earthquakes-circles', () => {
-            map.getCanvas().style.cursor = 'pointer';
+            if (!profileModeRef.current) {
+              map.getCanvas().style.cursor = 'pointer';
+            }
           });
           map.on('mouseleave', 'earthquakes-circles', () => {
-            map.getCanvas().style.cursor = '';
+            map.getCanvas().style.cursor = profileModeRef.current
+              ? 'crosshair'
+              : '';
+          });
+
+          map.addSource('profile', {
+            type: 'geojson',
+            data: toProfileFeatureCollection(profileStart, profileEnd),
+          });
+          map.addLayer({
+            id: 'profile-line',
+            type: 'line',
+            source: 'profile',
+            filter: ['==', ['geometry-type'], 'LineString'],
+            paint: {
+              'line-color': '#111827',
+              'line-width': 2,
+              'line-dasharray': [4, 2],
+            },
+          });
+          map.addLayer({
+            id: 'profile-points',
+            type: 'circle',
+            source: 'profile',
+            filter: ['==', ['geometry-type'], 'Point'],
+            paint: {
+              'circle-radius': 5,
+              'circle-color': '#111827',
+              'circle-stroke-color': '#ffffff',
+              'circle-stroke-width': 1.5,
+            },
           });
 
           if (!cancelled) {
@@ -331,6 +395,23 @@ export function EarthquakeMap({
     const source = map.getSource('earthquakes') as GeoJSONSource | undefined;
     source?.setData(toEarthquakeFeatureCollection(events));
   }, [events, mapReady]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!mapReady || map === null) {
+      return;
+    }
+    const source = map.getSource('profile') as GeoJSONSource | undefined;
+    source?.setData(toProfileFeatureCollection(profileStart, profileEnd));
+  }, [profileStart, profileEnd, mapReady]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!mapReady || map === null) {
+      return;
+    }
+    map.getCanvas().style.cursor = profileMode ? 'crosshair' : '';
+  }, [profileMode, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;

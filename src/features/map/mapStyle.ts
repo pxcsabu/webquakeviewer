@@ -1,6 +1,12 @@
 import type { StyleSpecification } from 'maplibre-gl';
 import type { ExpressionSpecification } from '@maplibre/maplibre-gl-style-spec';
-import type { Feature, FeatureCollection, Point, Polygon } from 'geojson';
+import type {
+  Feature,
+  FeatureCollection,
+  Point,
+  Polygon,
+} from 'geojson';
+import type { GeoPoint } from '../../analysis/geodesy/distance';
 import type { Earthquake } from '../../domain/earthquake/types';
 import { JAPAN_REGION_BOUNDS } from '../../domain/geography/japanRegion';
 
@@ -182,4 +188,46 @@ export function toEarthquakeFeatureCollection(
         },
       })),
   };
+}
+
+
+export function toProfileFeatureCollection(
+  start: GeoPoint | null,
+  end: GeoPoint | null,
+): FeatureCollection {
+  const features: Feature[] = [];
+  if (start !== null && end !== null) {
+    features.push({
+      type: 'Feature',
+      properties: { role: 'profile-line' },
+      geometry: {
+        type: 'LineString',
+        coordinates: [
+          [start.longitude, start.latitude],
+          [end.longitude, end.latitude],
+        ],
+      },
+    });
+  }
+  if (start !== null) {
+    features.push({
+      type: 'Feature',
+      properties: { role: 'start' },
+      geometry: {
+        type: 'Point',
+        coordinates: [start.longitude, start.latitude],
+      },
+    });
+  }
+  if (end !== null) {
+    features.push({
+      type: 'Feature',
+      properties: { role: 'end' },
+      geometry: {
+        type: 'Point',
+        coordinates: [end.longitude, end.latitude],
+      },
+    });
+  }
+  return { type: 'FeatureCollection', features };
 }

@@ -70,6 +70,17 @@ The JMA `bosai/quake/data/list.json` source is a JSON array of reports.
 - Reports are deduplicated by `eid`. The latest complete report supplies the hypocenter/magnitude, while the latest available maximum intensity is retained.
 - The source does not state its CRS. EarthScope stores `crs: UNKNOWN` and applies no datum transformation.
 
+### 3.3 Slab2 depth contours
+
+The bundled Slab2 asset is a GeoJSON `FeatureCollection` of `LineString` contours.
+
+- `properties.depth` is the contour depth in kilometres.
+- `properties.region` is the Slab2 region name.
+- The source is USGS Slab2, a model-derived subduction geometry, not direct observation.
+- Coordinates are WGS84 decimal degrees, simplified with Douglas–Peucker 0.01° for display.
+- The file includes a `metadata` foreign member with source, citation, license, retrieval time, and simplification notes.
+- Cross-section intersections are computed locally; the contours are not a replacement for a full 3D velocity or slab model.
+
 ## 4. Time
 
 Use ISO 8601 timestamps.

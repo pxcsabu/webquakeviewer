@@ -44,6 +44,22 @@ describe('SOURCE_REGISTRY', () => {
     expect(jma?.attribution).toBe('気象庁');
   });
 
+  it('registers Slab2 as a READY model-derived source', () => {
+    const slab = getSourceRegistryEntry('usgs-slab2');
+    expect(slab).toBeDefined();
+    expect(slab?.status).toBe('READY');
+    expect(slab?.dataLicense).toContain('Public Domain');
+    expect(slab?.attribution).toContain('Slab2');
+  });
+
+  it('keeps the NIED kmoni strong-motion source unavailable', () => {
+    const kmoni = getSourceRegistryEntry('nied-kmoni');
+    expect(kmoni).toBeDefined();
+    expect(kmoni?.status).toBe('UNAVAILABLE');
+    expect(kmoni?.corsVerified).toBe(false);
+    expect(kmoni?.redistributionAllowed).toBeNull();
+  });
+
   it('does not claim READY without a verification timestamp and CORS check', () => {
     for (const entry of SOURCE_REGISTRY) {
       if (entry.status === 'READY') {

@@ -23,6 +23,10 @@ The project is designed to be hosted on GitHub Pages without requiring a dedicat
 - Natural Earth offline fallback (no API key or tile server)
 - List/map selection synchronization
 - Magnitude-sized and depth-colored event markers
+- 地震分布図 / 強震モニタ tabs
+- Cross-section tool with Slab2 depth contours
+- Strong-motion availability panel and JMA intensity summary
+- Surface and hypocentral distance modules; Aki–Utsu b-value module
 
 ### Planned
 
@@ -141,6 +145,20 @@ Preview the production build:
 ```bash
 npm run preview
 ```
+
+### Cross-section tool
+
+In the 地震分布図 tab, select 断面を選択 and click a start point followed by an end point on the map. The cross-section panel shows:
+
+- earthquake hypocenters within ±100 km of the profile
+- distance from the start and depth
+- Slab2 model-derived depth contours intersecting the profile
+
+The Slab2 contours are model context, not direct observations. Horizontal and vertical scales are independent. Events with unknown depth are excluded and counted.
+
+### Strong-motion tab
+
+The 強震モニタ tab intentionally does not fabricate live strong-motion data. The NIED kmoni service is HTTP-only from the verified environment and cannot be embedded in an HTTPS GitHub Pages application; K-NET/KiK-net data requires registration and has usage restrictions. The tab shows the availability status, official links, and a clearly labeled JMA intensity summary.
 
 ### Local caches
 

@@ -6,8 +6,10 @@ import {
   type ErrorInfo,
   type ReactNode,
 } from 'react';
+import { haversineDistanceKm, type GeoPoint } from '../../analysis/geodesy/distance';
 import { JAPAN_REGION_BOUNDS } from '../../domain/geography/japanRegion';
 import type { Earthquake } from '../../domain/earthquake/types';
+import { CrossSectionPanel } from '../cross-section/CrossSectionPanel';
 import {
   BASEMAP_OPTIONS,
   DEFAULT_BASEMAP,
@@ -109,9 +111,50 @@ function MapLegend({ basemap }: { basemap: BasemapId }) {
 
 export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
   const [basemap, setBasemap] = useState<BasemapId>(DEFAULT_BASEMAP);
+  const [profileMode, setProfileMode] = useState(false);
+  const [profileStart, setProfileStart] = useState<GeoPoint | null>(null);
+  const [profileEnd, setProfileEnd] = useState<GeoPoint | null>(null);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const hasProfile = profileStart !== null && profileEnd !== null;
+
+  const clearProfile = (): void => {
+    setProfileMode(false);
+    setProfileStart(null);
+    setProfileEnd(null);
+    setProfileError(null);
+  };
+
+  const toggleProfileMode = (): void => {
+    if (profileMode) {
+      clearProfile();
+      return;
+    }
+    setProfileMode(true);
+    setProfileStart(null);
+    setProfileEnd(null);
+    setProfileError(null);
+  };
+
+  const handleProfilePoint = (point: GeoPoint): void => {
+    setProfileError(null);
+    if (profileStart === null || profileEnd !== null) {
+      setProfileStart(point);
+      setProfileEnd(null);
+      return;
+    }
+    if (haversineDistanceKm(profileStart, point) < 5) {
+      setProfileError('始点と終点が近すぎます。5 km 以上離してください。');
+      return;
+    }
+    setProfileEnd(point);
+    setProfileMode(false);
+  };
 
   return (
-    <section className="panel map-panel" aria-labelledby="map-heading">
+    <section
+      className={`panel map-panel${hasProfile ? ' map-panel-with-analysis' : ''}`}
+      aria-labelledby="map-heading"
+    >
       <div className="panel-heading">
         <h2 id="map-heading">地震分布図</h2>
         <label className="map-basemap-control">
@@ -130,6 +173,26 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
           </select>
         </label>
       </div>
+      <div className="map-toolbar">
+        <button
+          type="button"
+          aria-pressed={profileMode}
+          onClick={toggleProfileMode}
+        >
+          {profileMode ? '地図上で始点/終点を選択中…' : '断面を選択'}
+        </button>
+        {profileStart !== null || profileEnd !== null ? (
+          <button type="button" onClick={clearProfile}>
+            クリア
+          </button>
+        ) : null}
+        <span className="map-toolbar-note">
+          地図上で始点 → 終点の順にクリック
+        </span>
+      </div>
+      {profileError ? (
+        <p className="map-toolbar-error">{profileError}</p>
+      ) : null}
       <div className="map-frame">
         <Suspense
           fallback={<div className="map-overlay">地図モジュールを読み込み中…</div>}
@@ -139,12 +202,24 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
               events={events}
               selectedId={selectedId}
               basemap={basemap}
+              profileStart={profileStart}
+              profileEnd={profileEnd}
+              profileMode={profileMode}
+              onProfilePoint={handleProfilePoint}
               onSelect={onSelect}
             />
           </MapErrorBoundary>
         </Suspense>
         <MapLegend basemap={basemap} />
       </div>
+      {hasProfile && profileStart !== null && profileEnd !== null ? (
+        <CrossSectionPanel
+          events={events}
+          start={profileStart}
+          end={profileEnd}
+          onClear={clearProfile}
+        />
+      ) : null}
     </section>
   );
 }

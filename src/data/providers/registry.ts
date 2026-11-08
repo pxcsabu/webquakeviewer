@@ -44,6 +44,26 @@ export const SOURCE_REGISTRY: readonly SourceRegistryEntry[] = [
       'ne_110m_land.geojson and ne_110m_admin_0_boundary_lines_land.geojson are bundled under public/geo for the basemap. They provide geographic context only and are not a source of earthquake parameters.',
   },
   {
+    id: 'gsi-tiles',
+    name: 'GSI Standard / Pale Map Tiles',
+    provider: 'Geospatial Information Authority of Japan',
+    status: 'READY',
+    homepage: 'https://maps.gsi.go.jp/development/ichiran.html',
+    documentationUrl:
+      'https://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html',
+    dataLicense:
+      '国土地理院コンテンツ利用規約 / PDL1.0 (attribution required)',
+    attribution: '国土地理院',
+    accessMethod:
+      'HTTPS raster tiles (z5-18, direct browser fetch, no API key)',
+    requiresAuthentication: false,
+    corsVerified: true,
+    redistributionAllowed: null,
+    lastVerifiedAt: '2026-11-08T08:00:00Z',
+    notes:
+      'GSI standard and pale raster tiles (z5-18) returned CORS-enabled PNGs. Attribution to 国土地理院 and a link to the GSI tile list are required. Tiles are fetched directly from the GSI service and are not bundled or redistributed by EarthScope.',
+  },
+  {
     id: 'jma-disaster-prevention-xml',
     name: 'JMA Disaster Prevention XML',
     provider: 'Japan Meteorological Agency',

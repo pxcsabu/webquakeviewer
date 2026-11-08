@@ -17,7 +17,8 @@ The project is designed to be hosted on GitHub Pages without requiring a dedicat
 - Periodic catalog updates with conditional HTTP requests
 - Data source status, timestamps, and acquisition warnings
 - MapLibre GL JS hypocenter map
-- Static Natural Earth basemap (no API key or tile server)
+- GSI standard/pale detailed basemap with selector
+- Natural Earth offline fallback (no API key or tile server)
 - List/map selection synchronization
 - Magnitude-sized and depth-colored event markers
 
@@ -56,7 +57,7 @@ Technology choices may be adjusted when a demonstrable technical reason exists.
 
 USGS is currently integrated as the Phase 1 Japan-region catalog and is marked `READY`. Browser access, CORS, and 304 conditional requests have been verified. USGS is a U.S. federal agency and its works are generally public domain; attribution to the U.S. Geological Survey is retained.
 
-The Phase 2 basemap uses bundled Natural Earth 1:110m land and boundary vectors. Natural Earth is public domain and requires no API key or tile server.
+The Phase 2 map uses GSI standard/pale raster tiles with attribution and no API key, plus bundled Natural Earth 1:110m vectors as an offline fallback. GSI tiles are fetched directly from the Geospatial Information Authority of Japan and are not bundled by EarthScope.
 
 Potential future sources include:
 

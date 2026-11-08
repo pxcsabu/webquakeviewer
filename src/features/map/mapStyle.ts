@@ -10,6 +10,44 @@ export const MAP_BOUNDARY_COLOR = '#aeb9c3';
 export const MAP_REGION_COLOR = '#165a8a';
 export const MAP_MISSING_DEPTH_COLOR = '#7f8c8d';
 
+export type BasemapId = 'gsi-pale' | 'gsi-std' | 'natural-earth';
+
+export interface BasemapOption {
+  id: BasemapId;
+  label: string;
+  attribution: string;
+}
+
+export const GSI_TILE_LIST_URL =
+  'https://maps.gsi.go.jp/development/ichiran.html';
+
+export const GSI_ATTRIBUTION = '国土地理院 (地理院タイル)';
+
+export const GSI_TILE_URLS: Record<'gsi-pale' | 'gsi-std', string> = {
+  'gsi-pale': 'https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png',
+  'gsi-std': 'https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
+};
+
+export const BASEMAP_OPTIONS: readonly BasemapOption[] = [
+  {
+    id: 'gsi-pale',
+    label: '地理院 淡色',
+    attribution: GSI_ATTRIBUTION,
+  },
+  {
+    id: 'gsi-std',
+    label: '地理院 標準',
+    attribution: GSI_ATTRIBUTION,
+  },
+  {
+    id: 'natural-earth',
+    label: 'Natural Earth',
+    attribution: 'Natural Earth (public domain)',
+  },
+];
+
+export const DEFAULT_BASEMAP: BasemapId = 'gsi-pale';
+
 export const DEPTH_CLASSES = [
   { label: '0–30 km', color: '#c0392b' },
   { label: '30–100 km', color: '#d68910' },

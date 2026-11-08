@@ -72,6 +72,8 @@ A user can browse, filter, and inspect real earthquake events from a permitted p
 - [x] Display magnitude and depth with documented visual scales
 - [x] Synchronize event-list selection with map selection
 - [x] Add navigation and scale controls
+- [x] Add a GSI standard/pale basemap selector with attribution
+- [x] Retain Natural Earth as an offline basemap fallback
 - [x] Handle WebGL lifecycle, including `map.remove()`
 - [x] Test map resize and responsive layout
 - [ ] Implement map layer visibility controls

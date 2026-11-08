@@ -24,6 +24,16 @@ describe('SOURCE_REGISTRY', () => {
     expect(usgs?.attribution).toBe('U.S. Geological Survey');
   });
 
+  it('marks GSI tiles READY with attribution and verified CORS', () => {
+    const gsi = getSourceRegistryEntry('gsi-tiles');
+    expect(gsi).toBeDefined();
+    expect(gsi?.status).toBe('READY');
+    expect(gsi?.corsVerified).toBe(true);
+    expect(gsi?.lastVerifiedAt).not.toBeNull();
+    expect(gsi?.dataLicense).toContain('PDL1.0');
+    expect(gsi?.attribution).toBe('国土地理院');
+  });
+
   it('does not claim READY without a verification timestamp and CORS check', () => {
     for (const entry of SOURCE_REGISTRY) {
       if (entry.status === 'READY') {

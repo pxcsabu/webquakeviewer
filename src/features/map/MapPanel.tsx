@@ -2,12 +2,19 @@ import {
   Component,
   Suspense,
   lazy,
+  useState,
   type ErrorInfo,
   type ReactNode,
 } from 'react';
 import { JAPAN_REGION_BOUNDS } from '../../domain/geography/japanRegion';
 import type { Earthquake } from '../../domain/earthquake/types';
-import { DEPTH_CLASSES } from './mapStyle';
+import {
+  BASEMAP_OPTIONS,
+  DEFAULT_BASEMAP,
+  DEPTH_CLASSES,
+  GSI_TILE_LIST_URL,
+  type BasemapId,
+} from './mapStyle';
 
 const LazyEarthquakeMap = lazy(() =>
   import('./EarthquakeMap').then((module) => ({
@@ -55,7 +62,10 @@ class MapErrorBoundary extends Component<
   }
 }
 
-function MapLegend() {
+function MapLegend({ basemap }: { basemap: BasemapId }) {
+  const selectedBasemap = BASEMAP_OPTIONS.find(
+    (option) => option.id === basemap,
+  );
   return (
     <aside className="map-legend" aria-label="地図の凡例">
       <p className="map-legend-title">凡例</p>
@@ -79,18 +89,46 @@ function MapLegend() {
         °E）
       </p>
       <p className="map-legend-note">
-        ベースマップ: Natural Earth（パブリックドメイン）
+        ベースマップ: {selectedBasemap?.label ?? '不明'}
       </p>
+      {basemap !== 'natural-earth' ? (
+        <p className="map-legend-note">
+          出典:{' '}
+          <a
+            href={GSI_TILE_LIST_URL}
+            target="_blank"
+            rel="noreferrer"
+          >
+            国土地理院 地理院タイル一覧
+          </a>
+        </p>
+      ) : null}
     </aside>
   );
 }
 
 export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
+  const [basemap, setBasemap] = useState<BasemapId>(DEFAULT_BASEMAP);
+
   return (
     <section className="panel map-panel" aria-labelledby="map-heading">
       <div className="panel-heading">
         <h2 id="map-heading">地震分布図</h2>
-        <span>Phase 2</span>
+        <label className="map-basemap-control">
+          <span>ベースマップ</span>
+          <select
+            value={basemap}
+            onChange={(event) =>
+              setBasemap(event.target.value as BasemapId)
+            }
+          >
+            {BASEMAP_OPTIONS.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
       <div className="map-frame">
         <Suspense
@@ -100,11 +138,12 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
             <LazyEarthquakeMap
               events={events}
               selectedId={selectedId}
+              basemap={basemap}
               onSelect={onSelect}
             />
           </MapErrorBoundary>
         </Suspense>
-        <MapLegend />
+        <MapLegend basemap={basemap} />
       </div>
     </section>
   );

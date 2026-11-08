@@ -84,7 +84,36 @@ Conditions and limitations:
 - The 1:110m scale is intentionally coarse. It must not be presented as a
   high-resolution coastline or administrative boundary.
 
-## 5. Japan Meteorological Agency
+## 5. GSI Standard / Pale Map Tiles
+
+**Status: READY**
+
+The Geospatial Information Authority of Japan (GSI) provides detailed raster
+tiles for the Japanese archipelago and surrounding areas.
+
+Tile endpoints:
+
+- Standard: `https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png`
+- Pale: `https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png`
+
+Conditions and limitations:
+
+- Zoom levels 5–18 for both standard and pale tiles.
+- CORS was verified with `Origin: https://pxcsabu.github.io`; the responses
+  include `Access-Control-Allow-Origin: *`.
+- No API key is required.
+- Attribution to 国土地理院 and a link to the GSI tile list are required.
+- Tiles are fetched directly from the GSI service. EarthScope does not bundle
+  or redistribute the tile images.
+- The tiles are a geographic basemap only. They are not used for distance,
+  boundary, or scientific calculations.
+- The standard and pale styles are selectable in the map UI. Natural Earth is
+  retained as an offline fallback.
+
+Reference: [GSI tile list](https://maps.gsi.go.jp/development/ichiran.html),
+[GSI content terms](https://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html).
+
+## 6. Japan Meteorological Agency
 
 **Status: CONDITIONAL**
 
@@ -121,7 +150,7 @@ Do not claim that an endpoint supports CORS without testing it.
 
 Do not claim that all JMA information is real-time.
 
-## 6. NIED Hi-net
+## 7. NIED Hi-net
 
 **Status: RESTRICTED / CONDITIONAL**
 
@@ -146,7 +175,7 @@ Do not assume that Hi-net waveforms are available through an unrestricted public
 
 Do not redistribute downloaded waveforms without explicit permission.
 
-## 7. NIED K-NET / KiK-net
+## 8. NIED K-NET / KiK-net
 
 **Status: RESTRICTED / CONDITIONAL**
 
@@ -172,7 +201,7 @@ Potential formats include ASCII, binary, and CSV depending on the dataset.
 
 A future EarthScope waveform module may support user-provided files obtained under valid access conditions.
 
-## 8. J-SHIS
+## 9. J-SHIS
 
 **Status: CONDITIONAL**
 
@@ -197,7 +226,7 @@ Before integration, verify:
 - Redistribution permission
 - Browser accessibility
 
-## 9. Geological Survey of Japan
+## 10. Geological Survey of Japan
 
 **Status: CONDITIONAL**
 
@@ -214,7 +243,7 @@ Official resource:
 
 Check dataset-specific licensing, attribution, scale, coordinate system, and update history.
 
-## 10. Published Geophysical Models
+## 11. Published Geophysical Models
 
 Potential sources include published:
 
@@ -230,7 +259,7 @@ Each model must have its own metadata and usage review.
 
 Do not combine models from different publications without recording their differences.
 
-## 11. Browser Compatibility Verification
+## 12. Browser Compatibility Verification
 
 For each provider, test the actual deployed browser environment.
 
@@ -249,7 +278,7 @@ Record:
 
 A successful command-line download does not prove that browser-side fetching works.
 
-## 12. Live Data Policy
+## 13. Live Data Policy
 
 EarthScope divides live information into three categories.
 
@@ -273,7 +302,7 @@ It may require specialized access, authentication, a relay service, or a separat
 
 The application must never simulate real-time observations and label them as live data.
 
-## 13. Source Registry
+## 14. Source Registry
 
 Each integrated source must have a registry entry containing:
 

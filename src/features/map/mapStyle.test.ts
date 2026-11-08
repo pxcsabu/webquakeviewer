@@ -1,6 +1,26 @@
 import { describe, expect, it } from 'vitest';
 import { sampleEarthquakes } from '../../data/providers/sample/fixtures';
-import { toEarthquakeFeatureCollection } from './mapStyle';
+import {
+  BASEMAP_OPTIONS,
+  GSI_TILE_URLS,
+  toEarthquakeFeatureCollection,
+} from './mapStyle';
+
+describe('basemap options', () => {
+  it('provides GSI pale, GSI standard, and Natural Earth options', () => {
+    expect(BASEMAP_OPTIONS.map((option) => option.id)).toEqual([
+      'gsi-pale',
+      'gsi-std',
+      'natural-earth',
+    ]);
+    expect(GSI_TILE_URLS['gsi-pale']).toContain(
+      'cyberjapandata.gsi.go.jp/xyz/pale',
+    );
+    expect(GSI_TILE_URLS['gsi-std']).toContain(
+      'cyberjapandata.gsi.go.jp/xyz/std',
+    );
+  });
+});
 
 describe('toEarthquakeFeatureCollection', () => {
   it('uses GeoJSON longitude, latitude order', () => {

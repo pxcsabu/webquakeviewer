@@ -290,9 +290,15 @@ Filtering must never silently alter source coordinates, magnitudes, depths, or p
 
 ## 14. Basemap and Visualization Context
 
-The Phase 2 basemap uses Natural Earth 1:110m land and country-boundary vectors bundled as static public-domain assets. It provides geographic context only.
+The Phase 2 map offers two basemap families:
+
+- GSI standard and pale raster tiles (zoom 5–18), fetched directly from the Geospatial Information Authority of Japan with attribution.
+- Natural Earth 1:110m land and country-boundary vectors, bundled as static public-domain assets and used as an offline fallback.
+
+Both basemaps provide geographic context only.
 
 - Do not use the basemap for distance, area, boundary, or legal determinations.
 - The basemap does not define the Japan region filter. The filter rectangle is defined separately in section 13.
+- GSI tiles are not bundled or redistributed by EarthScope. Attribution and a link to the GSI tile list are displayed with the map.
 - Earthquake marker size encodes magnitude and marker color encodes depth class. The map legend documents the classes.
 - A visualization must not imply greater positional or boundary accuracy than the underlying basemap supports.

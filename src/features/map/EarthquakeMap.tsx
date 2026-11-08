@@ -12,17 +12,21 @@ import {
   BASE_MAP_STYLE,
   EARTHQUAKE_POINT_COLOR,
   EARTHQUAKE_POINT_RADIUS,
+  GSI_ATTRIBUTION,
+  GSI_TILE_URLS,
   JAPAN_REGION_POLYGON,
   MAP_BOUNDARY_COLOR,
   MAP_LAND_COLOR,
   MAP_REGION_COLOR,
   SELECTED_POINT_RADIUS,
   toEarthquakeFeatureCollection,
+  type BasemapId,
 } from './mapStyle';
 
 interface EarthquakeMapProps {
   events: Earthquake[];
   selectedId: string | null;
+  basemap: BasemapId;
   onSelect: (id: string) => void;
 }
 
@@ -39,6 +43,7 @@ async function fetchFeatureCollection(
 export function EarthquakeMap({
   events,
   selectedId,
+  basemap,
   onSelect,
 }: EarthquakeMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -51,6 +56,7 @@ export function EarthquakeMap({
     'loading',
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [basemapWarning, setBasemapWarning] = useState<string | null>(null);
   const [contextLost, setContextLost] = useState(false);
 
   useEffect(() => {
@@ -70,6 +76,7 @@ export function EarthquakeMap({
     let cancelled = false;
     setStatus('loading');
     setErrorMessage(null);
+    setBasemapWarning(null);
     setMapReady(false);
     setContextLost(false);
 
@@ -77,12 +84,12 @@ export function EarthquakeMap({
       container,
       style: BASE_MAP_STYLE,
       bounds: [
-        [128, 29],
-        [146, 46],
+        [130, 30],
+        [145, 45],
       ],
       fitBoundsOptions: { padding: 24 },
-      minZoom: 2.5,
-      maxZoom: 9,
+      minZoom: 5,
+      maxZoom: 14,
       maxBounds: [
         [110, 5],
         [170, 60],
@@ -120,10 +127,20 @@ export function EarthquakeMap({
 
     map.on('error', (event) => {
       console.error('MapLibre error', event.error);
-      if (!cancelled) {
-        setErrorMessage('地図の描画中にエラーが発生しました。');
-        setStatus('error');
+      if (cancelled) {
+        return;
       }
+
+      const sourceId = 'sourceId' in event ? event.sourceId : undefined;
+      if (typeof sourceId === 'string' && sourceId.startsWith('gsi-')) {
+        setBasemapWarning(
+          '地理院タイルの一部を読み込めませんでした。Natural Earth を表示しています。',
+        );
+        return;
+      }
+
+      setErrorMessage('地図の描画中にエラーが発生しました。');
+      setStatus('error');
     });
 
     map.on('load', () => {
@@ -168,6 +185,46 @@ export function EarthquakeMap({
             paint: {
               'line-color': MAP_BOUNDARY_COLOR,
               'line-width': 0.6,
+            },
+          });
+
+          map.addSource('gsi-pale', {
+            type: 'raster',
+            tiles: [GSI_TILE_URLS['gsi-pale']],
+            tileSize: 256,
+            minzoom: 5,
+            maxzoom: 18,
+            attribution: GSI_ATTRIBUTION,
+          });
+          map.addLayer({
+            id: 'basemap-gsi-pale',
+            type: 'raster',
+            source: 'gsi-pale',
+            layout: {
+              visibility: basemap === 'gsi-pale' ? 'visible' : 'none',
+            },
+            paint: {
+              'raster-opacity': 1,
+            },
+          });
+
+          map.addSource('gsi-std', {
+            type: 'raster',
+            tiles: [GSI_TILE_URLS['gsi-std']],
+            tileSize: 256,
+            minzoom: 5,
+            maxzoom: 18,
+            attribution: GSI_ATTRIBUTION,
+          });
+          map.addLayer({
+            id: 'basemap-gsi-std',
+            type: 'raster',
+            source: 'gsi-std',
+            layout: {
+              visibility: basemap === 'gsi-std' ? 'visible' : 'none',
+            },
+            paint: {
+              'raster-opacity': 1,
             },
           });
 
@@ -314,6 +371,31 @@ export function EarthquakeMap({
     });
   }, [events, selectedId, mapReady]);
 
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!mapReady || map === null) {
+      return;
+    }
+
+    if (map.getLayer('basemap-gsi-pale')) {
+      map.setLayoutProperty(
+        'basemap-gsi-pale',
+        'visibility',
+        basemap === 'gsi-pale' ? 'visible' : 'none',
+      );
+    }
+    if (map.getLayer('basemap-gsi-std')) {
+      map.setLayoutProperty(
+        'basemap-gsi-std',
+        'visibility',
+        basemap === 'gsi-std' ? 'visible' : 'none',
+      );
+    }
+    if (basemap === 'natural-earth') {
+      setBasemapWarning(null);
+    }
+  }, [basemap, mapReady]);
+
   return (
     <div
       className="map-container"
@@ -326,6 +408,9 @@ export function EarthquakeMap({
       ) : null}
       {status === 'error' ? (
         <div className="map-overlay map-overlay-error">{errorMessage}</div>
+      ) : null}
+      {basemapWarning ? (
+        <div className="map-basemap-warning">{basemapWarning}</div>
       ) : null}
       {contextLost ? (
         <div className="map-overlay">

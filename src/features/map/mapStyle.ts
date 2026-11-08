@@ -31,6 +31,9 @@ export const JSHIS_ATTRIBUTION =
 
 export const JSHIS_URL = 'https://www.j-shis.bosai.go.jp/map/';
 
+export const SLAB2_ATTRIBUTION =
+  'USGS Slab2 depth contours (Hayes et al., 2018)';
+
 export const PB2002_ATTRIBUTION =
   'PB2002 plate boundaries (Bird 2003; Nordpil, ODC-By 1.0)';
 

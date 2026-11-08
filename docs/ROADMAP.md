@@ -136,23 +136,23 @@ Do not block the core application if a source is unavailable.
 
 Historical CRS note: the current JMA list JSON does not state a CRS, so EarthScope stores `UNKNOWN` and applies no datum transformation. Historical JMA datasets are not integrated. Any future historical dataset must carry dataset-specific CRS metadata (including the Tokyo Datum cutoff documented in `docs/SCIENCE.md`).
 
-## Phase 5 — 3D Earth Visualization
+## Phase 5 — 3D Earth Visualization (DEFERRED — removed from current scope)
 
 **Goal: Introduce interactive 3D geophysical visualization.**
 
-**Status: COMPLETE — implemented, tested, and verified in the browser (2026-11-08).**
+**Status: DEFERRED — the 3D globe implementation was removed by project decision.** PB2002 plate boundaries and Slab2 depth contours are now integrated into the 2D earthquake map and cross-section tool.
 
-- [x] Initialize Three.js globe
-- [x] Define deterministic camera orientation
-- [x] Center the initial view on Japan
-- [x] Display earthquake hypocenters in 3D
-- [x] Implement depth visualization (display scale and depth colors)
-- [x] Implement cross-section visualization (2D profile tool; 3D globe provides depth context)
-- [x] Add configurable geological overlays (PB2002 on the globe)
-- [x] Add 3D Slab2 interface depth contours (post-Phase-5 extension)
-- [x] Implement WebGL lifecycle management (dispose, context loss, resize)
-- [x] Test coexistence with MapLibre (mutually exclusive tabs; context disposal verified)
-- [x] Verify 3D globe on GitHub Pages
+- [ ] Initialize Three.js globe
+- [ ] Define deterministic camera orientation
+- [ ] Center the initial view on Japan
+- [ ] Display earthquake hypocenters in 3D
+- [ ] Implement depth visualization (display scale and depth colors)
+- [ ] Implement cross-section visualization in 3D
+- [ ] Add configurable geological overlays in 3D
+- [ ] Add 3D Slab2 interface depth contours
+- [ ] Implement 3D WebGL lifecycle management
+- [ ] Test 3D coexistence with MapLibre
+- [ ] Verify 3D globe on GitHub Pages
 
 Completion criteria:
 
@@ -224,7 +224,7 @@ These may be reconsidered when suitable access and infrastructure are available.
 2. Geographic visualization and monitoring
 3. Correct scientific analysis
 4. Japan-specific data integration
-5. 3D Earth visualization
+5. 3D Earth visualization (deferred)
 6. Waveform analysis
 7. Advanced geophysical models
 

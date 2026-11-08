@@ -119,6 +119,7 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
   const [profileEnd, setProfileEnd] = useState<GeoPoint | null>(null);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [showPlateBoundaries, setShowPlateBoundaries] = useState(false);
+  const [showSlab2, setShowSlab2] = useState(false);
   const [showHazard, setShowHazard] = useState(false);
   const hasProfile = profileStart !== null && profileEnd !== null;
 
@@ -212,12 +213,26 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
         <label>
           <input
             type="checkbox"
+            checked={showSlab2}
+            onChange={(event) => setShowSlab2(event.target.checked)}
+          />
+          Slab2 等深線
+        </label>
+        <label>
+          <input
+            type="checkbox"
             checked={showHazard}
             onChange={(event) => setShowHazard(event.target.checked)}
           />
           J-SHIS 地震ハザード
         </label>
       </div>
+      {showSlab2 ? (
+        <p className="map-layer-note">
+          Slab2 等深線は USGS のモデル（Hayes et al., 2018）です。
+          深さに応じて色分けしています。
+        </p>
+      ) : null}
       {showHazard ? (
         <p className="map-layer-note">
           {JSHIS_ATTRIBUTION} 2020年版。確率論的評価であり、現在の揺れではありません。{' '}
@@ -239,6 +254,7 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
               selectedId={selectedId}
               basemap={basemap}
               showPlateBoundaries={showPlateBoundaries}
+              showSlab2={showSlab2}
               showHazard={showHazard}
               profileStart={profileStart}
               profileEnd={profileEnd}

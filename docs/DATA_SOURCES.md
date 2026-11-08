@@ -347,7 +347,7 @@ The USGS Slab2 depth contours are used only for cross-section context. They are 
 - The static GeoJSON asset was simplified with Douglas–Peucker 0.01° and rounded to 4 decimal places for display.
 - Depth values are in kilometres. The model includes the Izu-Bonin, Kuril, Manila, and Ryukyu regions.
 - The cross-section tool intersects these contours with the user-selected profile. It does not interpolate or claim a unique plate interface where multiple slabs overlap.
-- The same contours are available as an optional 3D globe overlay, placed at the depth display radius and colored by depth.
+- The contours are also available as an optional 2D map overlay, colored by depth. The 3D globe was removed from the current scope.
 - The bundled contour asset and cross-section rendering were verified on the deployed GitHub Pages site on 2026-11-08.
 - Do not use the contours for legal boundaries, hazard zoning, or quantitative plate reconstruction.
 
@@ -386,5 +386,6 @@ K-NET/KiK-net waveform and strong-motion data remain registration-restricted.
 - 241 boundary features, WGS84.
 - Bundled as `public/geo/PB2002_boundaries.json`.
 - This is a model-derived plate-boundary dataset, not a legal or administrative boundary.
-- It is displayed as an optional map overlay and is not used for distance or hazard calculations.
+- It is displayed as an optional 2D map overlay and is not used for distance or hazard calculations.
+- The former 3D globe overlay was removed from the current scope.
 - The bundled overlay was verified on GitHub Pages on 2026-11-08.

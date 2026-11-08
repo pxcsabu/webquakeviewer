@@ -26,11 +26,9 @@ The project is designed to be hosted on GitHub Pages without requiring a dedicat
 - 地震分布図 / 強震モニタ tabs
 - Cross-section tool with Slab2 depth contours
 - Strong-motion availability panel and JMA intensity summary
-- PB2002 plate-boundary overlay
+- PB2002 plate-boundary overlay on the 2D map
 - J-SHIS 2020 probabilistic seismic-hazard WMS overlay
-- Three.js 3D globe with depth-colored hypocenters
-- PB2002 plate-boundary overlay on the 3D globe
-- Slab2 depth-contour overlay on the 3D globe
+- Slab2 depth-contour overlay on the 2D map
 - Surface and hypocentral distance modules; Aki–Utsu b-value module
 - Depth histogram, cumulative magnitude-frequency, temporal statistics, DBSCAN spatial clusters, and b-value analysis panel
 
@@ -41,7 +39,6 @@ The project is designed to be hosted on GitHub Pages without requiring a dedicat
 - Hypocenter cross-sections
 - Magnitude-frequency analysis
 - b-value calculation
-- 3D Earth visualization
 - Plate and geological overlays
 - Seismic waveform visualization
 - Focal mechanism visualization
@@ -57,7 +54,6 @@ Advanced features depend on the availability and permitted use of suitable datas
 | UI | React |
 | Build system | Vite |
 | Geographic map | MapLibre GL JS |
-| 3D visualization | Three.js |
 | Charts | Apache ECharts |
 | Local cache | IndexedDB |
 | Background processing | Web Workers |

@@ -11,7 +11,6 @@ import { CatalogAnalysisPanel } from '../features/analysis/CatalogAnalysisPanel'
 import { EarthquakeDetail } from '../features/earthquakes/EarthquakeDetail';
 import { EarthquakeFilters } from '../features/earthquakes/EarthquakeFilters';
 import { EarthquakeList } from '../features/earthquakes/EarthquakeList';
-import { GlobePanel } from '../features/globe/GlobePanel';
 import { MapPanel } from '../features/map/MapPanel';
 import { StrongMotionPanel } from '../features/strong-motion/StrongMotionPanel';
 import {
@@ -21,7 +20,7 @@ import {
 } from '../features/earthquakes/filters';
 import { useCatalog } from './state/useCatalog';
 
-type MainTab = 'map' | 'strong-motion' | 'globe';
+type MainTab = 'map' | 'strong-motion';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<MainTab>('map');
@@ -89,14 +88,6 @@ export function App() {
         >
           強震モニタ
         </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeTab === 'globe'}
-          onClick={() => setActiveTab('globe')}
-        >
-          3D地球
-        </button>
       </nav>
 
       {activeTab === 'map' ? (
@@ -140,13 +131,9 @@ export function App() {
           />
         </div>
         </main>
-      ) : activeTab === 'strong-motion' ? (
-        <main className="app-main app-main-single">
-          <StrongMotionPanel events={visibleEvents} providerId={providerId} />
-        </main>
       ) : (
         <main className="app-main app-main-single">
-          <GlobePanel events={visibleEvents} />
+          <StrongMotionPanel events={visibleEvents} providerId={providerId} />
         </main>
       )}
 

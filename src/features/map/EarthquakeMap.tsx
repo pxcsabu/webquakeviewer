@@ -23,6 +23,7 @@ import {
   MAP_REGION_COLOR,
   PB2002_ATTRIBUTION,
   PLATE_BOUNDARY_COLOR,
+  SLAB2_ATTRIBUTION,
   SELECTED_POINT_RADIUS,
   toEarthquakeFeatureCollection,
   toProfileFeatureCollection,
@@ -37,6 +38,7 @@ interface EarthquakeMapProps {
   profileEnd: GeoPoint | null;
   profileMode: boolean;
   showPlateBoundaries: boolean;
+  showSlab2: boolean;
   showHazard: boolean;
   onProfilePoint: (point: GeoPoint) => void;
   onSelect: (id: string) => void;
@@ -60,6 +62,7 @@ export function EarthquakeMap({
   profileEnd,
   profileMode,
   showPlateBoundaries,
+  showSlab2,
   showHazard,
   onProfilePoint,
   onSelect,
@@ -174,7 +177,7 @@ export function EarthquakeMap({
     map.on('load', () => {
       void (async () => {
         try {
-          const [land, boundaries, plateBoundaries] = await Promise.all([
+          const [land, boundaries, plateBoundaries, slab2] = await Promise.all([
             fetchFeatureCollection(
               `${import.meta.env.BASE_URL}geo/ne_110m_land.geojson`,
             ),
@@ -183,6 +186,9 @@ export function EarthquakeMap({
             ),
             fetchFeatureCollection(
               `${import.meta.env.BASE_URL}geo/PB2002_boundaries.json`,
+            ),
+            fetchFeatureCollection(
+              `${import.meta.env.BASE_URL}geo/slab2_japan_depth_contours.geojson`,
             ),
           ]);
           if (cancelled) {
@@ -292,6 +298,35 @@ export function EarthquakeMap({
               'line-color': PLATE_BOUNDARY_COLOR,
               'line-width': 1.3,
               'line-opacity': 0.9,
+            },
+          });
+
+          map.addSource('slab2-contours', {
+            type: 'geojson',
+            data: slab2,
+            attribution: SLAB2_ATTRIBUTION,
+          });
+          map.addLayer({
+            id: 'slab2-contours-line',
+            type: 'line',
+            source: 'slab2-contours',
+            layout: {
+              visibility: showSlab2 ? 'visible' : 'none',
+            },
+            paint: {
+              'line-color': [
+                'step',
+                ['get', 'depth'],
+                '#c0392b',
+                30,
+                '#d68910',
+                100,
+                '#2e86c1',
+                300,
+                '#6c3483',
+              ],
+              'line-width': 1.2,
+              'line-opacity': 0.85,
             },
           });
 
@@ -479,7 +514,14 @@ export function EarthquakeMap({
         showHazard ? 'visible' : 'none',
       );
     }
-  }, [showPlateBoundaries, showHazard, mapReady]);
+    if (map.getLayer('slab2-contours-line')) {
+      map.setLayoutProperty(
+        'slab2-contours-line',
+        'visibility',
+        showSlab2 ? 'visible' : 'none',
+      );
+    }
+  }, [showPlateBoundaries, showSlab2, showHazard, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;

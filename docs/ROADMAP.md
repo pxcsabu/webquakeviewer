@@ -77,7 +77,7 @@ A user can browse, filter, and inspect real earthquake events from a permitted p
 - [ ] Implement map layer visibility controls
 - [ ] Test WebGL context loss and restoration
 - [ ] Test coexistence with the future 3D module
-- [ ] Verify map rendering on GitHub Pages
+- [x] Verify map rendering on GitHub Pages
 
 Basemap candidates must be evaluated against the static-first and no-embedded-API-key requirements. A static vector basemap or an explicitly permitted tile service may be used. Provider terms must be documented before implementation.
 

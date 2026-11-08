@@ -74,13 +74,13 @@ A user can browse, filter, and inspect real earthquake events from a permitted p
 - [x] Add navigation and scale controls
 - [x] Add a GSI standard/pale basemap selector with attribution
 - [x] Retain Natural Earth as an offline basemap fallback
-- [x] Add 地震分布図 / 強震モニタ tabs
+- [x] Add 地震分布図 / 強震モニタ tabs (later expanded with 3D地殻 and 波形解析)
 - [x] Add a strong-motion tab with official-link fallback; embedding/relay/extraction is prohibited by NIED terms
 - [x] Handle WebGL lifecycle, including `map.remove()`
 - [x] Test map resize and responsive layout
-- [ ] Implement map layer visibility controls
+- [x] Implement map layer visibility controls
 - [ ] Test WebGL context loss and restoration
-- [ ] Test coexistence with the future 3D module
+- [x] Keep MapLibre and Three.js in mutually exclusive tabs
 - [x] Verify map rendering on GitHub Pages
 
 Basemap candidates must be evaluated against the static-first and no-embedded-API-key requirements. A static vector basemap or an explicitly permitted tile service may be used. Provider terms must be documented before implementation.
@@ -136,43 +136,48 @@ Do not block the core application if a source is unavailable.
 
 Historical CRS note: the current JMA list JSON does not state a CRS, so EarthScope stores `UNKNOWN` and applies no datum transformation. Historical JMA datasets are not integrated. Any future historical dataset must carry dataset-specific CRS metadata (including the Tokyo Datum cutoff documented in `docs/SCIENCE.md`).
 
-## Phase 5 — 3D Earth Visualization (DEFERRED — removed from current scope)
+## Phase 5 — Japan-Limited 3D Crust Block (PARTIAL)
 
-**Goal: Introduce interactive 3D geophysical visualization.**
+**Goal: Add an interactive, Japan-limited 3D geophysical view without returning to a global Earth globe.**
 
-**Status: DEFERRED — the 3D globe implementation was removed by project decision.** PB2002 plate boundaries and Slab2 depth contours are now integrated into the 2D earthquake map and cross-section tool.
+**Status: PARTIAL — implemented and locally verified.** The global 3D Earth/globe remains out of scope. The implemented view is a non-spherical crust block covering the operational Japan region, with hypocenters, PB2002 boundaries, and Slab2 depth contours.
 
-- [ ] Initialize Three.js globe
-- [ ] Define deterministic camera orientation
-- [ ] Center the initial view on Japan
-- [ ] Display earthquake hypocenters in 3D
-- [ ] Implement depth visualization (display scale and depth colors)
+- [x] Initialize a Three.js Japan-limited crust block (not a globe)
+- [x] Define deterministic camera position, target, and up vector
+- [x] Center the initial view on Japan
+- [x] Display earthquake hypocenters in 3D
+- [x] Implement depth visualization (display scale and depth colors)
+- [x] Add right-drag orbit, middle-drag pan, wheel zoom, and double-click reset
+- [x] Add PB2002 and Slab2 context in 3D
+- [x] Implement 3D WebGL lifecycle management and resource disposal
+- [x] Keep MapLibre and Three.js in mutually exclusive tabs
 - [ ] Implement cross-section visualization in 3D
-- [ ] Add configurable geological overlays in 3D
-- [ ] Add 3D Slab2 interface depth contours
-- [ ] Implement 3D WebGL lifecycle management
-- [ ] Test 3D coexistence with MapLibre
-- [ ] Verify 3D globe on GitHub Pages
+- [ ] Add a 3D Slab2 surface (only depth-contour lines are shown)
+- [ ] Verify the 3D block on GitHub Pages
 
 Completion criteria:
 
-Not applicable while Phase 5 is deferred. The 2D map remains the primary geographic visualization.
+The Japan-limited 3D block works without degrading the 2D map or event catalog. It is a display model, not a velocity or geological model. A global 3D Earth is explicitly deferred.
 
-## Phase 6 — Waveform Analysis
+## Phase 6 — Waveform Analysis (PARTIAL)
 
 **Goal: Support waveform visualization and basic processing.**
 
+**Status: PARTIAL — user-provided CSV/JSON files are implemented and tested.** MiniSEED, binary waveform storage, and NIED waveform feeds are not implemented.
+
 This phase depends on legally usable waveform data.
 
-- [ ] Define waveform data model
-- [ ] Support user-provided waveform files
+- [x] Define waveform data model
+- [x] Support user-provided CSV/JSON waveform files
 - [ ] Implement MiniSEED parsing where appropriate
 - [ ] Implement binary waveform support
-- [ ] Display waveform time series
-- [ ] Implement filtering
-- [ ] Implement amplitude measurements
-- [ ] Display sampling frequency and units
-- [ ] Add station metadata
+- [x] Display waveform time series
+- [x] Implement simple lowpass/highpass filtering
+- [x] Implement amplitude measurements (mean, peak, peak-to-peak, RMS)
+- [x] Display sampling frequency and units
+- [x] Add station metadata
+- [ ] Add instrument-response correction
+- [ ] Verify waveform analysis on GitHub Pages
 
 NIED waveform integration must follow the applicable access and redistribution conditions.
 
@@ -213,6 +218,8 @@ The following must not be promised as initial capabilities:
 - Unrestricted real-time Hi-net waveform streaming
 - Unrestricted K-NET/KiK-net waveform streaming
 - Guaranteed real-time JMA early warning
+- Global 3D Earth globe (the Japan-limited crust block is the current 3D scope)
+- MiniSEED or NIED waveform streaming without documented permission
 - Server-side processing
 - Large-scale tomography processing without selected datasets
 
@@ -224,8 +231,8 @@ These may be reconsidered when suitable access and infrastructure are available.
 2. Geographic visualization and monitoring
 3. Correct scientific analysis
 4. Japan-specific data integration
-5. 3D Earth visualization (deferred)
-6. Waveform analysis
+5. Japan-limited 3D crust block (partial)
+6. Waveform analysis (partial — user-provided files)
 7. Advanced geophysical models
 
 The long-term vision remains comprehensive geophysical analysis. The staged roadmap exists to make that vision achievable rather than to reduce its scope.

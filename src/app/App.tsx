@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import {
+  Suspense,
+  lazy,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {
   CATALOG_PROVIDER_OPTIONS,
   DEFAULT_CATALOG_PROVIDER,
@@ -13,6 +19,7 @@ import { EarthquakeFilters } from '../features/earthquakes/EarthquakeFilters';
 import { EarthquakeList } from '../features/earthquakes/EarthquakeList';
 import { MapPanel } from '../features/map/MapPanel';
 import { StrongMotionPanel } from '../features/strong-motion/StrongMotionPanel';
+import { WaveformPanel } from '../features/waveform/WaveformPanel';
 import {
   DEFAULT_EARTHQUAKE_FILTERS,
   filterEarthquakes,
@@ -20,7 +27,13 @@ import {
 } from '../features/earthquakes/filters';
 import { useCatalog } from './state/useCatalog';
 
-type MainTab = 'map' | 'strong-motion';
+type MainTab = 'map' | 'crust3d' | 'waveform' | 'strong-motion';
+
+const LazyCrust3DPanel = lazy(() =>
+  import('../features/crust3d/Crust3DPanel').then((module) => ({
+    default: module.Crust3DPanel,
+  })),
+);
 
 export function App() {
   const [activeTab, setActiveTab] = useState<MainTab>('map');
@@ -83,6 +96,22 @@ export function App() {
         <button
           type="button"
           role="tab"
+          aria-selected={activeTab === 'crust3d'}
+          onClick={() => setActiveTab('crust3d')}
+        >
+          3D地殻
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'waveform'}
+          onClick={() => setActiveTab('waveform')}
+        >
+          波形解析
+        </button>
+        <button
+          type="button"
+          role="tab"
           aria-selected={activeTab === 'strong-motion'}
           onClick={() => setActiveTab('strong-motion')}
         >
@@ -130,6 +159,20 @@ export function App() {
             warnings={catalog.warnings}
           />
         </div>
+        </main>
+      ) : activeTab === 'crust3d' ? (
+        <main className="app-main app-main-single app-main-crust3d">
+          <Suspense
+            fallback={
+              <div className="crust3d-loading">3Dモジュールを読み込み中…</div>
+            }
+          >
+            <LazyCrust3DPanel events={visibleEvents} />
+          </Suspense>
+        </main>
+      ) : activeTab === 'waveform' ? (
+        <main className="app-main app-main-single app-main-waveform">
+          <WaveformPanel />
         </main>
       ) : (
         <main className="app-main app-main-single">

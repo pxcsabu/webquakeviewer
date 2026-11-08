@@ -80,6 +80,7 @@ The bundled Slab2 asset is a GeoJSON `FeatureCollection` of `LineString` contour
 - Coordinates are WGS84 decimal degrees, simplified with Douglas–Peucker 0.01° for display.
 - The file includes a `metadata` foreign member with source, citation, license, retrieval time, and simplification notes.
 - Cross-section intersections are computed locally; the contours are not a replacement for a full 3D velocity or slab model.
+- The same contours are drawn at their model depth in the Japan-limited 3D crust block.
 
 ## 4. Time
 
@@ -135,6 +136,56 @@ Example:
 The rank is an ordinal index, not a linear measurement.
 
 ## 7. Waveform Data
+
+### 7.1 User-provided CSV waveform
+
+Current implementation:
+
+```text
+time,amplitude,station,channel,units,samplingRateHz
+2026-01-01T00:00:00Z,1.0,TEST,BHZ,counts,10
+2026-01-01T00:00:00.1Z,-1.1,TEST,BHZ,counts,10
+```
+
+- `time` and `amplitude` are required.
+- `station`, `network`, `channel`, `location`, `units`, and `samplingRateHz` are optional.
+- Lines whose first field begins with `#` are comments.
+- Time accepts ISO 8601 with a timezone, Unix seconds, or Unix milliseconds.
+- Numeric amplitudes are preserved without unit conversion.
+- The original time text is retained per sample when supplied.
+- Invalid rows are excluded and reported. The parser does not interpolate gaps.
+- Duplicate timestamps keep the first value and emit a warning.
+- If `samplingRateHz` is absent, the median positive interval is used.
+- A single file is treated as a single trace.
+
+### 7.2 User-provided JSON waveform
+
+```json
+{
+  "station": { "network": "XX", "station": "ABC", "channel": "HHZ" },
+  "units": "m/s",
+  "samplingRateHz": 100,
+  "samples": [
+    { "time": "2026-01-01T00:00:00Z", "amplitude": 0.001 },
+    { "time": "2026-01-01T00:00:00.01Z", "amplitude": 0.002 }
+  ]
+}
+```
+
+A top-level array of `{ "time", "amplitude" }` objects is also accepted. Metadata is optional. The same validation, timezone warning, and unit-preservation rules as CSV apply.
+
+### 7.3 MiniSEED and binary waveforms
+
+MiniSEED and binary waveform support are **not implemented**. Do not treat a user-provided file with a `.mseed` extension as parsed data. Future binary support must follow the relevant format specification and document:
+
+- record version and byte order
+- sample encoding
+- start time and sampling rate
+- station/channel/location metadata
+- units and calibration
+- missing-value handling
+
+### 7.4 General waveform storage
 
 Waveform data can be large and should not be stored as enormous JSON arrays.
 
@@ -272,7 +323,7 @@ Maintain compatibility or provide explicit migration logic where necessary.
 - The bundled file has a `metadata` foreign member with source, citation, license, retrieval time, and CRS
 - Model-derived boundaries, not legal boundaries
 
-### 14.2 J-SHIS WMS image
+### 14.2 J-SHIS WMS raster tiles
 
 - Format: PNG raster tiles returned by WMS `GetMap`
 - Source CRS: EPSG:3857

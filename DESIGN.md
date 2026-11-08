@@ -90,9 +90,9 @@ Every data provider must have:
 
 ### Advanced features
 
-- 3D Earth visualization
+- Japan-limited 3D crust block
 - Earth interior visualization
-- Seismic waveform display
+- Seismic waveform display (user-provided CSV/JSON)
 - Focal mechanism visualization
 - Tomography and velocity models
 - Strong-motion analysis
@@ -189,7 +189,7 @@ The layout must remain usable on smaller screens, although desktop is the primar
 
 MapLibre GL JS is the primary geographic map renderer.
 
-Three.js is used for 3D Earth and scientific visualization.
+Three.js is used for the Japan-limited, non-spherical 3D crust block. A global Earth globe is not part of the current scope.
 
 The application must account for the fact that both systems use WebGL.
 
@@ -197,7 +197,9 @@ Use lazy initialization, renderer disposal, resource cleanup, and WebGL context-
 
 Do not assume a fixed browser WebGL context limit.
 
-The initial 3D camera orientation must be explicitly defined. When the Earth is first displayed, Japan should be visible near the center of the globe.
+The initial 3D camera orientation must be explicitly defined. The initial view centers the operational Japan region on the crust block.
+
+Right-drag orbits, middle-drag pans, and the wheel zooms. The 2D map and 3D block are mounted in mutually exclusive tabs so that only one WebGL view is active at a time.
 
 ## 7. Performance
 

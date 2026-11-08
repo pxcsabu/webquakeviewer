@@ -205,11 +205,11 @@ Important limitations:
 
 Potential formats include ASCII, binary, and CSV depending on the dataset.
 
-A future EarthScope waveform module may support user-provided files obtained under valid access conditions.
+EarthScope supports user-provided CSV/JSON waveform files obtained under valid access conditions. The file's provenance, station metadata, units, and redistribution rights remain the user's responsibility. MiniSEED and binary parsing are not yet implemented.
 
 ## 9. J-SHIS Seismic Hazard Map
 
-**Status: READY (WMS image overlay; raw-data redistribution prohibited)**
+**Status: READY (WMS raster tiles; raw-data redistribution prohibited)**
 
 J-SHIS provides probabilistic seismic hazard maps and related information.
 
@@ -220,7 +220,7 @@ Implemented overlay:
 - Raster tiles: WMS GetMap with `{bbox-epsg-3857}`
 - CRS: EPSG:3857
 - CORS: `Access-Control-Allow-Origin: *` verified
-- The image is displayed as a derived overlay with attribution.
+- The raster tiles are displayed as a derived overlay with attribution.
 - The WMS overlay was verified on GitHub Pages on 2026-11-08.
 - The J-SHIS terms permit editing, processing, and distribution of derived results with attribution, but prohibit copying and redistributing the seismic-hazard data as-is. EarthScope does not redistribute raw J-SHIS data.
 
@@ -347,7 +347,7 @@ The USGS Slab2 depth contours are used only for cross-section context. They are 
 - The static GeoJSON asset was simplified with Douglas–Peucker 0.01° and rounded to 4 decimal places for display.
 - Depth values are in kilometres. The model includes the Izu-Bonin, Kuril, Manila, and Ryukyu regions.
 - The cross-section tool intersects these contours with the user-selected profile. It does not interpolate or claim a unique plate interface where multiple slabs overlap.
-- The contours are also available as an optional 2D map overlay, colored by depth. The 3D globe was removed from the current scope.
+- The contours are available as an optional 2D map overlay and as depth-positioned lines in the Japan-limited 3D crust block. A continuous 3D slab surface and a global 3D globe are not provided.
 - The bundled contour asset and cross-section rendering were verified on the deployed GitHub Pages site on 2026-11-08.
 - Do not use the contours for legal boundaries, hazard zoning, or quantitative plate reconstruction.
 
@@ -386,6 +386,24 @@ K-NET/KiK-net waveform and strong-motion data remain registration-restricted.
 - 241 boundary features, WGS84.
 - Bundled as `public/geo/PB2002_boundaries.json`.
 - This is a model-derived plate-boundary dataset, not a legal or administrative boundary.
-- It is displayed as an optional 2D map overlay and is not used for distance or hazard calculations.
-- The former 3D globe overlay was removed from the current scope.
+- It is displayed as an optional 2D map overlay and on the top surface of the Japan-limited 3D crust block. It is not used for distance or hazard calculations.
+- A global 3D globe is not provided.
 - The bundled overlay was verified on GitHub Pages on 2026-11-08.
+
+## 18. User-Provided Waveform Files
+
+**Status: USER-PROVIDED — no provider integration**
+
+EarthScope accepts CSV and JSON waveforms selected by the user. It does not fetch, relay, or redistribute waveform data from a provider.
+
+- Required CSV columns: `time`, `amplitude`.
+- Optional metadata columns: `station`, `network`, `channel`, `location`, `units`, `samplingRateHz`.
+- JSON may contain a top-level sample array or an object with `samples`, `units`, `samplingRateHz`, and `station`.
+- Time is interpreted as ISO 8601 with timezone, Unix seconds, or Unix milliseconds.
+- Amplitude units are preserved as supplied. No conversion or instrument-response correction is applied.
+- Station metadata and source provenance are not verified by EarthScope.
+- The synthetic demo is explicitly classified `SIMULATED`; it is not an observation.
+- MiniSEED, binary waveform storage, and NIED waveform feeds are not implemented.
+- Users are responsible for ensuring that they have the right to use and redistribute any file they load.
+
+NIED Hi-net / K-NET / KiK-net waveform access remains subject to registration, authentication, and redistribution conditions. Do not treat those services as unrestricted public APIs.

@@ -19,7 +19,7 @@ External data providers are accessed through isolated provider adapters when bro
 | Build | Vite |
 | Geographic rendering | MapLibre GL JS |
 | 3D rendering | Three.js |
-| Charts | Apache ECharts |
+| Charts | Custom SVG/Canvas |
 | Local storage | IndexedDB |
 | Background processing | Web Workers |
 | Hosting | GitHub Pages |
@@ -74,8 +74,8 @@ src/
     intensity/
     statistics/
     cross-section/
-    waveforms/
-    earth-3d/
+    waveform/
+    crust3d/
 
   data/
     providers/
@@ -262,25 +262,33 @@ Avoid rebuilding all map sources for every small state change.
 
 ## 10. 3D Visualization
 
-Three.js is responsible for:
+Three.js is used for the Japan-limited 3D crust block. A global Earth globe is not part of the current scope.
 
-- Earth globe
-- Earth interior
-- Hypocenter visualization
-- Cross-section visualization
-- 3D scientific models
+The block is responsible for:
 
-The initial globe orientation must be deterministic.
+- Japan-region land texture on a horizontal top surface
+- Hypocenter visualization by longitude, latitude, and depth
+- PB2002 boundaries on the top surface
+- Slab2 depth contours at their model depth
+- Depth-coloured earthquake points
 
-Set an explicit initial camera position, target, and up vector.
+The initial camera position, target, and up vector are explicit and deterministic. The initial view centers the operational Japan region. The block is a display model, not a velocity or geological model.
 
-The initial view should place Japan near the center.
+### Interaction model
 
-### WebGL lifecycle
+The 3D block uses OrbitControls with:
 
-MapLibre and Three.js both use WebGL.
+- right-drag orbit
+- middle-drag pan
+- wheel zoom toward the cursor
+- double-click reset
+- one-finger touch orbit and two-finger touch pan/zoom
 
-They can coexist, but resource usage must be monitored.
+The left mouse button is reserved and does not manipulate the camera.
+
+### Tab isolation and WebGL lifecycle
+
+The 2D MapLibre map and the Three.js block are mounted in mutually exclusive tabs. They are not displayed simultaneously. Switching tabs unmounts the inactive renderer.
 
 Implement:
 

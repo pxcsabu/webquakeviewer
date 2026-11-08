@@ -356,13 +356,13 @@ The b-value panel uses the same filtered catalog and an explicit user-selected M
 
 ### 17.1 J-SHIS probabilistic hazard map
 
-The J-SHIS 2020 probabilistic seismic hazard map is displayed as a WMS image overlay in EPSG:4612 for the extent 30°N–46°N, 128°E–150°E. It is a model-derived probabilistic evaluation, not current shaking, an earthquake prediction, or a site-specific engineering result. The map is shown with attribution to J-SHIS and must not be treated as a real-time observation layer.
+The J-SHIS 2020 probabilistic seismic hazard map is displayed as WMS raster tiles in EPSG:3857. The WMS request template uses `{bbox-epsg-3857}` and the MapLibre raster tile path. It is a model-derived probabilistic evaluation, not current shaking, an earthquake prediction, or a site-specific engineering result. The map is shown with attribution to J-SHIS and must not be treated as a real-time observation layer. Loading can take several seconds because the WMS service generates each tile on request.
 
 The J-SHIS terms permit derived display and processing with attribution but prohibit copying and redistributing the raw hazard data as-is. EarthScope does not redistribute the raw data.
 
 ### 17.2 PB2002 plate boundaries
 
-PB2002 is a model-derived global plate-boundary dataset (Bird, 2003; ODC-By 1.0). The bundled GeoJSON contains 241 boundary features in WGS84. It is an optional map overlay and is not used for distance, hazard, or legal-boundary calculations.
+PB2002 is a model-derived global plate-boundary dataset (Bird, 2003; ODC-By 1.0). The bundled GeoJSON contains 241 boundary features in WGS84. It is an optional 2D map overlay and is drawn on the top surface of the 3D crust block. It is not used for distance, hazard, or legal-boundary calculations.
 
 ### 17.3 Coordinate reference systems for domestic data
 
@@ -371,8 +371,88 @@ The current JMA earthquake list JSON does not state a CRS. EarthScope stores it 
 
 
 
-## 18. Deferred 3D Visualization
+## 18. Japan-Limited 3D Crust Block
 
-The 3D globe was removed from the current scope by project decision. EarthScope does not currently render a 3D Earth, 3D hypocenters, or a 3D Slab2 surface.
+EarthScope provides a non-spherical 3D crust block for the operational Japan region. It is not a global Earth globe. The view exists to relate hypocenters, depth, and model-derived slab/plate context, not to represent a physical voxel model.
 
-PB2002 plate boundaries and Slab2 depth contours are instead available as optional 2D map overlays and in the cross-section tool. They remain model-derived datasets, not direct observations or legal boundaries.
+### 18.1 Geometry and projection
+
+- Horizontal extent: the operational region 20°N–47°N, 120°E–155°E.
+- Longitude and latitude are mapped with an equirectangular display projection.
+- The horizontal aspect ratio uses cos(mid-latitude) so that one degree of longitude is scaled relative to one degree of latitude near central Japan.
+- The top surface uses Natural Earth 1:110m land polygons as a texture. No political boundaries or labels are drawn on the 3D top surface.
+- The block depth is 0–700 km. 700 km is displayed as 0.9 local units against a 4-unit width; this is a near-physical display scale, not a geodetic or geological model.
+- Depths greater than 700 km are clamped to the bottom for display. Events with unknown or negative depth are placed on the top surface and drawn with the missing-depth colour.
+
+### 18.2 Data shown
+
+- Earthquake points use the same depth classes and colours as the 2D map. Point size increases with magnitude.
+- Hypocenters are rendered without depth testing so that events inside the block remain visible. This is an x-ray display choice and must not be interpreted as a transparent physical medium.
+- PB2002 plate boundaries are drawn on the top surface.
+- Slab2 depth contours are drawn at their model depth. They are lines, not a continuous rendered slab surface.
+- PB2002 and Slab2 remain model-derived datasets. They are not direct observations, legal boundaries, or a velocity model.
+- The 3D block does not currently provide 3D cross-sections, focal mechanisms, moment tensors, tomography, or a 3D velocity model.
+
+### 18.3 Interaction
+
+- Right-drag: orbit.
+- Middle-drag: pan.
+- Wheel: zoom toward the cursor.
+- Double-click: reset the view.
+- Touch: one-finger orbit; two-finger pan/zoom.
+
+The MapLibre 2D map and the Three.js 3D block are mounted in mutually exclusive tabs. Switching tabs disposes the inactive renderer and its GPU resources.
+
+### 18.4 Limitations
+
+- The vertical scale is a display scale, not a measured depth profile.
+- The Natural Earth texture is a coarse 1:110m display background; it is not a topographic or bathymetric surface.
+- The block is not a geological structure, a plate interface, or a seismic velocity model.
+- The view must not be used for distance, depth, hazard, or engineering calculations.
+
+## 19. User-Provided Waveform Analysis
+
+### 19.1 Input formats
+
+EarthScope currently accepts user-provided CSV and JSON waveform files. MiniSEED and binary waveform formats are not implemented. NIED waveform feeds are not connected; their access and redistribution conditions must be respected.
+
+CSV requires `time` and `amplitude` columns. Optional columns are `station`, `network`, `channel`, `location`, `units`, and `samplingRateHz`. JSON may contain a top-level sample array or an object with `samples`, `units`, `samplingRateHz`, and `station`.
+
+### 19.2 Time and sampling
+
+- Times are stored as Unix epoch milliseconds in UTC; the original timestamp text is retained with each sample when supplied.
+- ISO 8601 timestamps with an explicit timezone are preferred. Numeric Unix seconds and milliseconds are accepted.
+- If a timestamp has no timezone, EarthScope parses it with the browser's local timezone and emits a warning; UTC must not be assumed.
+- Samples are sorted by time; duplicate timestamps are reduced to the first value.
+- Sampling frequency uses the declared value when present; otherwise it is the reciprocal of the median positive sample interval.
+- Irregular intervals, duplicate timestamps, and invalid rows are reported. Invalid rows are excluded rather than silently interpolated.
+
+### 19.3 Units and provenance
+
+- Amplitude values are displayed in the supplied units without conversion.
+- If units are absent, the trace is labeled `未指定` and a warning is shown.
+- Station, network, channel, and location are preserved when supplied; EarthScope does not verify them.
+- User-provided files are classified `OBSERVED` with a provenance warning, or `SIMULATED` for the synthetic demo. The classification does not certify the source.
+- No instrument-response correction, calibration, or unit conversion is applied.
+
+### 19.4 Filtering
+
+The waveform panel offers a simple centred moving-average lowpass and a highpass formed by subtracting that moving average from the original samples.
+
+- The window is specified in seconds and converted to samples using the trace sampling rate.
+- Even window lengths are adjusted to an odd number.
+- The first and last half-window use a truncated window, so edge values are less reliable.
+- This is a display/analysis aid, not a seismic instrument-response correction or a standard seismic filter chain.
+
+### 19.5 Measurements
+
+For the currently displayed samples (after an optional filter), EarthScope reports:
+
+- sample count
+- duration from first to last sample
+- mean amplitude
+- maximum absolute amplitude
+- peak-to-peak amplitude
+- RMS amplitude
+
+All amplitude statistics use the supplied amplitude units. The chart may downsample by preserving the minimum and maximum in each horizontal bucket; measurements always use the full selected sample set, not the downsampled chart data.

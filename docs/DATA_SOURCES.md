@@ -125,6 +125,7 @@ Implemented source:
 - Usage terms: 公共データ利用規約（第1.0版 / PDL1.0） with attribution to 気象庁
 - Observed data: 196 reports / 154 unique Japan-region events over 30 days
 - The list is a 30-day rolling window. The UI defaults to the last 24 hours and allows the full 30-day window.
+- JMA default display and USGS switching were verified on the deployed GitHub Pages site on 2026-11-08.
 - The list contains multiple report types for the same `eid`. EarthScope deduplicates by `eid` and uses the latest complete report, while retaining the latest available maximum intensity.
 - JMA `cod` coordinates mix decimal-degree and degree-minute notation. They are normalized to decimal degrees without a datum transformation.
 - The JSON does not state a coordinate reference system. EarthScope stores these coordinates with `crs: UNKNOWN` rather than silently assuming WGS84.

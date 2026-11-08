@@ -116,6 +116,7 @@ Calculations have documented methods, assumptions, units, and automated tests.
 - [x] Implement Japanese seismic intensity display
 - [x] Implement intensity ordinal ranking
 - [x] Implement JMA / USGS catalog source selector
+- [x] Verify JMA integration on GitHub Pages
 - [ ] Verify historical coordinate reference systems
 - [ ] Integrate permitted geological and hazard datasets
 

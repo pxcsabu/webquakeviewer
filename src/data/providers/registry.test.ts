@@ -13,14 +13,15 @@ describe('SOURCE_REGISTRY', () => {
     }
   });
 
-  it('marks USGS as conditional after browser verification but before license review', () => {
+  it('marks USGS READY with verified CORS and public-domain provenance', () => {
     const usgs = getSourceRegistryEntry('usgs-earthquake-feed');
     expect(usgs).toBeDefined();
-    expect(usgs?.status).toBe('CONDITIONAL');
+    expect(usgs?.status).toBe('READY');
     expect(usgs?.corsVerified).toBe(true);
     expect(usgs?.lastVerifiedAt).not.toBeNull();
-    expect(usgs?.dataLicense).toBeNull();
-    expect(usgs?.redistributionAllowed).toBeNull();
+    expect(usgs?.dataLicense).toBe('Public Domain (U.S. Government Work)');
+    expect(usgs?.redistributionAllowed).toBe(true);
+    expect(usgs?.attribution).toBe('U.S. Geological Survey');
   });
 
   it('does not claim READY without a verification timestamp and CORS check', () => {

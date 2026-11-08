@@ -15,46 +15,73 @@ However, development must proceed in stages based on:
 
 A feature must not be considered complete merely because a visualization can be drawn.
 
+The data foundation and the rendering foundation are deliberately separated. Geographic rendering introduces tile delivery, CORS, API-key restrictions, WebGL context management, and layout issues that must be validated without obscuring catalog correctness.
+
 ## Phase 0 — Foundation
 
 **Goal: Establish a reliable application foundation.**
 
-- [ ] Initialize TypeScript, React, and Vite
-- [ ] Configure GitHub Pages deployment
-- [ ] Establish application layout
-- [ ] Establish data provider interface
-- [ ] Establish normalized earthquake model
-- [ ] Establish error and loading states
-- [ ] Establish scientific data classification
-- [ ] Establish unit testing
-- [ ] Establish IndexedDB infrastructure
+- [x] Initialize TypeScript, React, and Vite
+- [x] Configure GitHub Pages build and Actions deployment workflow
+- [ ] Verify GitHub Pages deployment on the live URL
+- [x] Establish application layout
+- [x] Establish data provider interface
+- [x] Establish normalized earthquake model
+- [x] Establish error and loading states
+- [x] Establish scientific data classification
+- [x] Establish unit testing
+- [x] Establish IndexedDB infrastructure
 
 Completion criteria:
 
-The application builds, deploys, and can display validated sample data without depending on a backend.
+The application builds, deploys, and can display validated data without depending on a backend. Live GitHub Pages verification remains pending until a remote repository is configured.
 
-## Phase 1 — Core Earthquake Catalog
+## Phase 1 — Earthquake Data Foundation
 
-**Goal: Create a genuinely usable earthquake monitoring application.**
+**Goal: Create a usable, provenance-preserving earthquake data foundation.**
 
-- [ ] Integrate USGS GeoJSON feeds
-- [ ] Display earthquake events on MapLibre
-- [ ] Display magnitude and depth
-- [ ] Implement event list
-- [ ] Implement event detail panel
-- [ ] Implement time filtering
-- [ ] Implement magnitude filtering
-- [ ] Implement depth filtering
-- [ ] Implement periodic catalog updates
-- [ ] Implement data source status
-- [ ] Implement IndexedDB caching
-- [ ] Handle duplicate and updated events
+- [x] Integrate USGS GeoJSON feeds
+- [x] Normalize USGS records while preserving source IDs, timestamps, coordinates, and units
+- [x] Display magnitude and depth
+- [x] Implement event list
+- [x] Implement event detail panel
+- [x] Implement time filtering
+- [x] Implement magnitude filtering
+- [x] Implement depth filtering
+- [x] Implement periodic catalog updates
+- [x] Implement data source status
+- [x] Implement IndexedDB caching
+- [x] Handle duplicate and updated events
+- [x] Implement conditional HTTP requests using Last-Modified / 304
+- [x] Display acquisition warnings, including negative or missing depth
+- [x] Preserve event type and provider place text
 
 Completion criteria:
 
-A user can browse, search, and inspect real earthquake events using permitted public data.
+A user can browse, filter, and inspect real earthquake events from a permitted public source, with local caching, source status, and no backend dependency. Geographic rendering is explicitly out of scope for this phase.
 
-## Phase 2 — Basic Scientific Analysis
+## Phase 2 — Geographic Visualization and Monitoring
+
+**Goal: Add geographic visualization without destabilizing the data foundation.**
+
+- [ ] Select and verify a no-API-key basemap source
+- [ ] Document basemap license, attribution, CORS, and tile usage policy
+- [ ] Introduce MapLibre GL JS with lazy initialization
+- [ ] Display earthquake hypocenters on the map
+- [ ] Display magnitude and depth with documented visual scales
+- [ ] Synchronize event-list selection with map selection
+- [ ] Implement map layer visibility controls
+- [ ] Handle WebGL lifecycle, including `map.remove()`
+- [ ] Test resize, WebGL context loss, and restoration
+- [ ] Test coexistence with the future 3D module
+
+Basemap candidates must be evaluated against the static-first and no-embedded-API-key requirements. A static vector basemap or an explicitly permitted tile service may be used. Provider terms must be documented before implementation.
+
+Completion criteria:
+
+The map displays the catalog without degrading data correctness, does not require an embedded API key, is usable on GitHub Pages, and releases WebGL resources when unmounted.
+
+## Phase 3 — Basic Scientific Analysis
 
 **Goal: Add scientifically meaningful analysis tools.**
 
@@ -70,9 +97,9 @@ A user can browse, search, and inspect real earthquake events using permitted pu
 
 Completion criteria:
 
-Calculations have documented methods and automated tests.
+Calculations have documented methods, assumptions, units, and automated tests.
 
-## Phase 3 — Japan-Focused Data
+## Phase 4 — Japan-Focused Data
 
 **Goal: Integrate domestic earthquake information.**
 
@@ -89,7 +116,7 @@ This phase is conditional on endpoint availability and data usage conditions.
 
 Do not block the core application if a source is unavailable.
 
-## Phase 4 — 3D Earth Visualization
+## Phase 5 — 3D Earth Visualization
 
 **Goal: Introduce interactive 3D geophysical visualization.**
 
@@ -107,7 +134,7 @@ Completion criteria:
 
 The 3D view works without degrading the core map and event catalog.
 
-## Phase 5 — Waveform Analysis
+## Phase 6 — Waveform Analysis
 
 **Goal: Support waveform visualization and basic processing.**
 
@@ -127,7 +154,7 @@ NIED waveform integration must follow the applicable access and redistribution c
 
 Do not assume unrestricted access to Hi-net, K-NET, or KiK-net waveforms.
 
-## Phase 6 — Advanced Geophysical Visualization
+## Phase 7 — Advanced Geophysical Visualization
 
 **Goal: Expand into Earth interior and seismic source analysis.**
 
@@ -142,7 +169,7 @@ Do not assume unrestricted access to Hi-net, K-NET, or KiK-net waveforms.
 
 This phase requires carefully selected scientific datasets with documented provenance and licensing.
 
-## Phase 7 — Advanced Analysis
+## Phase 8 — Advanced Analysis
 
 Potential future work:
 
@@ -169,11 +196,12 @@ These may be reconsidered when suitable access and infrastructure are available.
 
 ## Release Priorities
 
-1. Reliable core earthquake catalog
-2. Correct scientific analysis
-3. Japan-specific data integration
-4. 3D Earth visualization
-5. Waveform analysis
-6. Advanced geophysical models
+1. Reliable core earthquake catalog and data foundation
+2. Geographic visualization and monitoring
+3. Correct scientific analysis
+4. Japan-specific data integration
+5. 3D Earth visualization
+6. Waveform analysis
+7. Advanced geophysical models
 
 The long-term vision remains comprehensive geophysical analysis. The staged roadmap exists to make that vision achievable rather than to reduce its scope.

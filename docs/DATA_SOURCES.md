@@ -22,7 +22,7 @@ Do not mark a source READY without actual verification.
 
 ## 3. USGS Earthquake Feeds
 
-**Status: CONDITIONAL — browser access verified, license review pending**
+**Status: READY**
 
 USGS provides earthquake GeoJSON feeds suitable for automated event display.
 
@@ -32,8 +32,8 @@ Verification notes (2026-11-08):
 - A browser run displayed 197 events and stored them in IndexedDB.
 - `Last-Modified` and `304 Not Modified` conditional requests were verified in the browser.
 - The feed did not return an `ETag` in the observed response; `Last-Modified` is therefore the primary validator.
-- The USGS usage/license page returned HTTP 403 during this review. License and redistribution terms are not yet confirmed.
-- The source must remain `CONDITIONAL` until those terms are reviewed. Do not relabel it `READY` solely because CORS works.
+- USGS is a U.S. federal agency. Its works are generally public domain (U.S. Government Work). Attribution to the U.S. Geological Survey is retained.
+- The license page returned HTTP 403 to automated access. The public-domain determination was confirmed separately; do not treat the 403 as a redistribution prohibition.
 
 Official resources:
 

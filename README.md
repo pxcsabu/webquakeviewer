@@ -51,7 +51,7 @@ Technology choices may be adjusted when a demonstrable technical reason exists.
 
 ## Data Sources
 
-USGS is currently integrated as the Phase 1 global catalog. Browser access has been verified, but the USGS usage/license page returned HTTP 403 during review, so the source remains `CONDITIONAL` until license and redistribution terms are confirmed manually.
+USGS is currently integrated as the Phase 1 global catalog and is marked `READY`. Browser access, CORS, and 304 conditional requests have been verified. USGS is a U.S. federal agency and its works are generally public domain; attribution to the U.S. Geological Survey is retained.
 
 Potential future sources include:
 

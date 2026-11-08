@@ -34,8 +34,8 @@ export function EarthquakeList({
 
       {events.length === 0 && status !== 'loading' ? (
         <p className="empty-message">
-          表示できるイベントがありません。USGS GeoJSON の取得は Phase 1
-          で実装します。
+          表示できるイベントがありません。フィルター条件または USGS
+          フィードの状態を確認してください。
         </p>
       ) : null}
 

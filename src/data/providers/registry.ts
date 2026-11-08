@@ -87,19 +87,21 @@ export const SOURCE_REGISTRY: readonly SourceRegistryEntry[] = [
     name: 'NIED Strong Motion Monitor (kmoni)',
     provider:
       'National Research Institute for Earth Science and Disaster Resilience',
-    status: 'UNAVAILABLE',
+    status: 'RESTRICTED',
     homepage: 'http://www.kmoni.bosai.go.jp/',
-    documentationUrl: null,
-    dataLicense: null,
-    attribution: 'NIED',
+    documentationUrl:
+      'https://www.kyoshin.bosai.go.jp/ja/about_kmoni/',
+    dataLicense:
+      'NIED 強震モニタ利用条件（転載・送信・再配布・観測点色抽出を禁止）',
+    attribution: '防災科学技術研究所（NIED）',
     accessMethod:
-      'HTTP web service; HTTPS endpoint did not respond and HTTP cannot be embedded in an HTTPS GitHub Pages app',
+      'Official HTTP page; embedding, relay, and pixel-value extraction are not permitted',
     requiresAuthentication: false,
     corsVerified: false,
-    redistributionAllowed: null,
-    lastVerifiedAt: '2026-11-08T08:30:00Z',
+    redistributionAllowed: false,
+    lastVerifiedAt: '2026-11-08T09:00:00Z',
     notes:
-      'The HTTPS kmoni endpoint was unreachable; the HTTP endpoint is mixed content for an HTTPS app. K-NET/KiK-net data access remains restricted. EarthScope does not proxy, bundle, or fabricate strong-motion data.',
+      'NIED terms prohibit reproduction, transmission, and redistribution of kmoni content, and explicitly discourage extracting individual station values from the image colors. A Vercel/edge relay would be transmission/redistribution and is therefore not implemented. EarthScope links to the official site only. K-NET/KiK-net also remain restricted.',
   },
   {
     id: 'jma-earthquake-list-json',

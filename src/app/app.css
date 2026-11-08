@@ -187,18 +187,6 @@ button:disabled {
 }
 
 
-.kmoni-image-wrap {
-  margin: 10px 0;
-}
-
-.kmoni-image {
-  display: block;
-  width: 100%;
-  max-width: 720px;
-  border: 1px solid var(--border);
-  background: #ffffff;
-}
-
 .strong-motion-links {
   margin: 10px 0 0;
   padding-left: 18px;

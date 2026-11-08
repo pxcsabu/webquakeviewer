@@ -159,7 +159,7 @@ The Slab2 contours are model context, not direct observations. Horizontal and ve
 
 ### Strong-motion tab
 
-The 強震モニタ tab uses the same official image URL pattern as `KyoshinEewViewerIngen` / `KyoshinMonitorLib`. The NIED kmoni service is HTTP-only; it can be displayed by the HTTP development server, but the HTTPS GitHub Pages build cannot embed it (mixed content). The tab shows the availability status, the official link, the latest-image link, and a clearly labeled JMA intensity summary. K-NET/KiK-net data requires registration and has usage restrictions.
+The 強震モニタ tab intentionally does not embed, relay, or extract values from the NIED kmoni image. NIED's terms prohibit reproduction, transmission, and redistribution of kmoni content and discourage extracting individual station values from the image colors. A Vercel/edge relay would be a transmission/redistribution and is not implemented. The tab shows the restriction status, official links, the terms, and a clearly labeled JMA intensity summary. K-NET/KiK-net data also requires registration and has usage restrictions.
 
 ### Local caches
 

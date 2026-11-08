@@ -52,12 +52,13 @@ describe('SOURCE_REGISTRY', () => {
     expect(slab?.attribution).toContain('Slab2');
   });
 
-  it('keeps the NIED kmoni strong-motion source unavailable', () => {
+  it('keeps the NIED kmoni strong-motion source restricted', () => {
     const kmoni = getSourceRegistryEntry('nied-kmoni');
     expect(kmoni).toBeDefined();
-    expect(kmoni?.status).toBe('UNAVAILABLE');
+    expect(kmoni?.status).toBe('RESTRICTED');
     expect(kmoni?.corsVerified).toBe(false);
-    expect(kmoni?.redistributionAllowed).toBeNull();
+    expect(kmoni?.redistributionAllowed).toBe(false);
+    expect(kmoni?.dataLicense).toContain('転載');
   });
 
   it('does not claim READY without a verification timestamp and CORS check', () => {

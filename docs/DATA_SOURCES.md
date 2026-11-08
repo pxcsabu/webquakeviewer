@@ -347,12 +347,23 @@ The USGS Slab2 depth contours are used only for cross-section context. They are 
 
 ## 16. NIED Strong Motion Monitor
 
-**Status: UNAVAILABLE for direct embedding; K-NET/KiK-net RESTRICTED**
+**Status: RESTRICTED — no embedding, relay, or pixel-value extraction**
 
-- The NIED kmoni site is available over HTTP, but its HTTPS endpoint did not respond during verification.
-- The image URL pattern was cross-checked against `ingen084/KyoshinEewViewerIngen` and `KyoshinMonitorLib`: `http://www.kmoni.bosai.go.jp/data/map_img/RealTimeImg/jma_s/YYYYMMDD/YYYYMMDDHHmmss.jma_s.gif`.
-- In the HTTP development server, EarthScope can display the official GIF; the HTTPS GitHub Pages build shows the official link instead.
-- An HTTPS GitHub Pages application cannot embed or fetch HTTP resources without creating mixed content.
-- The K-NET/KiK-net strong-motion data requires registration and has usage/redistribution conditions.
-- EarthScope does not proxy these services, does not bundle restricted images, and does not fabricate a strong-motion monitor.
-- The strong-motion tab therefore displays availability, source restrictions, official links, and a clearly labeled JMA intensity summary (which is not a strong-motion monitor).
+NIED's strong-motion monitor terms (https://www.kyoshin.bosai.go.jp/ja/about_kmoni/) state that:
+
+- Reproduction, transmission, and redistribution of kmoni content are prohibited.
+- Extracting individual station values from the image colors and publishing or distributing them is not an intended use and is discouraged.
+
+The reference desktop client (`ingen084/KyoshinEewViewerIngen`) fetches the official GIF image over HTTP, decodes it, reads pixel colors at observation-point coordinates, and derives intensities. That method does not grant EarthScope permission to reproduce, relay, or publish the content.
+
+A Vercel/edge relay would be a transmission/redistribution of NIED content and would also facilitate prohibited pixel-value extraction. It is therefore not implemented, even on a free tier.
+
+EarthScope currently:
+
+- links to the official NIED monitor and terms,
+- does not embed or proxy the image,
+- does not bundle restricted images,
+- does not fabricate a strong-motion monitor,
+- shows a clearly labeled JMA intensity summary, which is not a strong-motion monitor.
+
+K-NET/KiK-net waveform and strong-motion data remain registration-restricted.

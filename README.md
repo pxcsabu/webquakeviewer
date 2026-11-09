@@ -35,7 +35,7 @@ The project is designed to be hosted on GitHub Pages without requiring a dedicat
 - JMA 250m estimated-intensity distribution tiles for qualifying events
 - Clickable 3D hypocenters that select the event detail
 - User-provided CSV/JSON waveform import, time-series chart, simple filters, and amplitude statistics
-- User-provided NIED Hi-net ALJ2023 velocity-model import with depth slices and cross-sections
+- Desktop-only user-provided NIED Hi-net ALJ2023 velocity-model import with depth slices and cross-sections
 - Surface and hypocentral distance modules; Aki–Utsu b-value module
 - Depth histogram, cumulative magnitude-frequency, temporal statistics, DBSCAN spatial clusters, and b-value analysis panel
 
@@ -172,7 +172,7 @@ The Slab2 contours are model context, not direct observations. Horizontal and ve
 
 ### Velocity structure tab
 
-The 速度構造 tab accepts a user-downloaded `ALJ2023.zip` from the NIED Hi-net 日本列島三次元地震波速度構造 distribution page. The ZIP is parsed locally; no model data is sent to a server or included in the build. The panel shows:
+The 速度構造 tab is shown only in the Tauri desktop runtime. It accepts a user-downloaded `ALJ2023.zip` from the NIED Hi-net 日本列島三次元地震波速度構造 distribution page. The ZIP is parsed locally; no model data is sent to a server or included in the build. The panel shows:
 
 - P-wave velocity, S-wave velocity, Vp/Vs, and supplied reliability values
 - a depth slice on a longitude/latitude grid

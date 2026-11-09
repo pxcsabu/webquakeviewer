@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './app/App';
+import { isTauriRuntime } from './app/runtime';
 import { ErrorBoundary } from './app/ErrorBoundary';
 import './app/app.css';
 
@@ -12,7 +13,7 @@ import './app/app.css';
  * HTTP(S) URLs are forwarded to the OS.
  */
 function installDesktopExternalLinkHandler(): void {
-  if (!('__TAURI_INTERNALS__' in window)) {
+  if (!isTauriRuntime()) {
     return;
   }
   document.addEventListener(

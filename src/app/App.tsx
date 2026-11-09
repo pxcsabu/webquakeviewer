@@ -25,6 +25,7 @@ import {
   type EarthquakeFilterState,
 } from '../features/earthquakes/filters';
 import { useCatalog } from './state/useCatalog';
+import { isTauriRuntime } from './runtime';
 
 type MainTab = 'map' | 'velocity' | 'waveform' | 'strong-motion';
 
@@ -40,6 +41,7 @@ export function App() {
   );
   const [now, setNow] = useState(() => new Date());
   const [desktopTitleBar] = useState(isDesktopWindows);
+  const [desktopRuntime] = useState(isTauriRuntime);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -90,14 +92,16 @@ export function App() {
         >
           地震分布図
         </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeTab === 'velocity'}
-          onClick={() => setActiveTab('velocity')}
-        >
-          速度構造
-        </button>
+        {desktopRuntime ? (
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'velocity'}
+            onClick={() => setActiveTab('velocity')}
+          >
+            速度構造
+          </button>
+        ) : null}
         <button
           type="button"
           role="tab"

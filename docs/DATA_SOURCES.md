@@ -455,7 +455,7 @@ JMA publishes estimated-intensity distribution maps for earthquakes with a maxim
 
 ## 21. NIED Hi-net ALJ2023 Velocity Structure
 
-**Status: USER-PROVIDED — local import only; no data bundled**
+**Status: USER-PROVIDED — desktop-only local import; no data bundled**
 
 Source page: https://www.hinet.bosai.go.jp/topics/sokudo_kozo/alljpn_download.php?LANG=ja
 
@@ -468,6 +468,6 @@ The package is `ALJ2023.zip` (approximately 13 MB compressed). It contains `VEL.
 - The provider does not state a CRS in the package. EarthScope stores the grid as `UNKNOWN` and applies no datum transformation.
 - Citation required: Matsubara et al. (2022), Earth, Planets and Space 74:171, https://doi.org/10.1186/s40623-022-01724-0.
 - The provider states: do not redistribute the data; do not distribute processed versions of the data.
-- EarthScope therefore does not bundle, relay, or redistribute `ALJ2023.zip` or derived model outputs. The user selects the ZIP locally, and the file is read by a Web Worker in the browser/WebView. No model data is sent to an EarthScope server.
+- The 速度構造 tab is exposed only in the Tauri desktop runtime. EarthScope therefore does not bundle, relay, or redistribute `ALJ2023.zip` or derived model outputs. The user selects the ZIP locally, and the file is read by a Web Worker in the browser/WebView. No model data is sent to an EarthScope server.
 - The displayed depth slices and cross-sections use nearest-grid sampling. They are display products, not a new inversion, and are classified `MODEL`.
 - The full 3D volume is not rendered; only the selected depth slice and profile are shown.

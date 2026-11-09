@@ -26,6 +26,7 @@ The project is designed to be hosted on GitHub Pages without requiring a dedicat
 - 地震分布図 / 波形解析 / 強震モニタ tabs
 - Cross-section tool with Slab2 depth contours
 - Strong-motion availability panel and JMA intensity summary
+- Documented NIED kmoni permission policy (no GIF retrieval/processing implemented)
 - Japan-limited, non-spherical 3D crust block embedded in the 2D map (available when Slab2 is on) with right-drag orbit, middle-drag pan, and wheel zoom
 - PB2002 plate-boundary overlay on the 2D map and 3D block
 - J-SHIS 2020 probabilistic seismic-hazard WMS raster overlay
@@ -169,6 +170,8 @@ The Slab2 contours are model context, not direct observations. Horizontal and ve
 ### Strong-motion tab
 
 The 強震モニタ tab intentionally does not embed, relay, or extract values from the NIED kmoni image. NIED's terms prohibit reproduction, transmission, and redistribution of kmoni content and discourage extracting individual station values from the image colors. A Vercel/edge relay would be a transmission/redistribution and is not implemented. The tab shows the restriction status, official links, the terms, and a clearly labeled JMA intensity summary. K-NET/KiK-net data also requires registration and has usage restrictions.
+
+Technical feasibility and permission are tracked separately in [docs/NIED_STRONG_MOTION_POLICY.md](docs/NIED_STRONG_MOTION_POLICY.md). Desktop native HTTP and local processing are technically possible, but no kmoni retrieval/processing feature is enabled until NIED permission is documented.
 
 ### Local caches
 

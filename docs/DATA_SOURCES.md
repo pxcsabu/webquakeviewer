@@ -356,27 +356,36 @@ The USGS Slab2 depth contours are used only for cross-section context. They are 
 
 ## 16. NIED Strong Motion Monitor
 
-**Status: RESTRICTED — no embedding, relay, or pixel-value extraction**
+**Status: RESTRICTED / PERMISSION PENDING — no embedding, relay, or pixel-value extraction is implemented**
 
-NIED's strong-motion monitor terms (https://www.kyoshin.bosai.go.jp/ja/about_kmoni/) state that:
+NIED's strong-motion monitor terms (https://www.kyoshin.bosai.go.jp/ja/about_kmoni/) state, in substance:
 
-- Reproduction, transmission, and redistribution of kmoni content are prohibited.
-- Extracting individual station values from the image colors and publishing or distributing them is not an intended use and is discouraged.
+- NIED holds copyright in the content except where another provider owns it.
+- Copying is prohibited except for private use, quotation, and other uses permitted by copyright law.
+- Reprinting, modifying, transmitting, or redistributing copied content is prohibited.
+- Detecting individual observation-point color changes and extracting observation values from colors are described as unintended uses.
+- Publishing or distributing information processed in those ways is requested to be refrained from.
 
-The reference desktop client (`ingen084/KyoshinEewViewerIngen`) fetches the official GIF image over HTTP, decodes it, reads pixel colors at observation-point coordinates, and derives intensities. That method does not grant EarthScope permission to reproduce, relay, or publish the content.
+The terms do not explicitly enumerate every operation (direct retrieval, local decode, local analysis, desktop embedding). See [NIED_STRONG_MOTION_POLICY.md](NIED_STRONG_MOTION_POLICY.md) for the item-by-item classification and the permission checklist.
 
-A Vercel/edge relay would be a transmission/redistribution of NIED content and would also facilitate prohibited pixel-value extraction. It is therefore not implemented, even on a free tier.
+Technical feasibility is acknowledged:
+
+- Web: an HTTPS GitHub Pages app cannot directly load the documented HTTP image because of Mixed Content. A relay is not adopted.
+- Desktop: native HTTP retrieval, local decoding, and local analysis are technically possible, but the NIED terms still apply.
 
 EarthScope currently:
 
 - links to the official NIED monitor and terms,
-- does not embed or proxy the image,
-- does not bundle restricted images,
+- does not fetch, embed, decode, proxy, or process the kmoni image,
+- does not bundle restricted images or derived values,
 - does not fabricate a strong-motion monitor,
 - shows a clearly labeled JMA intensity summary, which is not a strong-motion monitor.
 
-K-NET/KiK-net waveform and strong-motion data remain registration-restricted.
+A Vercel/edge relay is not implemented because it would transmit/redistribute NIED content and would not resolve the permission question.
 
+The public implementations surveyed (`KyoshinEewViewerIngen`, `EQMonitor`, JQuake, Quarog) demonstrate that direct retrieval and local processing are technically possible. Their existence is not evidence of NIED permission; their code licenses do not grant data rights. JQuake's public notice states that per-station numerical information has been withdrawn following a terms update.
+
+K-NET/KiK-net waveform and strong-motion data remain registration-restricted.
 
 ## 17. PB2002 Plate Boundaries
 

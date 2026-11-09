@@ -256,6 +256,7 @@ MapLibre GL JS is responsible for:
 - Geographic overlays
 - Fault and plate boundary layers
 - Selected-event municipality-level intensity fill and optional JMA 250m estimated-intensity tiles
+- User-provided velocity-model depth slices and cross-sections
 - Map interaction
 
 Keep data processing separate from map rendering.

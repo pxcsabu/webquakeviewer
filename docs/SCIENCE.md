@@ -481,3 +481,39 @@ For the currently displayed samples (after an optional filter), EarthScope repor
 - RMS amplitude
 
 All amplitude statistics use the supplied amplitude units. The chart may downsample by preserving the minimum and maximum in each horizontal bucket; measurements always use the full selected sample set, not the downsampled chart data.
+
+## 20. User-Provided ALJ2023 Velocity Structure
+
+### 20.1 Provenance and status
+
+The velocity structure viewer accepts a user-selected `ALJ2023.zip` from the NIED Hi-net distribution page. EarthScope does not bundle, relay, or redistribute the package. The model is classified `MODEL`; it is not an observation.
+
+Required citation: Matsubara et al. (2022), Earth, Planets and Space 74:171, https://doi.org/10.1186/s40623-022-01724-0.
+
+The provider requires citation and states that the data must not be redistributed and that processed versions must not be distributed. The EarthScope panel is therefore a local display of a user-provided file; it does not offer model export or publication.
+
+### 20.2 Grid and units
+
+- Longitude 120–150°E, latitude 20–48°N, 301 x 281 horizontal grid.
+- The supplied package has 32 depth layers from -5 to 400 km.
+- `VEL.dat` stores longitude, latitude, depth, Vp (km/s), Vs (km/s), P reliability, and S reliability.
+- The provider does not state a CRS in the package. EarthScope retains `UNKNOWN` and does not apply a datum transformation.
+- Reliability values are shown as supplied; EarthScope does not reinterpret them as probabilities or standard errors.
+
+### 20.3 Display method
+
+- The depth slice maps the selected depth layer onto a longitude/latitude canvas.
+- The cross-section samples the model along the user-drawn straight profile using the nearest longitude/latitude grid cell at each depth.
+- No interpolation, spline, smoothing, or new inversion is performed.
+- Distance along the profile uses the Haversine formula on the sphere.
+- The display is a nearest-cell sampling of the supplied model, not a continuous 3D volume rendering.
+- Vp/Vs is computed as Vp/Vs only where Vs is nonzero.
+- The UI labels the model, citation, local-only processing, and the no-redistribution condition.
+
+### 20.4 Limitations
+
+- The package is about 138 MB uncompressed and is parsed in a Web Worker; lower-memory devices may not be able to load it.
+- The depth slice is a grid display, not a geologic cross-section interpretation.
+- The profile is a straight interpolation of longitude/latitude between the selected endpoints for sampling; it is not a great-circle path.
+- The model's resolution and reliability vary spatially.
+- The viewer does not claim that a nearest-grid value is the true value at an arbitrary point.

@@ -23,7 +23,7 @@ The project is designed to be hosted on GitHub Pages without requiring a dedicat
 - Natural Earth offline fallback (no API key or tile server)
 - List/map selection synchronization
 - Magnitude-sized and depth-colored event markers
-- 地震分布図 / 波形解析 / 強震モニタ tabs
+- 地震分布図 / 速度構造 / 波形解析 / 強震モニタ tabs
 - Cross-section tool with Slab2 depth contours
 - Strong-motion availability panel and JMA intensity summary
 - Documented NIED kmoni permission policy (no GIF retrieval/processing implemented)
@@ -35,6 +35,7 @@ The project is designed to be hosted on GitHub Pages without requiring a dedicat
 - JMA 250m estimated-intensity distribution tiles for qualifying events
 - Clickable 3D hypocenters that select the event detail
 - User-provided CSV/JSON waveform import, time-series chart, simple filters, and amplitude statistics
+- User-provided NIED Hi-net ALJ2023 velocity-model import with depth slices and cross-sections
 - Surface and hypocentral distance modules; Aki–Utsu b-value module
 - Depth histogram, cumulative magnitude-frequency, temporal statistics, DBSCAN spatial clusters, and b-value analysis panel
 
@@ -75,6 +76,8 @@ Selecting a JMA event displays municipality-level maximum intensity as a fill la
 For qualifying events (maximum intensity 5弱 or greater), EarthScope can also load the JMA 250m estimated-intensity distribution. The tiles are fetched directly from JMA and are model-derived estimates, not observations. They are not bundled or interpolated.
 
 Waveform analysis currently accepts user-provided CSV/JSON files only. MiniSEED and binary waveforms, and NIED waveform feeds, are not connected. Amplitude units and station metadata are preserved as supplied; EarthScope does not verify them.
+
+Velocity structure analysis accepts a user-selected `ALJ2023.zip` (or equivalent official package) and reads it locally in a Web Worker. The model is not bundled, relayed, or redistributed. It is displayed as depth slices and cross-sections with nearest-grid sampling. The model is classified `MODEL`, not an observation, and the provider does not state a CRS in the package; EarthScope keeps it `UNKNOWN`.
 
 Potential future sources include:
 
@@ -166,6 +169,16 @@ In the 地震分布図 tab, select 断面を選択 and click a start point follo
 - Slab2 model-derived depth contours intersecting the profile
 
 The Slab2 contours are model context, not direct observations. Horizontal and vertical scales are independent. Events with unknown depth are excluded and counted.
+
+### Velocity structure tab
+
+The 速度構造 tab accepts a user-downloaded `ALJ2023.zip` from the NIED Hi-net 日本列島三次元地震波速度構造 distribution page. The ZIP is parsed locally; no model data is sent to a server or included in the build. The panel shows:
+
+- P-wave velocity, S-wave velocity, Vp/Vs, and supplied reliability values
+- a depth slice on a longitude/latitude grid
+- a cross-section selected by dragging a line on the depth slice
+
+The display uses nearest grid cells, not interpolation or a new inversion. The model is `MODEL` data, not an observation. The NIED terms require citation of Matsubara et al. (2022) and prohibit redistribution of the data and distribution of processed model outputs. The panel shows this restriction.
 
 ### Strong-motion tab
 

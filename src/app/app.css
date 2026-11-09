@@ -1943,3 +1943,259 @@ button:disabled {
   outline-offset: -2px;
 }
 
+
+.app-main.app-main-velocity {
+  overflow: auto;
+  background: var(--surface);
+}
+
+.velocity-panel {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 20px 24px 28px;
+}
+
+.velocity-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.velocity-file-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 3px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.velocity-file-button input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.velocity-toolbar-note {
+  color: var(--muted);
+  font-size: 0.73rem;
+  line-height: 1.4;
+}
+
+.velocity-loading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.velocity-loading p {
+  margin: 0;
+}
+
+.velocity-loading progress {
+  width: 220px;
+  max-width: 100%;
+}
+
+.velocity-error {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--error-border);
+  background: var(--error-bg);
+  color: var(--error);
+  font-size: 0.8rem;
+}
+
+.velocity-empty {
+  max-width: 880px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.velocity-empty p {
+  margin: 0 0 8px;
+}
+
+.velocity-empty p:last-child {
+  margin-bottom: 0;
+}
+
+.velocity-empty a,
+.velocity-provenance a {
+  color: var(--accent);
+}
+
+.velocity-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px 16px;
+  margin-bottom: 12px;
+}
+
+.velocity-summary > div {
+  min-width: 0;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+}
+
+.velocity-summary span {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.velocity-summary strong {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.velocity-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.velocity-controls label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.velocity-controls select {
+  padding: 4px 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: 3px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.78rem;
+}
+
+.velocity-current {
+  color: var(--muted);
+  font-size: 0.73rem;
+}
+
+.velocity-visuals {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.velocity-slice,
+.velocity-section {
+  min-width: 0;
+}
+
+.velocity-canvas-frame,
+.velocity-section-frame {
+  position: relative;
+  height: 430px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.velocity-canvas-frame canvas,
+.velocity-section-frame canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  user-select: none;
+}
+
+.velocity-canvas-frame canvas {
+  cursor: crosshair;
+}
+
+.velocity-canvas-note {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.velocity-provenance {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+
+.velocity-provenance h3 {
+  margin: 0 0 8px;
+  color: var(--text);
+  font-size: 0.86rem;
+}
+
+.velocity-provenance p {
+  margin: 0 0 6px;
+}
+
+.velocity-usage-note {
+  padding: 7px 9px;
+  border: 1px solid var(--warning-border);
+  background: var(--warning-bg);
+  color: var(--warning);
+  font-size: 0.74rem;
+}
+
+.velocity-provenance code {
+  padding: 1px 3px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+}
+
+@media (max-width: 1000px) {
+  .velocity-visuals {
+    grid-template-columns: 1fr;
+  }
+
+  .velocity-canvas-frame,
+  .velocity-section-frame {
+    height: 390px;
+  }
+}
+
+@media (max-width: 760px) {
+  .velocity-panel {
+    padding: 14px 16px 20px;
+  }
+
+  .velocity-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .velocity-canvas-frame,
+  .velocity-section-frame {
+    height: 340px;
+  }
+}

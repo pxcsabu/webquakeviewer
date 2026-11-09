@@ -17,6 +17,7 @@ import { EarthquakeFilters } from '../features/earthquakes/EarthquakeFilters';
 import { EarthquakeList } from '../features/earthquakes/EarthquakeList';
 import { MapPanel } from '../features/map/MapPanel';
 import { StrongMotionPanel } from '../features/strong-motion/StrongMotionPanel';
+import { VelocityPanel } from '../features/velocity/VelocityPanel';
 import { WaveformPanel } from '../features/waveform/WaveformPanel';
 import {
   DEFAULT_EARTHQUAKE_FILTERS,
@@ -25,7 +26,7 @@ import {
 } from '../features/earthquakes/filters';
 import { useCatalog } from './state/useCatalog';
 
-type MainTab = 'map' | 'waveform' | 'strong-motion';
+type MainTab = 'map' | 'velocity' | 'waveform' | 'strong-motion';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<MainTab>('map');
@@ -92,6 +93,14 @@ export function App() {
         <button
           type="button"
           role="tab"
+          aria-selected={activeTab === 'velocity'}
+          onClick={() => setActiveTab('velocity')}
+        >
+          速度構造
+        </button>
+        <button
+          type="button"
+          role="tab"
           aria-selected={activeTab === 'waveform'}
           onClick={() => setActiveTab('waveform')}
         >
@@ -147,6 +156,10 @@ export function App() {
             warnings={catalog.warnings}
           />
         </div>
+        </main>
+      ) : activeTab === 'velocity' ? (
+        <main className="app-main app-main-single app-main-velocity">
+          <VelocityPanel />
         </main>
       ) : activeTab === 'waveform' ? (
         <main className="app-main app-main-single app-main-waveform">

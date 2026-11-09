@@ -354,3 +354,33 @@ Maintain compatibility or provide explicit migration logic where necessary.
 - PNG content: 250m estimated-intensity cells, displayed directly as a MapLibre image source
 - Datum handling: the legacy linear mesh correction used by the JMA viewer is applied when the entry does not declare datum 2
 - These tiles are estimates, not observations, and are not bundled by EarthScope
+
+## 15. ALJ2023 Velocity Model
+
+### 15.1 Archive
+
+- File: `ALJ2023.zip` (official NIED Hi-net package)
+- Compression: ZIP with DEFLATE entries
+- `VEL.dat` is about 138 MB uncompressed
+- Required metadata entries: `LON.lst`, `LAT.lst`, `DEP.lst`
+- EarthScope reads the archive locally and does not redistribute it
+
+### 15.2 VEL.dat
+
+Whitespace-separated rows:
+
+```text
+longitude latitude depth vp vs p_reliability s_reliability
+```
+
+- Longitude: decimal degrees east
+- Latitude: decimal degrees north
+- Depth: km
+- Vp: km/s
+- Vs: km/s
+- Reliability: values as supplied by the provider
+- Row order: longitude varies fastest, then latitude, then depth
+- Grid: 301 x 281 x 32
+- CRS: not stated by the provider; EarthScope uses `UNKNOWN`
+
+The import validates the axis files and row count before creating the model. The UI samples nearest grid cells for depth slices and profiles; it does not interpolate between cells or redistribute the model.

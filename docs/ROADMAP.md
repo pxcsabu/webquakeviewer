@@ -195,7 +195,8 @@ Do not assume unrestricted access to Hi-net, K-NET, or KiK-net waveforms.
 
 - [ ] Focal mechanism visualization
 - [ ] Moment tensor display
-- [ ] Published seismic velocity model support
+- [x] Support user-provided NIED ALJ2023 velocity model with depth slices and cross-sections
+- [ ] Full 3D velocity-volume rendering and model comparison
 - [ ] Tomography visualization
 - [ ] 3D velocity model rendering
 - [ ] Earth interior visualization

@@ -452,3 +452,22 @@ JMA publishes estimated-intensity distribution maps for earthquakes with a maxim
 - These are **estimated** intensities based on observed intensity and site amplification, not station observations. They are not interpolated or averaged by EarthScope.
 - Event mesh IDs and legacy datum handling follow the JMA map viewer's tile geometry.
 - If the list or individual tiles are unavailable, the rest of the map remains usable and a warning may be shown.
+
+## 21. NIED Hi-net ALJ2023 Velocity Structure
+
+**Status: USER-PROVIDED — local import only; no data bundled**
+
+Source page: https://www.hinet.bosai.go.jp/topics/sokudo_kozo/alljpn_download.php?LANG=ja
+
+The package is `ALJ2023.zip` (approximately 13 MB compressed). It contains `VEL.dat` (about 138 MB), `LON.lst`, `LAT.lst`, `DEP.lst`, and the provider's interpolation tools/documentation.
+
+- Grid: 301 longitudes x 281 latitudes x 32 depths.
+- Longitude range: 120°E–150°E; latitude range: 20°N–48°N; depth range in the supplied package: -5 to 400 km (32 layers).
+- `VEL.dat` columns: longitude, latitude, depth, Vp, Vs, P reliability, S reliability.
+- Units: Vp/Vs in km/s; reliability values are preserved as supplied.
+- The provider does not state a CRS in the package. EarthScope stores the grid as `UNKNOWN` and applies no datum transformation.
+- Citation required: Matsubara et al. (2022), Earth, Planets and Space 74:171, https://doi.org/10.1186/s40623-022-01724-0.
+- The provider states: do not redistribute the data; do not distribute processed versions of the data.
+- EarthScope therefore does not bundle, relay, or redistribute `ALJ2023.zip` or derived model outputs. The user selects the ZIP locally, and the file is read by a Web Worker in the browser/WebView. No model data is sent to an EarthScope server.
+- The displayed depth slices and cross-sections use nearest-grid sampling. They are display products, not a new inversion, and are classified `MODEL`.
+- The full 3D volume is not rendered; only the selected depth slice and profile are shown.

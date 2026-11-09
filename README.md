@@ -30,7 +30,8 @@ The project is designed to be hosted on GitHub Pages without requiring a dedicat
 - PB2002 plate-boundary overlay on the 2D map and 3D block
 - J-SHIS 2020 probabilistic seismic-hazard WMS raster overlay
 - Slab2 depth-contour overlay on the 2D map and 3D block
-- Selected-event prefecture-level JMA intensity fill (not a station distribution)
+- Selected-event municipality-level JMA intensity fill (not a station distribution)
+- JMA 250m estimated-intensity distribution tiles for qualifying events
 - Clickable 3D hypocenters that select the event detail
 - User-provided CSV/JSON waveform import, time-series chart, simple filters, and amplitude statistics
 - Surface and hypocentral distance modules; Aki–Utsu b-value module
@@ -55,9 +56,10 @@ Advanced features depend on the availability and permitted use of suitable datas
 | Geographic map | MapLibre GL JS |
 | 3D crust block | Three.js |
 | Charts | Custom SVG/Canvas |
+| Desktop application | Tauri 2 (Rust + WebView2/WebKitGTK) |
 | Local cache | IndexedDB |
 | Background processing | Web Workers |
-| Hosting | GitHub Pages |
+| Web hosting | GitHub Pages |
 
 Technology choices may be adjusted when a demonstrable technical reason exists.
 
@@ -67,7 +69,9 @@ The default catalog is the JMA earthquake information list (`bosai/quake/data/li
 
 The Phase 2 map uses GSI standard/pale raster tiles with attribution and no API key, plus bundled Natural Earth 1:110m vectors as an offline fallback. GSI tiles are fetched directly from the Geospatial Information Authority of Japan and are not bundled by EarthScope. The 3D crust block is available inside the 地震分布図 panel only when the Slab2 overlay is enabled. The 2D map remains on GSI tiles. The 3D top surface uses GSI pale tiles in Web Mercator, with Natural Earth as a fallback, and draws PB2002 / Slab2 as model context. Clicking a 3D hypocenter selects the event.
 
-Selecting a JMA event displays its prefecture-level maximum intensity as a fill layer. JMA supplies area/city intensity summaries (`int`), not a station-by-station shaking field. The overlay is an area aggregation and does not interpolate intensity between prefectures. Prefecture polygons are from Natural Earth 1:10m (public domain).
+Selecting a JMA event displays municipality-level maximum intensity as a fill layer. JMA supplies city/area intensity summaries (`int`), not a station-by-station shaking field. The overlay is an area aggregation and does not interpolate intensity between municipalities. Municipality polygons are derived from 国土数値情報 N03 via [simplify-japan-geojson](https://github.com/ricewin/simplify-japan-geojson) (CC BY 4.0). Designated-city wards that are not present in the simplified boundary asset are aggregated to their parent city.
+
+For qualifying events (maximum intensity 5弱 or greater), EarthScope can also load the JMA 250m estimated-intensity distribution. The tiles are fetched directly from JMA and are model-derived estimates, not observations. They are not bundled or interpolated.
 
 Waveform analysis currently accepts user-provided CSV/JSON files only. MiniSEED and binary waveforms, and NIED waveform feeds, are not connected. Amplitude units and station metadata are preserved as supplied; EarthScope does not verify them.
 
@@ -186,6 +190,73 @@ Sample data is disabled by default. It can be explicitly enabled with `VITE_ENAB
 - Conditional requests: `If-Modified-Since` using the stored `Last-Modified` value; `304 Not Modified` keeps the cached catalog
 - Cache: events are replaced per provider snapshot, so events leaving the rolling feed do not remain indefinitely
 - Revised events with the same normalized id replace the previous version
+
+## Desktop Application (Tauri 2)
+
+EarthScope can be packaged as a Windows, macOS, or Linux desktop application with Tauri 2. The desktop app uses the existing React/Vite frontend and does not use Electron.
+
+### Prerequisites
+
+- Node.js 20.19 or later.
+- Rust 1.77.2 or later via rustup.
+- Windows: Microsoft C++ Build Tools (MSVC) and the WebView2 Runtime. Windows 10 1803+ usually includes WebView2.
+- macOS: Xcode Command Line Tools and the macOS SDK.
+- Linux: WebKitGTK 4.1, GTK 3, librsvg, and related distribution packages. The CI workflow lists the Ubuntu package set.
+
+### Development
+
+```bash
+npm install
+npm run tauri:dev
+```
+
+`tauri:dev` starts the Vite dev server through `dev:desktop` (with `VITE_BASE_PATH=/`) and opens the Tauri window.
+
+### Production builds
+
+```bash
+# Current host OS; uses the bundle targets configured by Tauri
+npm run tauri:build
+
+# Compile the executable without creating installers
+npm run tauri:build:no-bundle
+
+# Windows installer only
+npm run tauri:build -- --bundles nsis
+
+# macOS application and disk image
+npm run tauri:build -- --bundles app,dmg
+
+# Linux AppImage and Debian package
+npm run tauri:build -- --bundles appimage,deb
+```
+
+Typical artifacts:
+
+- Windows: `src-tauri/target/release/bundle/nsis/EarthScope_<version>_x64-setup.exe`
+- macOS: `src-tauri/target/release/bundle/macos/EarthScope.app` and `.../dmg/EarthScope_<version>_<arch>.dmg`
+- Linux: `src-tauri/target/release/bundle/appimage/` and `.../deb/`
+
+The current desktop configuration does not configure code signing, notarization, or an updater. Builds are unsigned unless the corresponding platform credentials are supplied. macOS and Linux builds must be produced on their respective operating systems; Tauri does not provide general cross-compilation for those bundles. The Windows installer was built and smoke-tested locally on Windows 11 with WebView2. The macOS/Linux CI matrix is configured but has not yet been executed on hosted runners.
+
+### Web and desktop asset paths
+
+- Web/GitHub Pages: `npm run build`; GitHub Actions supplies `VITE_BASE_PATH=/webquakeviewer/`.
+- Desktop: `npm run build:desktop`; this sets `VITE_BASE_PATH=/` and produces the `dist/` consumed by Tauri.
+- Do not publish the desktop `dist/` to Pages. The Pages workflow continues to build with the Pages base path and is unchanged by the desktop workflow.
+
+### Security and capabilities
+
+- No custom Tauri commands are exposed.
+- The only native plugin is `opener`, restricted to opening `http://` and `https://` URLs in the system browser for the existing official links.
+- No filesystem, shell, clipboard, or updater permissions are granted.
+- The production CSP allows the existing data origins (JMA, USGS, GSI, J-SHIS) and local/asset resources. Dev CSP additionally allows the Vite dev server and HMR WebSocket.
+- API keys and credentials are not embedded in the frontend or bundle.
+- The Windows build uses a frameless window and an in-app draggable title bar with minimize, maximize/restore, and close controls. macOS and Linux keep native window decorations.
+
+### Desktop CI
+
+`.github/workflows/desktop-build.yml` builds Windows, macOS, and Linux bundles on pull requests or manual dispatch and uploads them as workflow artifacts. It does not run on pushes, does not create releases, and does not modify the GitHub Pages deployment workflow.
 
 ## Deployment
 

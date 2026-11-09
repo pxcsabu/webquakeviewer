@@ -1016,6 +1016,7 @@ button:disabled {
   height: 100%;
   cursor: grab;
   touch-action: none;
+  overscroll-behavior: contain;
 }
 
 .crust3d-canvas:active {
@@ -1868,3 +1869,77 @@ button:disabled {
     height: 250px;
   }
 }
+
+.app-shell.app-shell-with-titlebar {
+  grid-template-rows: 32px auto auto minmax(0, 1fr) auto;
+}
+
+.desktop-titlebar {
+  display: flex;
+  height: 32px;
+  align-items: stretch;
+  background: #123f5a;
+  color: #ffffff;
+  user-select: none;
+}
+
+.desktop-titlebar-drag {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  overflow: hidden;
+  cursor: default;
+}
+
+.desktop-titlebar-mark {
+  color: #9ed0e8;
+  font-size: 0.9rem;
+}
+
+.desktop-titlebar-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.desktop-titlebar-subtitle {
+  overflow: hidden;
+  color: #c6dce7;
+  font-size: 0.7rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.desktop-titlebar-controls {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.desktop-titlebar-button {
+  width: 46px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #ffffff;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.desktop-titlebar-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.desktop-titlebar-close:hover:not(:disabled) {
+  background: #b3261e;
+}
+
+.desktop-titlebar-button:focus-visible {
+  outline: 2px solid #9ed0e8;
+  outline-offset: -2px;
+}
+

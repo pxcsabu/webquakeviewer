@@ -123,8 +123,9 @@ Calculations have documented methods, assumptions, units, and automated tests.
 - [x] Verify usage conditions
 - [x] Implement permitted JMA earthquake information
 - [x] Implement Japanese seismic intensity display
-- [x] Display selected-event prefecture-level JMA intensity areas on the map
-- [x] Verify the intensity overlay on GitHub Pages
+- [x] Display selected-event municipality-level JMA intensity areas on the map
+- [x] Add JMA 250m estimated-intensity tiles for qualifying events
+- [x] Verify the municipality and 250m overlays on GitHub Pages
 - [x] Implement intensity ordinal ranking
 - [x] Implement JMA / USGS catalog source selector
 - [x] Verify JMA integration on GitHub Pages
@@ -215,6 +216,22 @@ Potential future work:
 - [ ] Ground-motion comparison
 - [ ] Custom analysis regions
 - [ ] Exportable analysis reports
+
+## Desktop Packaging (Tauri 2) — PARTIAL
+
+**Status: Windows executable and installer built and smoke-tested; macOS/Linux CI is configured but has not been executed on hosted runners.**
+
+- [x] Add a Tauri 2 Rust shell that reuses the Vite frontend
+- [x] Keep the GitHub Pages build and workflow separate
+- [x] Add Windows/macOS/Linux build commands and per-OS CI
+- [x] Add a production/dev CSP that allows the documented data origins
+- [x] Add minimal capabilities; only the URL opener plugin is enabled
+- [x] Add a Windows-only frameless custom title bar with drag/minimize/maximize/close
+- [x] Verify the Windows app with MapLibre, Three.js, IndexedDB, JMA intensity, 250m estimated tiles, and waveform demo
+- [ ] Execute the macOS/Linux CI matrix and record artifacts
+- [ ] Add code signing/notarization and an update channel (not configured)
+
+Cross-compilation is not supported for the macOS/Linux bundles. Build on the target OS or use the desktop CI matrix.
 
 ## Explicitly Deferred Features
 

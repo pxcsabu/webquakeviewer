@@ -5,6 +5,10 @@ import {
   type CatalogProviderId,
 } from '../data/providers/catalogProviders';
 import { AppHeader } from '../components/AppHeader';
+import {
+  DesktopTitleBar,
+  isDesktopWindows,
+} from './DesktopTitleBar';
 import { SourceStatusPanel } from '../components/SourceStatusPanel';
 import { StatusBar } from '../components/StatusBar';
 import { CatalogAnalysisPanel } from '../features/analysis/CatalogAnalysisPanel';
@@ -34,6 +38,7 @@ export function App() {
     DEFAULT_EARTHQUAKE_FILTERS,
   );
   const [now, setNow] = useState(() => new Date());
+  const [desktopTitleBar] = useState(isDesktopWindows);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -65,7 +70,10 @@ export function App() {
   }, [visibleEvents, selectedId]);
 
   return (
-    <div className="app-shell">
+    <div
+      className={`app-shell${desktopTitleBar ? ' app-shell-with-titlebar' : ''}`}
+    >
+      {desktopTitleBar ? <DesktopTitleBar /> : null}
       <AppHeader
         source={catalog.source}
         loading={catalog.status === 'loading'}

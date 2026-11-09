@@ -472,6 +472,14 @@ export function Crust3DView({
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
 
+    const preventMiddleButtonDefault = (
+      event: PointerEvent | MouseEvent,
+    ): void => {
+      if (event.button === 1) {
+        event.preventDefault();
+      }
+    };
+
     const raycaster = new THREE.Raycaster();
     raycaster.params.Points.threshold = 0.12;
     const pointer = new THREE.Vector2();
@@ -530,6 +538,21 @@ export function Crust3DView({
       renderer.setAnimationLoop(animate);
     };
     renderer.domElement.addEventListener('click', handleClick);
+    renderer.domElement.addEventListener(
+      'pointerdown',
+      preventMiddleButtonDefault,
+      true,
+    );
+    renderer.domElement.addEventListener(
+      'mousedown',
+      preventMiddleButtonDefault,
+      true,
+    );
+    renderer.domElement.addEventListener(
+      'auxclick',
+      preventMiddleButtonDefault,
+      true,
+    );
     renderer.domElement.addEventListener('contextmenu', preventContextMenu);
     renderer.domElement.addEventListener('dblclick', handleDoubleClick);
     renderer.domElement.addEventListener('webglcontextlost', handleContextLost);
@@ -601,6 +624,21 @@ export function Crust3DView({
       cancelled = true;
       resizeObserver.disconnect();
       renderer.domElement.removeEventListener('click', handleClick);
+      renderer.domElement.removeEventListener(
+        'pointerdown',
+        preventMiddleButtonDefault,
+        true,
+      );
+      renderer.domElement.removeEventListener(
+        'mousedown',
+        preventMiddleButtonDefault,
+        true,
+      );
+      renderer.domElement.removeEventListener(
+        'auxclick',
+        preventMiddleButtonDefault,
+        true,
+      );
       renderer.domElement.removeEventListener('contextmenu', preventContextMenu);
       renderer.domElement.removeEventListener('dblclick', handleDoubleClick);
       renderer.domElement.removeEventListener(

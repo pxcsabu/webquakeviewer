@@ -8,3 +8,5 @@ coverage/
 .npmrc
 .DS_Store
 Thumbs.db
+src-tauri/target/
+src-tauri/gen/schemas/

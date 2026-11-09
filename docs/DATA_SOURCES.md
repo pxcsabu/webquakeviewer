@@ -411,18 +411,35 @@ EarthScope accepts CSV and JSON waveforms selected by the user. It does not fetc
 
 NIED Hi-net / K-NET / KiK-net waveform access remains subject to registration, authentication, and redistribution conditions. Do not treat those services as unrestricted public APIs.
 
-## 19. Japan Prefecture Boundaries
+## 19. Japan Municipality Boundaries
 
 **Status: READY — static display geometry**
 
-The selected-event intensity fill uses prefecture polygons, not JMA observation-area polygons.
+The selected-event intensity fill uses municipality polygons, not JMA observation-area polygons.
 
-- Source: Natural Earth 1:10m Admin 1 – States, Provinces.
-- URL: https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-1-states-provinces/
-- License: public domain (Natural Earth).
-- The 47 Japan features are filtered from the global file and stored as `public/geo/japan_prefectures.geojson`.
-- Coordinates are rounded to four decimal places for the static asset.
-- `properties.code` is the two-digit JIS/ISO 3166-2 `JP-xx` prefecture code. It is matched to the JMA `int` area code.
+- Source: 国土数値情報 行政区域データ (N03).
+- Processing: [ricewin/simplify-japan-geojson](https://github.com/ricewin/simplify-japan-geojson), simplified with Mapshaper to 8%.
+- License: CC BY 4.0; attribution to 国土数値情報 and the simplification project is displayed with the map.
+- The 47 prefecture files are merged into `public/geo/japan_municipalities.geojson` (about 2.6 MB).
+- `properties.code` is the five-digit administrative area code (`N03_007`), `properties.name` is the municipality name, and `properties.prefecture` is the prefecture name.
+- JMA city codes are seven digits. EarthScope matches the first five digits. A designated-city ward code absent from the simplified asset is aggregated to its known parent city code (for example Yokohama, Kawasaki, Sagamihara, Hamamatsu, Sakai, and Fukuoka), or to `prefix + 00` for other codes.
 - The boundaries are a geographic display aid. They are not JMA intensity observation areas, legal boundaries, or survey-grade administrative boundaries.
-- The fill shows the maximum intensity reported for each prefecture and must not be interpreted as a continuous shaking field.
+- The fill shows the maximum intensity reported for each municipality and must not be interpreted as a continuous shaking field.
 - The JMA intensity-area fill and 3D hypocenter click selection were verified on GitHub Pages on 2026-11-09.
+
+## 20. JMA Estimated Intensity (250m Mesh)
+
+**Status: READY — event-dependent, direct JMA delivery**
+
+JMA publishes estimated-intensity distribution maps for earthquakes with a maximum intensity of 5弱 or greater. EarthScope loads these products only for the selected event.
+
+- List: `https://www.jma.go.jp/bosai/estimated_intensity_map/data/list.json`
+- Tile: `https://www.jma.go.jp/bosai/estimated_intensity_map/data/<event>/<mesh>.png`
+- Format: PNG tiles corresponding to JMA 250m estimated-intensity meshes.
+- CORS: verified with `Origin: http://tauri.localhost`; `Access-Control-Allow-Origin: *`.
+- Matching: the first 12 digits of the JMA event ID (YYYYMMDDHHmm JST) are matched to the first 12 digits of the estimated-map URL.
+- The list is fetched lazily only after a qualifying event is selected; it is cached in memory for the session.
+- The PNG tiles are displayed directly by MapLibre. EarthScope does not bundle, resample, or redistribute the JMA tiles.
+- These are **estimated** intensities based on observed intensity and site amplification, not station observations. They are not interpolated or averaged by EarthScope.
+- Event mesh IDs and legacy datum handling follow the JMA map viewer's tile geometry.
+- If the list or individual tiles are unavailable, the rest of the map remains usable and a warning may be shown.

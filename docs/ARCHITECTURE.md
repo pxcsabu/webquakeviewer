@@ -20,9 +20,10 @@ External data providers are accessed through isolated provider adapters when bro
 | Geographic rendering | MapLibre GL JS |
 | 3D rendering | Three.js |
 | Charts | Custom SVG/Canvas |
+| Desktop packaging | Tauri 2 (Rust) |
 | Local storage | IndexedDB |
 | Background processing | Web Workers |
-| Hosting | GitHub Pages |
+| Web hosting | GitHub Pages |
 
 ## 3. High-Level Architecture
 
@@ -254,7 +255,7 @@ MapLibre GL JS is responsible for:
 - Earthquake markers
 - Geographic overlays
 - Fault and plate boundary layers
-- Selected-event prefecture-level intensity fill
+- Selected-event municipality-level intensity fill and optional JMA 250m estimated-intensity tiles
 - Map interaction
 
 Keep data processing separate from map rendering.
@@ -350,3 +351,32 @@ Test:
 - Production deployment paths
 
 Test the deployed GitHub Pages environment, not only the local development server.
+
+## 14. Desktop Packaging (Tauri 2)
+
+The desktop application reuses the same Vite/React frontend. It does not replace the web build and does not use Electron.
+
+### Build separation
+
+- Web/GitHub Pages: `npm run build` with `VITE_BASE_PATH` supplied by the Pages workflow (for example `/webquakeviewer/`).
+- Desktop: `npm run build:desktop` sets `VITE_BASE_PATH=/`; Tauri consumes `dist/` through `frontendDist`.
+- `src-tauri/tauri.conf.json` defines `devUrl`, `beforeDevCommand`, `beforeBuildCommand`, and `frontendDist`.
+- The desktop build must not overwrite or publish the GitHub Pages artifact.
+
+### Security and capabilities
+
+- The Tauri frontend uses the same browser APIs for fetch, IndexedDB, WebGL, and file input.
+- No custom Rust commands are registered.
+- No filesystem, shell, clipboard, or updater permissions are granted.
+- The `opener` plugin is restricted to HTTP(S) URLs so existing official links open in the system browser.
+- The production CSP explicitly allowlists JMA, USGS, GSI, and J-SHIS for `connect-src`/`img-src`, plus MapLibre worker blobs and Tauri IPC.
+- The development CSP additionally permits the Vite dev server and HMR WebSocket.
+- No API key or secret is embedded in the desktop bundle.
+
+### Platform behavior
+
+- Windows: frameless native window; the renderer draws a draggable app title bar with minimize, maximize/restore, and close controls. This is configured only in `src-tauri/tauri.windows.conf.json`.
+- macOS and Linux: native window decorations remain.
+- Builds are unsigned unless signing credentials are supplied. macOS/Linux bundles must be built on their native operating systems; general cross-compilation is not supported.
+- Desktop CI is separate from Pages deployment and runs only on pull requests or manual dispatch.
+

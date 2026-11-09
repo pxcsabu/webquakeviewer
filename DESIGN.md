@@ -86,7 +86,8 @@ Every data provider must have:
 - Magnitude-frequency distribution
 - b-value calculation
 - Spatial and temporal analysis
-- Selected-event prefecture-level intensity distribution
+- Selected-event municipality-level intensity distribution
+- JMA 250m estimated-intensity distribution
 - Geological and plate boundary overlays
 
 ### Advanced features
@@ -230,3 +231,13 @@ It must also have:
 - Tests for important calculations
 
 The long-term vision is comprehensive geophysical analysis, but the application must remain useful even when restricted datasets are unavailable.
+## 9. Desktop Packaging
+
+EarthScope remains web-first. A Tauri 2 desktop build reuses the same React/Vite frontend and is optional; it is not a separate implementation.
+
+- Web builds continue to use the GitHub Pages base path.
+- Desktop builds use the root base path and the Tauri `frontendDist`.
+- No custom native commands or broad filesystem/shell permissions are required.
+- The only native plugin is a scoped URL opener for existing official links.
+- Windows uses a frameless window with an in-app draggable title bar; macOS and Linux keep native decorations.
+- macOS and Linux bundles are built on their native operating systems or in CI, not by cross-compilation from Windows.

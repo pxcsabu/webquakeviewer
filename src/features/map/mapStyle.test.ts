@@ -79,7 +79,7 @@ describe('toIntensityFeatureCollection', () => {
     features: [
       {
         type: 'Feature',
-        properties: { code: '13', name_ja: '東京都' },
+        properties: { code: '13101', name: '千代田区', prefecture: '東京都' },
         geometry: {
           type: 'Polygon',
           coordinates: [
@@ -95,7 +95,7 @@ describe('toIntensityFeatureCollection', () => {
       },
       {
         type: 'Feature',
-        properties: { code: '14', name_ja: '神奈川県' },
+        properties: { code: '14100', name: '横浜市', prefecture: '神奈川県' },
         geometry: {
           type: 'Polygon',
           coordinates: [
@@ -123,13 +123,17 @@ describe('toIntensityFeatureCollection', () => {
         {
           prefectureCode: '13',
           maxIntensity: { display: '4', rank: 4 },
+          cities: [
+            { code: '1310100', maxIntensity: { display: '4', rank: 4 } },
+          ],
         },
       ],
     });
     expect(collection.features).toHaveLength(1);
     expect(collection.features[0]?.properties).toEqual({
-      code: '13',
-      nameJa: '東京都',
+      code: '13101',
+      nameJa: '千代田区',
+      prefecture: '東京都',
       intensityDisplay: '4',
       intensityRank: 4,
       intensityColor: INTENSITY_COLOR_BY_DISPLAY['4'],

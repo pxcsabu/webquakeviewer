@@ -1,0 +1,52 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "EarthScope",
+  "version": "0.1.0",
+  "identifier": "io.github.pxcsabu.earthscope",
+  "build": {
+    "beforeDevCommand": "npm run dev:desktop",
+    "devUrl": "http://127.0.0.1:5173",
+    "beforeBuildCommand": "npm run build:desktop",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "EarthScope — 日本周辺の地震",
+        "width": 1440,
+        "height": 1000,
+        "minWidth": 1024,
+        "minHeight": 700,
+        "resizable": true,
+        "fullscreen": false,
+        "center": true
+      }
+    ],
+    "security": {
+      "capabilities": ["main-capability"],
+      "csp": "default-src 'self' customprotocol: asset:; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://cyberjapandata.gsi.go.jp https://www.j-shis.bosai.go.jp https://earthquake.usgs.gov https://www.jma.go.jp; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost https://www.jma.go.jp https://earthquake.usgs.gov https://cyberjapandata.gsi.go.jp https://www.j-shis.bosai.go.jp; worker-src 'self' blob:; child-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none';",
+      "devCsp": "default-src 'self' http://127.0.0.1:5173 http://localhost:5173; script-src 'self' 'unsafe-inline' http://127.0.0.1:5173 http://localhost:5173; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://cyberjapandata.gsi.go.jp https://www.j-shis.bosai.go.jp https://earthquake.usgs.gov https://www.jma.go.jp; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost ws://127.0.0.1:5173 ws://localhost:5173 http://127.0.0.1:5173 http://localhost:5173 https://www.jma.go.jp https://earthquake.usgs.gov https://cyberjapandata.gsi.go.jp https://www.j-shis.bosai.go.jp; worker-src 'self' blob:; child-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none';"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "createUpdaterArtifacts": false,
+    "category": "Education",
+    "shortDescription": "日本周辺の地震観測・震源分布ビューア",
+    "longDescription": "EarthScope は、日本周辺の地震カタログ、震度分布、3D地殻ブロック、波形解析を表示するデスクトップアプリです。",
+    "copyright": "EarthScope contributors",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "10.15"
+    }
+  },
+  "plugins": {}
+}

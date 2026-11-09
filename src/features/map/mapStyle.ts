@@ -32,7 +32,7 @@ export const PB2002_ATTRIBUTION =
 export const PLATE_BOUNDARY_COLOR = '#7d3c98';
 
 export const INTENSITY_ATTRIBUTION =
-  'Natural Earth prefecture boundaries (public domain); JMA intensity areas';
+  '市区町村界: 国土数値情報 N03 / simplify-japan-geojson (CC BY 4.0); JMA city intensity areas';
 
 export const INTENSITY_COLOR_BY_DISPLAY: Record<IntensityDisplay, string> = {
   '0': '#f0f0f0',
@@ -66,6 +66,7 @@ export const INTENSITY_LEGEND_CLASSES: ReadonlyArray<{
 export interface IntensityFeatureProperties {
   code: string;
   nameJa: string;
+  prefecture: string;
   intensityDisplay: IntensityDisplay;
   intensityRank: number;
   intensityColor: string;
@@ -78,11 +79,39 @@ export type IntensityFeatureCollection = FeatureCollection<
 
 /**
  * Filter prefecture polygons to the areas reported for the selected event and
- * attach the maximum intensity supplied by JMA. This is a prefecture-level
+ * attach the maximum intensity supplied by JMA. This is a municipality-level
  * summary of JMA intensity areas, not an interpolated station distribution.
  */
+function parentMunicipalityCode(code: string): string {
+  if (code.startsWith('1413')) {
+    return '14130';
+  }
+  if (code.startsWith('1415')) {
+    return '14150';
+  }
+  if (code.startsWith('2213')) {
+    return '22130';
+  }
+  if (code.startsWith('2714')) {
+    return '27140';
+  }
+  if (code.startsWith('4013')) {
+    return '40130';
+  }
+  return `${code.slice(0, 3)}00`;
+}
+
+/**
+ * Build a municipality-level fill from JMA city intensity summaries.
+ *
+ * JMA city codes are seven digits. The boundary asset uses five-digit
+ * administrative area codes. A designated-city ward code that is absent from
+ * the simplified asset is aggregated to its parent city (prefix + 00), which
+ * is documented in the map note. This is still an area summary, not a
+ * station-by-station or 250m mesh field.
+ */
 export function toIntensityFeatureCollection(
-  prefectures: FeatureCollection<Polygon | MultiPolygon> | null,
+  municipalities: FeatureCollection<Polygon | MultiPolygon> | null,
   event: Earthquake | null,
 ): IntensityFeatureCollection {
   const empty: IntensityFeatureCollection = {
@@ -90,18 +119,46 @@ export function toIntensityFeatureCollection(
     features: [],
   };
   if (
-    prefectures === null ||
+    municipalities === null ||
     event === null ||
     event.intensityAreas === undefined ||
     event.intensityAreas.length === 0
   ) {
     return empty;
   }
-  const byPrefecture = new Map(
-    event.intensityAreas.map((area) => [area.prefectureCode, area]),
+  const availableCodes = new Set(
+    municipalities.features
+      .map((feature) =>
+        typeof feature.properties?.code === 'string'
+          ? feature.properties.code
+          : null,
+      )
+      .filter((code): code is string => code !== null),
   );
+  const byCode = new Map<string, { display: IntensityDisplay; rank: number }>();
+  event.intensityAreas.forEach((area) => {
+    (area.cities ?? []).forEach((city) => {
+      const code = city.code.slice(0, 5);
+      const parentCode = parentMunicipalityCode(code);
+      const targetCode = availableCodes.has(code)
+        ? code
+        : availableCodes.has(parentCode)
+          ? parentCode
+          : null;
+      if (targetCode === null) {
+        return;
+      }
+      const current = byCode.get(targetCode);
+      if (current === undefined || city.maxIntensity.rank > current.rank) {
+        byCode.set(targetCode, {
+          display: city.maxIntensity.display,
+          rank: city.maxIntensity.rank,
+        });
+      }
+    });
+  });
   const features: IntensityFeatureCollection['features'] = [];
-  prefectures.features.forEach((feature) => {
+  municipalities.features.forEach((feature) => {
     const code =
       typeof feature.properties?.code === 'string'
         ? feature.properties.code
@@ -109,8 +166,8 @@ export function toIntensityFeatureCollection(
     if (code === null) {
       return;
     }
-    const area = byPrefecture.get(code);
-    if (area === undefined) {
+    const intensity = byCode.get(code);
+    if (intensity === undefined) {
       return;
     }
     features.push({
@@ -118,12 +175,16 @@ export function toIntensityFeatureCollection(
       properties: {
         code,
         nameJa:
-          typeof feature.properties?.name_ja === 'string'
-            ? feature.properties.name_ja
+          typeof feature.properties?.name === 'string'
+            ? feature.properties.name
             : code,
-        intensityDisplay: area.maxIntensity.display,
-        intensityRank: area.maxIntensity.rank,
-        intensityColor: INTENSITY_COLOR_BY_DISPLAY[area.maxIntensity.display],
+        prefecture:
+          typeof feature.properties?.prefecture === 'string'
+            ? feature.properties.prefecture
+            : '',
+        intensityDisplay: intensity.display,
+        intensityRank: intensity.rank,
+        intensityColor: INTENSITY_COLOR_BY_DISPLAY[intensity.display],
       },
       geometry: feature.geometry,
     });

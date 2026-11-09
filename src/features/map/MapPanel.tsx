@@ -23,6 +23,12 @@ import {
   PB2002_ATTRIBUTION,
   type BasemapId,
 } from './mapStyle';
+import {
+  JMA_ESTIMATED_ATTRIBUTION,
+  findJmaEstimatedEntry,
+  loadJmaEstimatedList,
+  type JmaEstimatedEntry,
+} from './jmaEstimatedIntensity';
 
 const LazyEarthquakeMap = lazy(() =>
   import('./EarthquakeMap').then((module) => ({
@@ -110,7 +116,7 @@ function IntensityLegend({ event }: { event: Earthquake }) {
     <aside className="map-intensity-legend" aria-label="震度分布の凡例">
       <p className="map-intensity-legend-title">震度分布</p>
       <p className="map-intensity-legend-row">
-        選択イベントの都道府県別最大震度
+        選択イベントの市区町村別最大震度
       </p>
       <ul>
         {INTENSITY_LEGEND_CLASSES.map((intensityClass) => (
@@ -125,7 +131,7 @@ function IntensityLegend({ event }: { event: Earthquake }) {
         ))}
       </ul>
       <p className="map-intensity-legend-note">
-        JMA の地域別震度を都道府県単位で集約したものです。観測点分布ではありません。
+        JMA の地域別震度を市区町村単位で集約したものです。政令指定都市の区は市単位に集約する場合があります。観測点分布ではありません。
       </p>
     </aside>
   );
@@ -186,6 +192,12 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
   const [showSlab2, setShowSlab2] = useState(false);
   const [showHazard, setShowHazard] = useState(false);
   const [showIntensity, setShowIntensity] = useState(true);
+  const [showEstimated, setShowEstimated] = useState(false);
+  const [estimatedEntry, setEstimatedEntry] =
+    useState<JmaEstimatedEntry | null>(null);
+  const [estimatedStatus, setEstimatedStatus] = useState<
+    'idle' | 'loading' | 'ready' | 'none' | 'error'
+  >('idle');
   const [show3d, setShow3d] = useState(false);
   const map3dRef = useRef<HTMLDivElement>(null);
   const selectedEvent =
@@ -193,6 +205,41 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
       ? null
       : events.find((event) => event.id === selectedId) ?? null;
   const hasProfile = profileStart !== null && profileEnd !== null;
+
+  useEffect(() => {
+    let cancelled = false;
+    setShowEstimated(false);
+    if (
+      selectedEvent === null ||
+      selectedEvent.source.provider !== 'JMA' ||
+      (selectedEvent.intensity?.rank ?? 0) < 5
+    ) {
+      setEstimatedEntry(null);
+      setEstimatedStatus('idle');
+      return;
+    }
+    setEstimatedEntry(null);
+    setEstimatedStatus('loading');
+    loadJmaEstimatedList()
+      .then((entries) => {
+        if (cancelled) {
+          return;
+        }
+        const entry = findJmaEstimatedEntry(selectedEvent, entries);
+        setEstimatedEntry(entry);
+        setEstimatedStatus(entry === null ? 'none' : 'ready');
+      })
+      .catch((error: unknown) => {
+        console.error('JMA estimated intensity list failed', error);
+        if (!cancelled) {
+          setEstimatedEntry(null);
+          setEstimatedStatus('error');
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedEvent]);
 
   useEffect(() => {
     if (show3d) {
@@ -329,6 +376,15 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
           />
           震度分布
         </label>
+        <label className={estimatedEntry ? '' : 'map-layer-disabled'}>
+          <input
+            type="checkbox"
+            checked={showEstimated}
+            disabled={estimatedEntry === null}
+            onChange={(event) => setShowEstimated(event.target.checked)}
+          />
+          推定震度（250m）
+        </label>
       </div>
       {showSlab2 ? (
         <p className="map-layer-note">
@@ -345,17 +401,36 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
           </a>
         </p>
       ) : null}
+      {selectedEvent !== null &&
+      selectedEvent.source.provider === 'JMA' &&
+      (selectedEvent.intensity?.rank ?? 0) >= 5 ? (
+        <p className="map-layer-note">
+          {estimatedStatus === 'loading'
+            ? '250m推計震度分布を確認中…'
+            : estimatedStatus === 'error'
+              ? '250m推計震度分布の一覧を取得できませんでした。'
+              : estimatedStatus === 'none'
+                ? 'このイベントの250m推計震度分布は公開されていません。'
+                : showEstimated
+                  ? `${JMA_ESTIMATED_ATTRIBUTION}を表示中。観測値ではなく、地盤増幅度等を用いた推計値です。`
+                  : 'このイベントには250m推計震度分布があります。チェックすると表示します。'}
+        </p>
+      ) : selectedEvent !== null && selectedEvent.intensity !== undefined ? (
+        <p className="map-layer-note">
+          250m推計震度分布は最大震度5弱以上の地震が対象です。
+        </p>
+      ) : null}
       {showPlateBoundaries ? (
         <p className="map-layer-note">{PB2002_ATTRIBUTION}</p>
       ) : null}
       {showIntensity ? (
         <p className="map-layer-note">
           {selectedEvent === null
-            ? '地震マーカーをクリックすると、そのイベントの都道府県別最大震度を表示します。'
+            ? '地震マーカーをクリックすると、そのイベントの市区町村別最大震度を表示します。'
             : selectedEvent.intensityAreas === undefined ||
                 selectedEvent.intensityAreas.length === 0
               ? '選択イベントには JMA の地域別震度データがありません。'
-              : '選択イベントの都道府県別最大震度を表示中。JMA の地域別震度を都道府県単位で集約したもので、観測点分布ではありません。'}
+              : '選択イベントの市区町村別最大震度を表示中。JMA の地域別震度を市区町村単位で集約したもので、観測点分布ではありません。'}
         </p>
       ) : null}
       <div className="map-frame">
@@ -371,6 +446,8 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
               showSlab2={showSlab2}
               showHazard={showHazard}
               showIntensity={showIntensity}
+              showEstimated={showEstimated}
+              estimatedEntry={estimatedEntry}
               profileStart={profileStart}
               profileEnd={profileEnd}
               profileMode={profileMode}

@@ -12,6 +12,11 @@ import type {
   Polygon,
 } from 'geojson';
 import type { GeoPoint } from '../../analysis/geodesy/distance';
+import {
+  estimatedMeshBounds,
+  estimatedMeshUrl,
+  type JmaEstimatedEntry,
+} from './jmaEstimatedIntensity';
 import type { Earthquake } from '../../domain/earthquake/types';
 import {
   BASE_MAP_STYLE,
@@ -47,6 +52,8 @@ interface EarthquakeMapProps {
   showSlab2: boolean;
   showHazard: boolean;
   showIntensity: boolean;
+  showEstimated: boolean;
+  estimatedEntry: JmaEstimatedEntry | null;
   onProfilePoint: (point: GeoPoint) => void;
   onSelect: (id: string) => void;
 }
@@ -72,6 +79,8 @@ export function EarthquakeMap({
   showSlab2,
   showHazard,
   showIntensity,
+  showEstimated,
+  estimatedEntry,
   onProfilePoint,
   onSelect,
 }: EarthquakeMapProps) {
@@ -82,7 +91,7 @@ export function EarthquakeMap({
   const profileModeRef = useRef(profileMode);
   const onProfilePointRef = useRef(onProfilePoint);
   const lastFlownIdRef = useRef<string | null>(null);
-  const prefectureDataRef = useRef<FeatureCollection<
+  const municipalityDataRef = useRef<FeatureCollection<
     Polygon | MultiPolygon
   > | null>(null);
   const [mapReady, setMapReady] = useState(false);
@@ -91,6 +100,8 @@ export function EarthquakeMap({
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [basemapWarning, setBasemapWarning] = useState<string | null>(null);
+  const [estimatedWarning, setEstimatedWarning] = useState<string | null>(null);
+  const estimatedLayerIdsRef = useRef<string[]>([]);
   const [contextLost, setContextLost] = useState(false);
 
   useEffect(() => {
@@ -119,6 +130,7 @@ export function EarthquakeMap({
     setStatus('loading');
     setErrorMessage(null);
     setBasemapWarning(null);
+    setEstimatedWarning(null);
     setMapReady(false);
     setContextLost(false);
 
@@ -174,6 +186,12 @@ export function EarthquakeMap({
       }
 
       const sourceId = 'sourceId' in event ? event.sourceId : undefined;
+      if (typeof sourceId === 'string' && sourceId.startsWith('jma-est-')) {
+        setEstimatedWarning(
+          '推計震度分布図の一部を読み込めませんでした。',
+        );
+        return;
+      }
       if (typeof sourceId === 'string' && sourceId.startsWith('gsi-')) {
         setBasemapWarning(
           '地理院タイルの一部を読み込めませんでした。Natural Earth を表示しています。',
@@ -188,7 +206,7 @@ export function EarthquakeMap({
     map.on('load', () => {
       void (async () => {
         try {
-          const [land, boundaries, plateBoundaries, slab2, prefectures] =
+          const [land, boundaries, plateBoundaries, slab2, municipalities] =
             await Promise.all([
             fetchFeatureCollection(
               `${import.meta.env.BASE_URL}geo/ne_110m_land.geojson`,
@@ -203,13 +221,13 @@ export function EarthquakeMap({
               `${import.meta.env.BASE_URL}geo/slab2_japan_depth_contours.geojson`,
             ),
             fetchFeatureCollection(
-              `${import.meta.env.BASE_URL}geo/japan_prefectures.geojson`,
+              `${import.meta.env.BASE_URL}geo/japan_municipalities.geojson`,
             ),
           ]);
           if (cancelled) {
             return;
           }
-          prefectureDataRef.current = prefectures as FeatureCollection<
+          municipalityDataRef.current = municipalities as FeatureCollection<
             Polygon | MultiPolygon
           >;
 
@@ -301,7 +319,7 @@ export function EarthquakeMap({
             },
           });
 
-          map.addSource('intensity-prefectures', {
+          map.addSource('intensity-municipalities', {
             type: 'geojson',
             data: { type: 'FeatureCollection', features: [] },
             attribution: INTENSITY_ATTRIBUTION,
@@ -309,7 +327,7 @@ export function EarthquakeMap({
           map.addLayer({
             id: 'intensity-fill',
             type: 'fill',
-            source: 'intensity-prefectures',
+            source: 'intensity-municipalities',
             layout: {
               visibility: 'none',
             },
@@ -321,7 +339,7 @@ export function EarthquakeMap({
           map.addLayer({
             id: 'intensity-outline',
             type: 'line',
-            source: 'intensity-prefectures',
+            source: 'intensity-municipalities',
             layout: {
               visibility: 'none',
             },
@@ -597,11 +615,11 @@ export function EarthquakeMap({
       selectedId === null
         ? null
         : events.find((event) => event.id === selectedId) ?? null;
-    const source = map.getSource('intensity-prefectures') as
+    const source = map.getSource('intensity-municipalities') as
       | GeoJSONSource
       | undefined;
     source?.setData(
-      toIntensityFeatureCollection(prefectureDataRef.current, selected),
+      toIntensityFeatureCollection(municipalityDataRef.current, selected),
     );
     const visible =
       showIntensity &&
@@ -617,6 +635,69 @@ export function EarthquakeMap({
       map.setLayoutProperty('intensity-outline', 'visibility', visible);
     }
   }, [selectedId, events, showIntensity, mapReady]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!mapReady || map === null) {
+      return;
+    }
+    const removeEstimatedLayers = (): void => {
+      estimatedLayerIdsRef.current.forEach((layerId) => {
+        if (map.getLayer(layerId)) {
+          map.removeLayer(layerId);
+        }
+        const sourceId = layerId.replace(/-raster$/, '');
+        if (map.getSource(sourceId)) {
+          map.removeSource(sourceId);
+        }
+      });
+      estimatedLayerIdsRef.current = [];
+    };
+
+    removeEstimatedLayers();
+    setEstimatedWarning(null);
+    if (!showEstimated || estimatedEntry === null) {
+      return removeEstimatedLayers;
+    }
+    const beforeId = map.getLayer('earthquakes-circles')
+      ? 'earthquakes-circles'
+      : undefined;
+    estimatedEntry.meshNum.forEach((mesh) => {
+      const coordinates = estimatedMeshBounds(mesh, estimatedEntry.datum);
+      if (coordinates === null) {
+        return;
+      }
+      const sourceId = `jma-est-${mesh}`;
+      const layerId = `${sourceId}-raster`;
+      if (map.getSource(sourceId) !== undefined) {
+        return;
+      }
+      try {
+        map.addSource(sourceId, {
+          type: 'image',
+          url: estimatedMeshUrl(estimatedEntry, mesh),
+          coordinates,
+        });
+        map.addLayer(
+          {
+            id: layerId,
+            type: 'raster',
+            source: sourceId,
+            paint: {
+              'raster-opacity': 0.78,
+              'raster-fade-duration': 0,
+            },
+          },
+          beforeId,
+        );
+        estimatedLayerIdsRef.current.push(layerId);
+      } catch (error) {
+        console.error('JMA estimated intensity layer failed', error);
+        setEstimatedWarning('推計震度分布図を追加できませんでした。');
+      }
+    });
+    return removeEstimatedLayers;
+  }, [showEstimated, estimatedEntry, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -682,6 +763,9 @@ export function EarthquakeMap({
       ) : null}
       {basemapWarning ? (
         <div className="map-basemap-warning">{basemapWarning}</div>
+      ) : null}
+      {estimatedWarning ? (
+        <div className="map-basemap-warning">{estimatedWarning}</div>
       ) : null}
       {contextLost ? (
         <div className="map-overlay">

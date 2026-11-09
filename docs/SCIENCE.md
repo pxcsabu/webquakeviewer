@@ -371,18 +371,31 @@ The current JMA earthquake list JSON does not state a CRS. EarthScope stores it 
 
 
 
-### 17.4 Selected-event prefecture-level intensity overlay
+### 17.4 Selected-event municipality-level intensity overlay
 
-When a JMA event is selected, EarthScope can fill prefecture polygons with the maximum intensity reported for that event's intensity areas.
+When a JMA event is selected, EarthScope can fill municipality polygons with the maximum intensity reported for that event's intensity areas.
 
-- Source field: JMA earthquake information list `int` array. Each entry has a two-digit prefecture code and `maxi`; city entries may also be present.
-- EarthScope maps the two-digit code to the JMA prefecture code and displays the **maximum** reported intensity for that prefecture.
-- The polygon is a prefecture boundary from Natural Earth 1:10m Admin 1 (public domain), filtered to Japan and rounded to four decimal places. It is not a JMA observation area boundary.
-- The fill is a prefecture-level aggregation. It does not show station observations, does not interpolate between prefectures, and does not imply that the whole prefecture experienced that intensity.
-- The fill is only shown for the selected event and only when the event has `int` area data. USGS events do not carry JMA intensity areas, so the overlay is unavailable for them.
+- Source field: JMA earthquake information list `int` array. Each entry has a two-digit prefecture code and `maxi`; city entries carry seven-digit JMA city codes and their own `maxi`.
+- EarthScope maps the first five digits of each JMA city code to the five-digit municipality code in the bundled N03-derived boundary asset.
+- When a designated-city ward code is absent from the simplified asset, the known parent city code is used for major designated cities; otherwise `first three digits + 00` is used. This is an aggregation, not a ward-level observation.
+- The polygon geometry is from 国土数値情報 N03 via `simplify-japan-geojson` (CC BY 4.0), simplified to 8%.
+- The fill is a municipality-level aggregation. It does not show station observations, does not interpolate between municipalities, and does not imply that the whole municipality experienced that intensity.
+- The fill is only shown for the selected event and only when the event has `int` city data. USGS events do not carry JMA intensity areas, so the overlay is unavailable for them.
 - Intensity is ordinal. The display value is preserved; ranks are used only for ordering. Do not average or arithmetically combine intensity categories.
 - Colors are a display aid, not a physical scale. The map note and legend state that the layer is not a station distribution.
-- The JMA `maxi` field remains the event-level maximum intensity. The prefecture overlay is not a replacement for a station-level strong-motion or shaking map.
+- The JMA `maxi` field remains the event-level maximum intensity. The municipality overlay is not a replacement for a station-level strong-motion or shaking map.
+
+### 17.5 JMA 250m estimated-intensity distribution
+
+For qualifying JMA events (maximum intensity 5弱 or greater), the user can enable the JMA estimated-intensity distribution at 250m mesh resolution.
+
+- The product is listed at `https://www.jma.go.jp/bosai/estimated_intensity_map/data/list.json` and is fetched lazily for the selected event.
+- The event is matched by the first 12 digits of the JMA event ID (YYYYMMDDHHmm JST). No approximate time or coordinate matching is used.
+- Each PNG tile is placed at the JMA mesh bounds. EarthScope implements the same 1-degree by 40-minute tile geometry and legacy datum correction used by the JMA map viewer.
+- The tiles are **estimated** intensities based on observed intensity and site amplification. They are not station observations, not a deterministic simulation, and not a replacement for a site-specific survey.
+- EarthScope does not interpolate, smooth, resample, or average the JMA tiles. The PNGs are displayed directly.
+- The list and tiles are loaded only when a qualifying event is selected and the user enables the 250m layer. They are cached by the browser/WebView and are not bundled with the app.
+- The 250m layer is separate from the municipality overlay. Enabling both overlays may make the map busy; the municipality layer remains the selected-event area summary.
 
 ## 18. Japan-Limited 3D Crust Block
 

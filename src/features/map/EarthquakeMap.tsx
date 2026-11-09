@@ -94,6 +94,9 @@ export function EarthquakeMap({
   const municipalityDataRef = useRef<FeatureCollection<
     Polygon | MultiPolygon
   > | null>(null);
+  const municipalityPromiseRef = useRef<Promise<
+    FeatureCollection<Polygon | MultiPolygon>
+  > | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>(
     'loading',
@@ -206,8 +209,7 @@ export function EarthquakeMap({
     map.on('load', () => {
       void (async () => {
         try {
-          const [land, boundaries, plateBoundaries, slab2, municipalities] =
-            await Promise.all([
+          const [land, boundaries, plateBoundaries, slab2] = await Promise.all([
             fetchFeatureCollection(
               `${import.meta.env.BASE_URL}geo/ne_110m_land.geojson`,
             ),
@@ -220,16 +222,10 @@ export function EarthquakeMap({
             fetchFeatureCollection(
               `${import.meta.env.BASE_URL}geo/slab2_japan_depth_contours.geojson`,
             ),
-            fetchFeatureCollection(
-              `${import.meta.env.BASE_URL}geo/japan_municipalities.geojson`,
-            ),
           ]);
           if (cancelled) {
             return;
           }
-          municipalityDataRef.current = municipalities as FeatureCollection<
-            Polygon | MultiPolygon
-          >;
 
           map.addSource('land', {
             type: 'geojson',
@@ -618,22 +614,69 @@ export function EarthquakeMap({
     const source = map.getSource('intensity-municipalities') as
       | GeoJSONSource
       | undefined;
-    source?.setData(
-      toIntensityFeatureCollection(municipalityDataRef.current, selected),
-    );
-    const visible =
+    const empty: FeatureCollection<Polygon | MultiPolygon> = {
+      type: 'FeatureCollection',
+      features: [],
+    };
+    source?.setData(empty);
+    const hasAreas =
       showIntensity &&
       selected !== null &&
       selected.intensityAreas !== undefined &&
-      selected.intensityAreas.length > 0
-        ? 'visible'
-        : 'none';
-    if (map.getLayer('intensity-fill')) {
-      map.setLayoutProperty('intensity-fill', 'visibility', visible);
+      selected.intensityAreas.length > 0;
+    const setVisibility = (visible: boolean): void => {
+      const value = visible ? 'visible' : 'none';
+      if (map.getLayer('intensity-fill')) {
+        map.setLayoutProperty('intensity-fill', 'visibility', value);
+      }
+      if (map.getLayer('intensity-outline')) {
+        map.setLayoutProperty('intensity-outline', 'visibility', value);
+      }
+    };
+    setVisibility(false);
+    if (!hasAreas || selected === null || selected.intensityAreas === undefined) {
+      return;
     }
-    if (map.getLayer('intensity-outline')) {
-      map.setLayoutProperty('intensity-outline', 'visibility', visible);
+
+    let cancelled = false;
+    const apply = (
+      municipalities: FeatureCollection<Polygon | MultiPolygon>,
+    ): void => {
+      if (cancelled) {
+        return;
+      }
+      source?.setData(
+        toIntensityFeatureCollection(municipalities, selected),
+      );
+      setVisibility(true);
+    };
+
+    if (municipalityDataRef.current !== null) {
+      apply(municipalityDataRef.current);
+      return;
     }
+    if (municipalityPromiseRef.current === null) {
+      municipalityPromiseRef.current = fetchFeatureCollection(
+        `${import.meta.env.BASE_URL}geo/japan_municipalities.geojson`,
+      )
+        .then((data) => data as FeatureCollection<Polygon | MultiPolygon>)
+        .then((data) => {
+          municipalityDataRef.current = data;
+          return data;
+        })
+        .catch((error: unknown) => {
+          municipalityPromiseRef.current = null;
+          throw error;
+        });
+    }
+    void municipalityPromiseRef.current
+      .then(apply)
+      .catch((error: unknown) => {
+        console.error('Municipality intensity boundaries failed', error);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [selectedId, events, showIntensity, mapReady]);
 
   useEffect(() => {

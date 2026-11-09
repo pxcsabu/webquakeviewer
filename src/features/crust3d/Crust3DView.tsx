@@ -8,6 +8,7 @@ import {
   extractPlateLines,
   extractSlabLines,
 } from './crust3dData';
+import { lonLatDepthToPosition } from './crust3dMath';
 import {
   CRUST3D_GSI_ATTRIBUTION,
   createGsiCanvas,
@@ -21,6 +22,7 @@ import {
   CRUST3D_WIDTH,
   depthColorHex,
   depthToY,
+  isInCrust3DRegion,
   latToZ,
   lonToX,
 } from './crust3dStyle';
@@ -126,6 +128,62 @@ function addEarthquakePoints(
   points.userData.eventIds = data.eventIds;
   group.add(points);
   return points;
+}
+
+function createSelectionSprite(): THREE.Sprite {
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 128;
+  const context = canvas.getContext('2d');
+  if (context !== null) {
+    context.clearRect(0, 0, 128, 128);
+    context.beginPath();
+    context.arc(64, 64, 46, 0, Math.PI * 2);
+    context.strokeStyle = 'rgba(255, 255, 255, 0.98)';
+    context.lineWidth = 12;
+    context.stroke();
+    context.beginPath();
+    context.arc(64, 64, 46, 0, Math.PI * 2);
+    context.strokeStyle = '#111827';
+    context.lineWidth = 4;
+    context.stroke();
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const material = new THREE.SpriteMaterial({
+    map: texture,
+    transparent: true,
+    depthTest: false,
+    depthWrite: false,
+  });
+  const sprite = new THREE.Sprite(material);
+  sprite.scale.set(0.24, 0.24, 0.24);
+  sprite.renderOrder = 30;
+  return sprite;
+}
+
+function updateSelection(
+  group: THREE.Group,
+  events: readonly Earthquake[],
+  selectedId: string | null,
+): void {
+  disposeGroup(group);
+  if (selectedId === null) {
+    return;
+  }
+  const event = events.find((candidate) => candidate.id === selectedId);
+  if (event === undefined || !isInCrust3DRegion(event.location)) {
+    return;
+  }
+  const sprite = createSelectionSprite();
+  sprite.position.copy(
+    lonLatDepthToPosition(
+      event.location.latitude,
+      event.location.longitude,
+      event.location.depthKm,
+    ),
+  );
+  group.add(sprite);
 }
 
 function addPlateLines(group: THREE.Group, data: unknown): void {
@@ -295,6 +353,7 @@ export function Crust3DView({
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const controlsRef = useRef<OrbitControls | null>(null);
   const quakeGroupRef = useRef<THREE.Group | null>(null);
+  const selectionGroupRef = useRef<THREE.Group | null>(null);
   const quakePointsRef = useRef<THREE.Points | null>(null);
   const plateGroupRef = useRef<THREE.Group | null>(null);
   const slabGroupRef = useRef<THREE.Group | null>(null);
@@ -331,6 +390,9 @@ export function Crust3DView({
         quakeGroupRef.current,
         events,
       );
+    }
+    if (selectionGroupRef.current !== null) {
+      updateSelection(selectionGroupRef.current, events, selectedId);
     }
   }, [events, selectedId]);
 
@@ -447,15 +509,18 @@ export function Crust3DView({
     scene.add(top);
 
     const quakeGroup = new THREE.Group();
+    const selectionGroup = new THREE.Group();
     const plateGroup = new THREE.Group();
     const slabGroup = new THREE.Group();
     plateGroup.visible = showPlateRef.current;
     slabGroup.visible = showSlabRef.current;
-    scene.add(quakeGroup, plateGroup, slabGroup);
+    scene.add(quakeGroup, selectionGroup, plateGroup, slabGroup);
     quakeGroupRef.current = quakeGroup;
+    selectionGroupRef.current = selectionGroup;
     plateGroupRef.current = plateGroup;
     slabGroupRef.current = slabGroup;
     quakePointsRef.current = addEarthquakePoints(quakeGroup, events);
+    updateSelection(selectionGroup, events, selectedId);
 
     addRegionBorder(scene);
     addDepthTicks(scene);
@@ -516,6 +581,9 @@ export function Crust3DView({
     const preventContextMenu = (event: Event): void => {
       event.preventDefault();
     };
+    const preventWheelScroll = (event: WheelEvent): void => {
+      event.preventDefault();
+    };
     const resetView = (): void => {
       camera.position.copy(CAMERA_POSITION);
       controls.target.copy(CAMERA_TARGET);
@@ -554,6 +622,9 @@ export function Crust3DView({
       true,
     );
     renderer.domElement.addEventListener('contextmenu', preventContextMenu);
+    renderer.domElement.addEventListener('wheel', preventWheelScroll, {
+      passive: false,
+    });
     renderer.domElement.addEventListener('dblclick', handleDoubleClick);
     renderer.domElement.addEventListener('webglcontextlost', handleContextLost);
     renderer.domElement.addEventListener(
@@ -640,6 +711,7 @@ export function Crust3DView({
         true,
       );
       renderer.domElement.removeEventListener('contextmenu', preventContextMenu);
+      renderer.domElement.removeEventListener('wheel', preventWheelScroll);
       renderer.domElement.removeEventListener('dblclick', handleDoubleClick);
       renderer.domElement.removeEventListener(
         'webglcontextlost',
@@ -680,6 +752,7 @@ export function Crust3DView({
       controlsRef.current = null;
       quakeGroupRef.current = null;
       quakePointsRef.current = null;
+      selectionGroupRef.current = null;
       plateGroupRef.current = null;
       slabGroupRef.current = null;
     };

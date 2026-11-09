@@ -33,7 +33,7 @@ The project is designed to be hosted on GitHub Pages without requiring a dedicat
 - Slab2 depth-contour overlay on the 2D map and 3D block
 - Selected-event municipality-level JMA intensity fill (not a station distribution)
 - JMA 250m estimated-intensity distribution tiles for qualifying events
-- Clickable 3D hypocenters that select the event detail
+- Clickable 3D hypocenters with a selection ring and event detail
 - User-provided CSV/JSON waveform import, time-series chart, simple filters, and amplitude statistics
 - Desktop-only user-provided NIED Hi-net ALJ2023 velocity-model import with depth slices and cross-sections
 - Surface and hypocentral distance modules; Aki–Utsu b-value module

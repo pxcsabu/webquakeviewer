@@ -371,6 +371,19 @@ The current JMA earthquake list JSON does not state a CRS. EarthScope stores it 
 
 
 
+### 17.4 Selected-event prefecture-level intensity overlay
+
+When a JMA event is selected, EarthScope can fill prefecture polygons with the maximum intensity reported for that event's intensity areas.
+
+- Source field: JMA earthquake information list `int` array. Each entry has a two-digit prefecture code and `maxi`; city entries may also be present.
+- EarthScope maps the two-digit code to the JMA prefecture code and displays the **maximum** reported intensity for that prefecture.
+- The polygon is a prefecture boundary from Natural Earth 1:10m Admin 1 (public domain), filtered to Japan and rounded to four decimal places. It is not a JMA observation area boundary.
+- The fill is a prefecture-level aggregation. It does not show station observations, does not interpolate between prefectures, and does not imply that the whole prefecture experienced that intensity.
+- The fill is only shown for the selected event and only when the event has `int` area data. USGS events do not carry JMA intensity areas, so the overlay is unavailable for them.
+- Intensity is ordinal. The display value is preserved; ranks are used only for ordering. Do not average or arithmetically combine intensity categories.
+- Colors are a display aid, not a physical scale. The map note and legend state that the layer is not a station distribution.
+- The JMA `maxi` field remains the event-level maximum intensity. The prefecture overlay is not a replacement for a station-level strong-motion or shaking map.
+
 ## 18. Japan-Limited 3D Crust Block
 
 EarthScope provides a non-spherical 3D crust block for the operational Japan region. It is not a global Earth globe. The view exists to relate hypocenters, depth, and model-derived slab/plate context, not to represent a physical voxel model.
@@ -390,7 +403,7 @@ EarthScope provides a non-spherical 3D crust block for the operational Japan reg
 - PB2002 plate boundaries are drawn on the top surface.
 - Slab2 depth contours are drawn at their model depth. They are lines, not a continuous rendered slab surface.
 - PB2002 and Slab2 remain model-derived datasets. They are not direct observations, legal boundaries, or a velocity model.
-- The 3D block does not currently provide 3D cross-sections, focal mechanisms, moment tensors, tomography, or a 3D velocity model.
+- Clicking a hypocenter sphere selects the corresponding event and updates the event detail panel. The 3D block does not currently provide 3D cross-sections, focal mechanisms, moment tensors, tomography, or a 3D velocity model.
 
 ### 18.3 Interaction
 

@@ -28,6 +28,7 @@ export interface EarthquakePointData {
   positions: Float32Array;
   colors: Float32Array;
   sizes: Float32Array;
+  eventIds: string[];
   count: number;
 }
 
@@ -62,6 +63,7 @@ export function buildEarthquakePointData(
   const positions = new Float32Array(inRegion.length * 3);
   const colors = new Float32Array(inRegion.length * 3);
   const sizes = new Float32Array(inRegion.length);
+  const eventIds: string[] = [];
 
   inRegion.forEach((event, index) => {
     const offset = index * 3;
@@ -76,9 +78,16 @@ export function buildEarthquakePointData(
     colors[offset + 1] = green;
     colors[offset + 2] = blue;
     sizes[index] = magnitudeToPointSize(event.magnitude?.value);
+    eventIds.push(event.id);
   });
 
-  return { positions, colors, sizes, count: inRegion.length };
+  return {
+    positions,
+    colors,
+    sizes,
+    eventIds,
+    count: inRegion.length,
+  };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

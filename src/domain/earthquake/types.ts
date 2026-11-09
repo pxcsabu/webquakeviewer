@@ -98,6 +98,23 @@ export interface SeismicIntensity {
   rank: number;
 }
 
+export interface IntensityCity {
+  /** JMA city code, preserved as supplied. */
+  code: string;
+  maxIntensity: SeismicIntensity;
+}
+
+/**
+ * Maximum intensity for a JMA intensity area (prefecture-level code).
+ * This is an area summary, not a station-by-station observation distribution.
+ */
+export interface IntensityArea {
+  /** Two-digit JMA prefecture code, for example 13 for Tokyo. */
+  prefectureCode: string;
+  maxIntensity: SeismicIntensity;
+  cities?: readonly IntensityCity[];
+}
+
 export interface Earthquake {
   id: string;
   source: EarthquakeSource;
@@ -105,6 +122,8 @@ export interface Earthquake {
   location: EarthquakeLocation;
   magnitude?: EarthquakeMagnitude;
   intensity?: SeismicIntensity;
+  /** JMA area-level maximum intensities supplied with the event, when available. */
+  intensityAreas?: readonly IntensityArea[];
   /** Provider-supplied place description, preserved as text. */
   place?: string;
   /** Provider-supplied event type, for example earthquake or quarry blast. */

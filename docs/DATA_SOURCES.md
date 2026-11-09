@@ -133,6 +133,7 @@ Implemented source:
 - The JSON does not state a coordinate reference system. EarthScope stores these coordinates with `crs: UNKNOWN` rather than silently assuming WGS84.
 - Conditional requests are not sent because the JMA CORS allow-list does not include `If-None-Match` or `If-Modified-Since`. EarthScope uses its IndexedDB cache for offline/stale fallback.
 - Seismic intensity `maxi` is stored as the display value plus an explicit ordinal rank; the rank is not a linear physical quantity.
+- The `int` array contains area-level intensity summaries with two-digit prefecture codes and optional city codes. EarthScope preserves these as `intensityAreas` for the selected-event map fill. It does not claim station-level coverage.
 
 Potential uses:
 
@@ -409,3 +410,18 @@ EarthScope accepts CSV and JSON waveforms selected by the user. It does not fetc
 - Users are responsible for ensuring that they have the right to use and redistribute any file they load.
 
 NIED Hi-net / K-NET / KiK-net waveform access remains subject to registration, authentication, and redistribution conditions. Do not treat those services as unrestricted public APIs.
+
+## 19. Japan Prefecture Boundaries
+
+**Status: READY — static display geometry**
+
+The selected-event intensity fill uses prefecture polygons, not JMA observation-area polygons.
+
+- Source: Natural Earth 1:10m Admin 1 – States, Provinces.
+- URL: https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-1-states-provinces/
+- License: public domain (Natural Earth).
+- The 47 Japan features are filtered from the global file and stored as `public/geo/japan_prefectures.geojson`.
+- Coordinates are rounded to four decimal places for the static asset.
+- `properties.code` is the two-digit JIS/ISO 3166-2 `JP-xx` prefecture code. It is matched to the JMA `int` area code.
+- The boundaries are a geographic display aid. They are not JMA intensity observation areas, legal boundaries, or survey-grade administrative boundaries.
+- The fill shows the maximum intensity reported for each prefecture and must not be interpreted as a continuous shaking field.

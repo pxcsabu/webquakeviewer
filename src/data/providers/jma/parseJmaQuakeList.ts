@@ -1,6 +1,7 @@
 import {
   INTENSITY_RANK_BY_DISPLAY,
   type Earthquake,
+  type IntensityArea,
 } from '../../../domain/earthquake/types';
 import {
   isIntensityDisplay,
@@ -20,6 +21,17 @@ export interface JmaParseResult {
   latestReportAt?: string;
 }
 
+interface JmaIntensityCity {
+  code: string;
+  maxi: string;
+}
+
+interface JmaIntensityArea {
+  prefectureCode: string;
+  maxi: string;
+  cities: JmaIntensityCity[];
+}
+
 interface JmaRecord {
   eid: string;
   at: string;
@@ -30,6 +42,7 @@ interface JmaRecord {
   mag: string;
   maxi?: string;
   json?: string;
+  intensityAreas: JmaIntensityArea[];
 }
 
 export interface JmaCoordinate {
@@ -103,6 +116,49 @@ export function parseJmaCoordinate(cod: string): JmaCoordinate | null {
   };
 }
 
+function parseIntensityCity(value: unknown): JmaIntensityCity | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+  if (
+    !isNonEmptyString(value.code) ||
+    !isNonEmptyString(value.maxi) ||
+    !isIntensityDisplay(value.maxi)
+  ) {
+    return null;
+  }
+  return { code: value.code, maxi: value.maxi };
+}
+
+function parseIntensityAreas(value: unknown): JmaIntensityArea[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  const areas: JmaIntensityArea[] = [];
+  value.forEach((rawArea) => {
+    if (!isRecord(rawArea)) {
+      return;
+    }
+    const code = rawArea.code;
+    const maxi = rawArea.maxi;
+    if (
+      typeof code !== 'string' ||
+      !/^\d{2}$/.test(code) ||
+      !isNonEmptyString(maxi) ||
+      !isIntensityDisplay(maxi)
+    ) {
+      return;
+    }
+    const cities = Array.isArray(rawArea.city)
+      ? rawArea.city
+          .map(parseIntensityCity)
+          .filter((city): city is JmaIntensityCity => city !== null)
+      : [];
+    areas.push({ prefectureCode: code, maxi, cities });
+  });
+  return areas;
+}
+
 function parseRecord(record: unknown): JmaRecord | null {
   if (!isRecord(record)) {
     return null;
@@ -126,6 +182,7 @@ function parseRecord(record: unknown): JmaRecord | null {
     ...(isNonEmptyString(record.anm) ? { anm: record.anm } : {}),
     ...(isNonEmptyString(record.maxi) ? { maxi: record.maxi } : {}),
     ...(isNonEmptyString(record.json) ? { json: record.json } : {}),
+    intensityAreas: parseIntensityAreas(record.int),
   };
 }
 
@@ -208,6 +265,29 @@ export function parseJmaQuakeList(
       .filter((record) => record.maxi !== undefined)
       .sort((left, right) => reportTime(right) - reportTime(left))[0];
     const intensity = toIntensity(latestWithIntensity?.maxi);
+    const latestWithIntensityAreas = records
+      .filter((record) => record.intensityAreas.length > 0)
+      .sort((left, right) => reportTime(right) - reportTime(left))[0];
+    const intensityAreas: IntensityArea[] = [];
+    (latestWithIntensityAreas?.intensityAreas ?? []).forEach((area) => {
+      const areaIntensity = toIntensity(area.maxi);
+      if (areaIntensity === undefined) {
+        return;
+      }
+      const cities = area.cities
+        .map((city) => {
+          const cityIntensity = toIntensity(city.maxi);
+          return cityIntensity === undefined
+            ? null
+            : { code: city.code, maxIntensity: cityIntensity };
+        })
+        .filter((city): city is NonNullable<typeof city> => city !== null);
+      intensityAreas.push({
+        prefectureCode: area.prefectureCode,
+        maxIntensity: areaIntensity,
+        ...(cities.length > 0 ? { cities } : {}),
+      });
+    });
 
     const updatedAtDate = latestRecord.rdt
       ? new Date(latestRecord.rdt)
@@ -270,6 +350,7 @@ export function parseJmaQuakeList(
       eventType: 'earthquake',
       magnitude: { value: magnitudeValue },
       ...(intensity !== undefined ? { intensity } : {}),
+      ...(intensityAreas.length > 0 ? { intensityAreas } : {}),
       classification: 'OBSERVED',
     };
 

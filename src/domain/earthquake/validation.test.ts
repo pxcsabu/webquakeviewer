@@ -140,6 +140,48 @@ describe('validateEarthquake', () => {
     }
   });
 
+  it('validates JMA intensity areas and their prefecture codes', () => {
+    const valid = validateEarthquake(
+      makeValid({
+        intensityAreas: [
+          {
+            prefectureCode: '13',
+            maxIntensity: { display: '4', rank: 4 },
+            cities: [
+              {
+                code: '1310100',
+                maxIntensity: { display: '3', rank: 3 },
+              },
+            ],
+          },
+        ],
+      }),
+    );
+    expect(valid.ok).toBe(true);
+    if (valid.ok) {
+      expect(valid.value.intensityAreas?.[0]?.prefectureCode).toBe('13');
+    }
+
+    const invalid = validateEarthquake(
+      makeValid({
+        intensityAreas: [
+          {
+            prefectureCode: '13',
+            maxIntensity: { display: '4', rank: 9 },
+          },
+        ],
+      }),
+    );
+    expect(invalid.ok).toBe(false);
+    if (!invalid.ok) {
+      expect(
+        invalid.issues.some((issue) =>
+          issue.path.includes('intensityAreas[0].maxIntensity.rank'),
+        ),
+      ).toBe(true);
+    }
+  });
+
   it('preserves place and event type text from the provider', () => {
     const result = validateEarthquake(
       makeValid({

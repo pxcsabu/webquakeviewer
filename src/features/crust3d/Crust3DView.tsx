@@ -30,6 +30,8 @@ interface Crust3DViewProps {
   showPlateBoundaries: boolean;
   showSlab2: boolean;
   resetToken: number;
+  selectedId: string | null;
+  onSelectEvent: (id: string) => void;
 }
 
 const CAMERA_POSITION = new THREE.Vector3(3.8, 3.2, 4.7);
@@ -101,11 +103,11 @@ function disposeGroup(group: THREE.Group): void {
 function addEarthquakePoints(
   group: THREE.Group,
   events: readonly Earthquake[],
-): void {
+): THREE.Points | null {
   disposeGroup(group);
   const data = buildEarthquakePointData(events);
   if (data.count === 0) {
-    return;
+    return null;
   }
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.BufferAttribute(data.positions, 3));
@@ -121,7 +123,9 @@ function addEarthquakePoints(
   const points = new THREE.Points(geometry, material);
   points.renderOrder = 10;
   points.frustumCulled = false;
+  points.userData.eventIds = data.eventIds;
   group.add(points);
+  return points;
 }
 
 function addPlateLines(group: THREE.Group, data: unknown): void {
@@ -283,16 +287,20 @@ export function Crust3DView({
   showPlateBoundaries,
   showSlab2,
   resetToken,
+  selectedId,
+  onSelectEvent,
 }: Crust3DViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const controlsRef = useRef<OrbitControls | null>(null);
   const quakeGroupRef = useRef<THREE.Group | null>(null);
+  const quakePointsRef = useRef<THREE.Points | null>(null);
   const plateGroupRef = useRef<THREE.Group | null>(null);
   const slabGroupRef = useRef<THREE.Group | null>(null);
   const showPlateRef = useRef(showPlateBoundaries);
   const showSlabRef = useRef(showSlab2);
+  const onSelectEventRef = useRef(onSelectEvent);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>(
     'loading',
   );
@@ -314,10 +322,17 @@ export function Crust3DView({
   }, [showSlab2]);
 
   useEffect(() => {
+    onSelectEventRef.current = onSelectEvent;
+  }, [onSelectEvent]);
+
+  useEffect(() => {
     if (quakeGroupRef.current !== null) {
-      addEarthquakePoints(quakeGroupRef.current, events);
+      quakePointsRef.current = addEarthquakePoints(
+        quakeGroupRef.current,
+        events,
+      );
     }
-  }, [events]);
+  }, [events, selectedId]);
 
   useEffect(() => {
     if (resetToken === 0 || cameraRef.current === null || controlsRef.current === null) {
@@ -440,7 +455,7 @@ export function Crust3DView({
     quakeGroupRef.current = quakeGroup;
     plateGroupRef.current = plateGroup;
     slabGroupRef.current = slabGroup;
-    addEarthquakePoints(quakeGroup, events);
+    quakePointsRef.current = addEarthquakePoints(quakeGroup, events);
 
     addRegionBorder(scene);
     addDepthTicks(scene);
@@ -456,6 +471,39 @@ export function Crust3DView({
     resize();
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
+
+    const raycaster = new THREE.Raycaster();
+    raycaster.params.Points.threshold = 0.12;
+    const pointer = new THREE.Vector2();
+    const handleClick = (event: MouseEvent): void => {
+      if (event.button !== 0) {
+        return;
+      }
+      const points = quakePointsRef.current;
+      if (points === null) {
+        return;
+      }
+      const rect = renderer.domElement.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) {
+        return;
+      }
+      pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObject(points, false);
+      const hit = hits[0];
+      if (hit === undefined || hit.index === undefined) {
+        return;
+      }
+      const eventIds = points.userData.eventIds;
+      if (!Array.isArray(eventIds)) {
+        return;
+      }
+      const id = eventIds[hit.index];
+      if (typeof id === 'string') {
+        onSelectEventRef.current(id);
+      }
+    };
 
     const preventContextMenu = (event: Event): void => {
       event.preventDefault();
@@ -481,6 +529,7 @@ export function Crust3DView({
       setContextLost(false);
       renderer.setAnimationLoop(animate);
     };
+    renderer.domElement.addEventListener('click', handleClick);
     renderer.domElement.addEventListener('contextmenu', preventContextMenu);
     renderer.domElement.addEventListener('dblclick', handleDoubleClick);
     renderer.domElement.addEventListener('webglcontextlost', handleContextLost);
@@ -551,6 +600,7 @@ export function Crust3DView({
     return () => {
       cancelled = true;
       resizeObserver.disconnect();
+      renderer.domElement.removeEventListener('click', handleClick);
       renderer.domElement.removeEventListener('contextmenu', preventContextMenu);
       renderer.domElement.removeEventListener('dblclick', handleDoubleClick);
       renderer.domElement.removeEventListener(
@@ -591,6 +641,7 @@ export function Crust3DView({
       cameraRef.current = null;
       controlsRef.current = null;
       quakeGroupRef.current = null;
+      quakePointsRef.current = null;
       plateGroupRef.current = null;
       slabGroupRef.current = null;
     };

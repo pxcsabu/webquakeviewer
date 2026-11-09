@@ -17,6 +17,7 @@ import {
   DEFAULT_BASEMAP,
   DEPTH_CLASSES,
   GSI_TILE_LIST_URL,
+  INTENSITY_LEGEND_CLASSES,
   JSHIS_ATTRIBUTION,
   JSHIS_URL,
   PB2002_ATTRIBUTION,
@@ -101,6 +102,35 @@ class Crust3DErrorBoundary extends Component<
   }
 }
 
+function IntensityLegend({ event }: { event: Earthquake }) {
+  if (event.intensityAreas === undefined || event.intensityAreas.length === 0) {
+    return null;
+  }
+  return (
+    <aside className="map-intensity-legend" aria-label="震度分布の凡例">
+      <p className="map-intensity-legend-title">震度分布</p>
+      <p className="map-intensity-legend-row">
+        選択イベントの都道府県別最大震度
+      </p>
+      <ul>
+        {INTENSITY_LEGEND_CLASSES.map((intensityClass) => (
+          <li key={intensityClass.display}>
+            <span
+              className="map-intensity-swatch"
+              style={{ backgroundColor: intensityClass.color }}
+              aria-hidden="true"
+            />
+            {intensityClass.label}
+          </li>
+        ))}
+      </ul>
+      <p className="map-intensity-legend-note">
+        JMA の地域別震度を都道府県単位で集約したものです。観測点分布ではありません。
+      </p>
+    </aside>
+  );
+}
+
 function MapLegend({ basemap }: { basemap: BasemapId }) {
   const selectedBasemap = BASEMAP_OPTIONS.find(
     (option) => option.id === basemap,
@@ -155,8 +185,13 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
   const [showPlateBoundaries, setShowPlateBoundaries] = useState(false);
   const [showSlab2, setShowSlab2] = useState(false);
   const [showHazard, setShowHazard] = useState(false);
+  const [showIntensity, setShowIntensity] = useState(true);
   const [show3d, setShow3d] = useState(false);
   const map3dRef = useRef<HTMLDivElement>(null);
+  const selectedEvent =
+    selectedId === null
+      ? null
+      : events.find((event) => event.id === selectedId) ?? null;
   const hasProfile = profileStart !== null && profileEnd !== null;
 
   useEffect(() => {
@@ -286,6 +321,14 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
           />
           J-SHIS 地震ハザード
         </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={showIntensity}
+            onChange={(event) => setShowIntensity(event.target.checked)}
+          />
+          震度分布
+        </label>
       </div>
       {showSlab2 ? (
         <p className="map-layer-note">
@@ -305,6 +348,16 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
       {showPlateBoundaries ? (
         <p className="map-layer-note">{PB2002_ATTRIBUTION}</p>
       ) : null}
+      {showIntensity ? (
+        <p className="map-layer-note">
+          {selectedEvent === null
+            ? '地震マーカーをクリックすると、そのイベントの都道府県別最大震度を表示します。'
+            : selectedEvent.intensityAreas === undefined ||
+                selectedEvent.intensityAreas.length === 0
+              ? '選択イベントには JMA の地域別震度データがありません。'
+              : '選択イベントの都道府県別最大震度を表示中。JMA の地域別震度を都道府県単位で集約したもので、観測点分布ではありません。'}
+        </p>
+      ) : null}
       <div className="map-frame">
         <Suspense
           fallback={<div className="map-overlay">地図モジュールを読み込み中…</div>}
@@ -317,6 +370,7 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
               showPlateBoundaries={showPlateBoundaries}
               showSlab2={showSlab2}
               showHazard={showHazard}
+              showIntensity={showIntensity}
               profileStart={profileStart}
               profileEnd={profileEnd}
               profileMode={profileMode}
@@ -326,6 +380,9 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
           </MapErrorBoundary>
         </Suspense>
         <MapLegend basemap={basemap} />
+        {showIntensity && selectedEvent !== null ? (
+          <IntensityLegend event={selectedEvent} />
+        ) : null}
       </div>
       {show3d && showSlab2 ? (
         <div className="map-3d-section" ref={map3dRef}>
@@ -335,7 +392,11 @@ export function MapPanel({ events, selectedId, onSelect }: MapPanelProps) {
             }
           >
             <Crust3DErrorBoundary>
-              <LazyCrust3DPanel events={events} />
+              <LazyCrust3DPanel
+                events={events}
+                selectedEvent={selectedEvent}
+                onSelect={onSelect}
+              />
             </Crust3DErrorBoundary>
           </Suspense>
         </div>

@@ -1,5 +1,5 @@
 export const EARTHSCOPE_DATABASE_NAME = 'earthscope';
-export const EARTHSCOPE_DATABASE_VERSION = 1;
+export const EARTHSCOPE_DATABASE_VERSION = 2;
 
 export const EVENTS_STORE = 'events';
 export const META_STORE = 'meta';
@@ -75,8 +75,23 @@ export function openEarthScopeDatabase(
   return new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open(name, EARTHSCOPE_DATABASE_VERSION);
 
-    request.onupgradeneeded = () => {
+    request.onupgradeneeded = (event) => {
       const db = request.result;
+      if (
+        event.oldVersion > 0 &&
+        event.oldVersion < 2 &&
+        request.transaction !== null
+      ) {
+        // Version 2 adds optional JMA intensity-area fields to cached events.
+        // Drop the old snapshot and conditional-request state so the next
+        // load fetches a fresh, complete catalog instead of reusing a 304.
+        if (db.objectStoreNames.contains(EVENTS_STORE)) {
+          request.transaction.objectStore(EVENTS_STORE).clear();
+        }
+        if (db.objectStoreNames.contains(PROVIDER_STATE_STORE)) {
+          request.transaction.objectStore(PROVIDER_STATE_STORE).clear();
+        }
+      }
 
       if (!db.objectStoreNames.contains(EVENTS_STORE)) {
         const events = db.createObjectStore(EVENTS_STORE, {

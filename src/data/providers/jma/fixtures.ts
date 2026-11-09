@@ -18,6 +18,13 @@ export const jmaFixture = [
     cod: '+32.6+130.6-10000/',
     mag: '2.8',
     maxi: '1',
+    int: [
+      {
+        code: '43',
+        maxi: '1',
+        city: [{ code: '4321300', maxi: '1' }],
+      },
+    ],
     json: '20261108112402_20261108112111_VXSE5k_1.json',
   },
   {

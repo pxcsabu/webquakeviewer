@@ -1,5 +1,10 @@
 import { useState } from 'react';
 import type { Earthquake } from '../../domain/earthquake/types';
+import {
+  formatDepthKm,
+  formatMagnitude,
+  formatUtcTimestamp,
+} from '../../utils/format';
 import { JAPAN_REGION_BOUNDS } from '../../domain/geography/japanRegion';
 import { Crust3DView } from './Crust3DView';
 import {
@@ -9,9 +14,15 @@ import {
 
 interface Crust3DPanelProps {
   events: Earthquake[];
+  selectedEvent: Earthquake | null;
+  onSelect: (id: string) => void;
 }
 
-export function Crust3DPanel({ events }: Crust3DPanelProps) {
+export function Crust3DPanel({
+  events,
+  selectedEvent,
+  onSelect,
+}: Crust3DPanelProps) {
   const [showPlateBoundaries, setShowPlateBoundaries] = useState(true);
   const [showSlab2, setShowSlab2] = useState(true);
   const [resetToken, setResetToken] = useState(0);
@@ -62,12 +73,30 @@ export function Crust3DPanel({ events }: Crust3DPanelProps) {
         </label>
       </div>
 
+      <p className="crust3d-selection">
+        {selectedEvent === null ? (
+          '地震の球をクリックすると、そのイベントの詳細を表示します。'
+        ) : (
+          <>
+            選択中: {selectedEvent.place ?? '場所未取得'} /{' '}
+            {formatMagnitude(selectedEvent.magnitude)} / 深さ{' '}
+            {formatDepthKm(selectedEvent.location.depthKm)}
+            {selectedEvent.intensity !== undefined
+              ? ` / 最大震度 ${selectedEvent.intensity.display}`
+              : ''}
+            {' / '}
+            {formatUtcTimestamp(selectedEvent.time.originTime)}
+          </>
+        )}
+      </p>
       <div className="crust3d-frame">
         <Crust3DView
           events={events}
           showPlateBoundaries={showPlateBoundaries}
           showSlab2={showSlab2}
           resetToken={resetToken}
+          selectedId={selectedEvent?.id ?? null}
+          onSelectEvent={onSelect}
         />
         <aside className="crust3d-legend" aria-label="3D地殻ブロックの凡例">
           <p className="crust3d-legend-title">凡例</p>

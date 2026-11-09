@@ -86,6 +86,7 @@ Every data provider must have:
 - Magnitude-frequency distribution
 - b-value calculation
 - Spatial and temporal analysis
+- Selected-event prefecture-level intensity distribution
 - Geological and plate boundary overlays
 
 ### Advanced features
@@ -96,6 +97,7 @@ Every data provider must have:
 - Focal mechanism visualization
 - Tomography and velocity models
 - Strong-motion analysis
+- Click-to-select hypocenters in the 3D block
 
 Advanced features must be implemented only when appropriate datasets and usage permissions are available.
 

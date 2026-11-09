@@ -254,6 +254,7 @@ MapLibre GL JS is responsible for:
 - Earthquake markers
 - Geographic overlays
 - Fault and plate boundary layers
+- Selected-event prefecture-level intensity fill
 - Map interaction
 
 Keep data processing separate from map rendering.
@@ -271,6 +272,7 @@ The block is responsible for:
 - PB2002 boundaries on the top surface
 - Slab2 depth contours at their model depth
 - Depth-coloured earthquake points
+- Click selection of hypocenters via Three.js raycasting
 
 The initial camera position, target, and up vector are explicit and deterministic. The initial view centers the operational Japan region. The block is a display model, not a velocity or geological model.
 

@@ -152,6 +152,7 @@ describe('crust3dData', () => {
     ];
     const data = buildEarthquakePointData(events);
     expect(data.count).toBe(3);
+    expect(data.eventIds).toEqual(['a', 'b', 'c']);
 
     expect(data.positions[0]).toBeCloseTo(lonToX(138), 6);
     expect(data.positions[1]).toBeCloseTo(depthToY(10), 6);
@@ -171,5 +172,6 @@ describe('crust3dData', () => {
     const data = buildEarthquakePointData([makeEvent('x', 0, 0, 10)]);
     expect(data.count).toBe(0);
     expect(data.positions).toHaveLength(0);
+    expect(data.eventIds).toHaveLength(0);
   });
 });

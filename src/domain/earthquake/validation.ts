@@ -8,6 +8,8 @@ import {
   type EarthquakeMagnitude,
   type EarthquakeSource,
   type EarthquakeTime,
+  type IntensityArea,
+  type IntensityCity,
   type IntensityDisplay,
   type OriginalDepth,
   type OriginalLocation,
@@ -491,11 +493,12 @@ function parseMagnitude(
 function parseIntensity(
   value: unknown,
   errors: ValidationIssue[],
+  path = 'intensity',
 ): SeismicIntensity | undefined {
   if (!isRecord(value)) {
     errors.push({
-      path: 'intensity',
-      message: 'intensity はオブジェクトが必要です。',
+      path,
+      message: `${path} はオブジェクトが必要です。`,
       severity: 'error',
     });
     return undefined;
@@ -506,7 +509,7 @@ function parseIntensity(
 
   if (!isIntensityDisplay(display)) {
     errors.push({
-      path: 'intensity.display',
+      path: `${path}.display`,
       message: '震度表示は 0, 1, 2, 3, 4, 5-, 5+, 6-, 6+, 7 のいずれかです。',
       severity: 'error',
     });
@@ -514,7 +517,7 @@ function parseIntensity(
   }
   if (typeof rank !== 'number' || !Number.isInteger(rank)) {
     errors.push({
-      path: 'intensity.rank',
+      path: `${path}.rank`,
       message: '震度ランクは整数が必要です。',
       severity: 'error',
     });
@@ -524,7 +527,7 @@ function parseIntensity(
   const expectedRank = INTENSITY_RANK_BY_DISPLAY[display];
   if (rank !== expectedRank) {
     errors.push({
-      path: 'intensity.rank',
+      path: `${path}.rank`,
       message: `震度 ${display} のランクは ${expectedRank} である必要があります。`,
       severity: 'error',
     });
@@ -532,6 +535,127 @@ function parseIntensity(
   }
 
   return { display, rank };
+}
+
+function parseIntensityCity(
+  value: unknown,
+  errors: ValidationIssue[],
+  path: string,
+): IntensityCity | undefined {
+  if (!isRecord(value)) {
+    errors.push({
+      path,
+      message: `${path} はオブジェクトが必要です。`,
+      severity: 'error',
+    });
+    return undefined;
+  }
+  const code = value.code;
+  if (!isNonEmptyString(code)) {
+    errors.push({
+      path: `${path}.code`,
+      message: '市町村コードが必要です。',
+      severity: 'error',
+    });
+    return undefined;
+  }
+  const maxIntensity = parseIntensity(
+    value.maxIntensity,
+    errors,
+    `${path}.maxIntensity`,
+  );
+  if (maxIntensity === undefined) {
+    return undefined;
+  }
+  return { code, maxIntensity };
+}
+
+function parseIntensityArea(
+  value: unknown,
+  errors: ValidationIssue[],
+  path: string,
+): IntensityArea | undefined {
+  if (!isRecord(value)) {
+    errors.push({
+      path,
+      message: `${path} はオブジェクトが必要です。`,
+      severity: 'error',
+    });
+    return undefined;
+  }
+  const prefectureCode = value.prefectureCode;
+  if (
+    typeof prefectureCode !== 'string' ||
+    !/^\d{2}$/.test(prefectureCode)
+  ) {
+    errors.push({
+      path: `${path}.prefectureCode`,
+      message: '都道府県コードは2桁の文字列が必要です。',
+      severity: 'error',
+    });
+    return undefined;
+  }
+  const maxIntensity = parseIntensity(
+    value.maxIntensity,
+    errors,
+    `${path}.maxIntensity`,
+  );
+  if (maxIntensity === undefined) {
+    return undefined;
+  }
+  let cities: IntensityCity[] | undefined;
+  if (value.cities !== undefined && value.cities !== null) {
+    if (!Array.isArray(value.cities)) {
+      errors.push({
+        path: `${path}.cities`,
+        message: 'cities は配列が必要です。',
+        severity: 'error',
+      });
+    } else {
+      cities = [];
+      value.cities.forEach((city, index) => {
+        const parsed = parseIntensityCity(
+          city,
+          errors,
+          `${path}.cities[${index}]`,
+        );
+        if (parsed !== undefined) {
+          cities?.push(parsed);
+        }
+      });
+    }
+  }
+  return {
+    prefectureCode,
+    maxIntensity,
+    ...(cities !== undefined ? { cities } : {}),
+  };
+}
+
+function parseIntensityAreas(
+  value: unknown,
+  errors: ValidationIssue[],
+): IntensityArea[] | undefined {
+  if (!Array.isArray(value)) {
+    errors.push({
+      path: 'intensityAreas',
+      message: 'intensityAreas は配列が必要です。',
+      severity: 'error',
+    });
+    return undefined;
+  }
+  const areas: IntensityArea[] = [];
+  value.forEach((area, index) => {
+    const parsed = parseIntensityArea(
+      area,
+      errors,
+      `intensityAreas[${index}]`,
+    );
+    if (parsed !== undefined) {
+      areas.push(parsed);
+    }
+  });
+  return areas;
 }
 
 export function validateEarthquake(
@@ -576,6 +700,10 @@ export function validateEarthquake(
     input.intensity === undefined || input.intensity === null
       ? undefined
       : parseIntensity(input.intensity, errors);
+  const intensityAreas =
+    input.intensityAreas === undefined || input.intensityAreas === null
+      ? undefined
+      : parseIntensityAreas(input.intensityAreas, errors);
   const place = readOptionalString(input, 'place', 'place', errors);
   const eventType = readOptionalString(
     input,
@@ -618,6 +746,7 @@ export function validateEarthquake(
   };
   if (magnitude !== undefined) earthquake.magnitude = magnitude;
   if (intensity !== undefined) earthquake.intensity = intensity;
+  if (intensityAreas !== undefined) earthquake.intensityAreas = intensityAreas;
   if (place !== undefined) earthquake.place = place;
   if (eventType !== undefined) earthquake.eventType = eventType;
 

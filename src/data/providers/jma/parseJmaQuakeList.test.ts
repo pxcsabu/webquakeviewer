@@ -86,6 +86,15 @@ describe('parseJmaQuakeList', () => {
     expect(event?.location.crs).toBe('UNKNOWN');
     expect(event?.magnitude).toEqual({ value: 2.8 });
     expect(event?.intensity).toEqual({ display: '1', rank: 1 });
+    expect(event?.intensityAreas).toEqual([
+      {
+        prefectureCode: '43',
+        maxIntensity: { display: '1', rank: 1 },
+        cities: [
+          { code: '4321300', maxIntensity: { display: '1', rank: 1 } },
+        ],
+      },
+    ]);
     expect(event?.place).toBe('熊本県天草・芦北地方');
     expect(event?.eventType).toBe('earthquake');
     expect(event?.classification).toBe('OBSERVED');

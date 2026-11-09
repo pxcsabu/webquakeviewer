@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { sampleEarthquakes } from '../../data/providers/sample/fixtures';
+import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 import {
   BASEMAP_OPTIONS,
   GSI_TILE_URLS,
+  INTENSITY_COLOR_BY_DISPLAY,
   toEarthquakeFeatureCollection,
+  toIntensityFeatureCollection,
 } from './mapStyle';
 
 describe('basemap options', () => {
@@ -66,5 +69,86 @@ describe('toEarthquakeFeatureCollection', () => {
     const before = sampleEarthquakes.length;
     toEarthquakeFeatureCollection(sampleEarthquakes);
     expect(sampleEarthquakes.length).toBe(before);
+  });
+});
+
+
+describe('toIntensityFeatureCollection', () => {
+  const prefectures: FeatureCollection<Polygon | MultiPolygon> = {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        properties: { code: '13', name_ja: '東京都' },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [139, 35],
+              [140, 35],
+              [140, 36],
+              [139, 36],
+              [139, 35],
+            ],
+          ],
+        },
+      },
+      {
+        type: 'Feature',
+        properties: { code: '14', name_ja: '神奈川県' },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [139, 35],
+              [140, 35],
+              [140, 35.5],
+              [139, 35.5],
+              [139, 35],
+            ],
+          ],
+        },
+      },
+    ],
+  };
+
+  it('keeps only prefectures reported for the selected event', () => {
+    const event = sampleEarthquakes[0];
+    if (event === undefined) {
+      throw new Error('サンプルフィクスチャが空です。');
+    }
+    const collection = toIntensityFeatureCollection(prefectures, {
+      ...event,
+      intensityAreas: [
+        {
+          prefectureCode: '13',
+          maxIntensity: { display: '4', rank: 4 },
+        },
+      ],
+    });
+    expect(collection.features).toHaveLength(1);
+    expect(collection.features[0]?.properties).toEqual({
+      code: '13',
+      nameJa: '東京都',
+      intensityDisplay: '4',
+      intensityRank: 4,
+      intensityColor: INTENSITY_COLOR_BY_DISPLAY['4'],
+    });
+  });
+
+  it('returns an empty collection without an event or intensity areas', () => {
+    const event = sampleEarthquakes[0];
+    if (event === undefined) {
+      throw new Error('サンプルフィクスチャが空です。');
+    }
+    expect(toIntensityFeatureCollection(prefectures, null).features).toEqual(
+      [],
+    );
+    expect(
+      toIntensityFeatureCollection(prefectures, {
+        ...event,
+        intensityAreas: undefined,
+      }).features,
+    ).toEqual([]);
   });
 });

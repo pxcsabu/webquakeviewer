@@ -3,11 +3,15 @@ import type { ExpressionSpecification } from '@maplibre/maplibre-gl-style-spec';
 import type {
   Feature,
   FeatureCollection,
+  MultiPolygon,
   Point,
   Polygon,
 } from 'geojson';
 import type { GeoPoint } from '../../analysis/geodesy/distance';
-import type { Earthquake } from '../../domain/earthquake/types';
+import type {
+  Earthquake,
+  IntensityDisplay,
+} from '../../domain/earthquake/types';
 import { JAPAN_REGION_BOUNDS } from '../../domain/geography/japanRegion';
 
 
@@ -26,6 +30,107 @@ export const PB2002_ATTRIBUTION =
   'PB2002 plate boundaries (Bird 2003; Nordpil, ODC-By 1.0)';
 
 export const PLATE_BOUNDARY_COLOR = '#7d3c98';
+
+export const INTENSITY_ATTRIBUTION =
+  'Natural Earth prefecture boundaries (public domain); JMA intensity areas';
+
+export const INTENSITY_COLOR_BY_DISPLAY: Record<IntensityDisplay, string> = {
+  '0': '#f0f0f0',
+  '1': '#dce9ff',
+  '2': '#b3d1ff',
+  '3': '#7fb8ff',
+  '4': '#ffe066',
+  '5-': '#ffc04d',
+  '5+': '#ff9a3d',
+  '6-': '#ff6b5b',
+  '6+': '#d94141',
+  '7': '#9e1b1b',
+};
+
+export const INTENSITY_LEGEND_CLASSES: ReadonlyArray<{
+  display: IntensityDisplay;
+  label: string;
+  color: string;
+}> = [
+  { display: '1', label: '1', color: INTENSITY_COLOR_BY_DISPLAY['1'] },
+  { display: '2', label: '2', color: INTENSITY_COLOR_BY_DISPLAY['2'] },
+  { display: '3', label: '3', color: INTENSITY_COLOR_BY_DISPLAY['3'] },
+  { display: '4', label: '4', color: INTENSITY_COLOR_BY_DISPLAY['4'] },
+  { display: '5-', label: '5弱', color: INTENSITY_COLOR_BY_DISPLAY['5-'] },
+  { display: '5+', label: '5強', color: INTENSITY_COLOR_BY_DISPLAY['5+'] },
+  { display: '6-', label: '6弱', color: INTENSITY_COLOR_BY_DISPLAY['6-'] },
+  { display: '6+', label: '6強', color: INTENSITY_COLOR_BY_DISPLAY['6+'] },
+  { display: '7', label: '7', color: INTENSITY_COLOR_BY_DISPLAY['7'] },
+];
+
+export interface IntensityFeatureProperties {
+  code: string;
+  nameJa: string;
+  intensityDisplay: IntensityDisplay;
+  intensityRank: number;
+  intensityColor: string;
+}
+
+export type IntensityFeatureCollection = FeatureCollection<
+  Polygon | MultiPolygon,
+  IntensityFeatureProperties
+>;
+
+/**
+ * Filter prefecture polygons to the areas reported for the selected event and
+ * attach the maximum intensity supplied by JMA. This is a prefecture-level
+ * summary of JMA intensity areas, not an interpolated station distribution.
+ */
+export function toIntensityFeatureCollection(
+  prefectures: FeatureCollection<Polygon | MultiPolygon> | null,
+  event: Earthquake | null,
+): IntensityFeatureCollection {
+  const empty: IntensityFeatureCollection = {
+    type: 'FeatureCollection',
+    features: [],
+  };
+  if (
+    prefectures === null ||
+    event === null ||
+    event.intensityAreas === undefined ||
+    event.intensityAreas.length === 0
+  ) {
+    return empty;
+  }
+  const byPrefecture = new Map(
+    event.intensityAreas.map((area) => [area.prefectureCode, area]),
+  );
+  const features: IntensityFeatureCollection['features'] = [];
+  prefectures.features.forEach((feature) => {
+    const code =
+      typeof feature.properties?.code === 'string'
+        ? feature.properties.code
+        : null;
+    if (code === null) {
+      return;
+    }
+    const area = byPrefecture.get(code);
+    if (area === undefined) {
+      return;
+    }
+    features.push({
+      type: 'Feature',
+      properties: {
+        code,
+        nameJa:
+          typeof feature.properties?.name_ja === 'string'
+            ? feature.properties.name_ja
+            : code,
+        intensityDisplay: area.maxIntensity.display,
+        intensityRank: area.maxIntensity.rank,
+        intensityColor: INTENSITY_COLOR_BY_DISPLAY[area.maxIntensity.display],
+      },
+      geometry: feature.geometry,
+    });
+  });
+  return { type: 'FeatureCollection', features };
+}
+
 
 export const MAP_BACKGROUND_COLOR = '#eef2f5';
 export const MAP_LAND_COLOR = '#e4e9ed';

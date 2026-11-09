@@ -6,7 +6,11 @@ import maplibregl, {
   type MapLayerMouseEvent,
   type MapLibreMap,
 } from 'maplibre-gl';
-import type { FeatureCollection } from 'geojson';
+import type {
+  FeatureCollection,
+  MultiPolygon,
+  Polygon,
+} from 'geojson';
 import type { GeoPoint } from '../../analysis/geodesy/distance';
 import type { Earthquake } from '../../domain/earthquake/types';
 import {
@@ -17,6 +21,7 @@ import {
   GSI_TILE_URLS,
   JAPAN_REGION_POLYGON,
   JSHIS_ATTRIBUTION,
+  INTENSITY_ATTRIBUTION,
   JSHIS_HAZARD_TILE_URL,
   MAP_BOUNDARY_COLOR,
   MAP_LAND_COLOR,
@@ -26,6 +31,7 @@ import {
   SLAB2_ATTRIBUTION,
   SELECTED_POINT_RADIUS,
   toEarthquakeFeatureCollection,
+  toIntensityFeatureCollection,
   toProfileFeatureCollection,
   type BasemapId,
 } from './mapStyle';
@@ -40,6 +46,7 @@ interface EarthquakeMapProps {
   showPlateBoundaries: boolean;
   showSlab2: boolean;
   showHazard: boolean;
+  showIntensity: boolean;
   onProfilePoint: (point: GeoPoint) => void;
   onSelect: (id: string) => void;
 }
@@ -64,6 +71,7 @@ export function EarthquakeMap({
   showPlateBoundaries,
   showSlab2,
   showHazard,
+  showIntensity,
   onProfilePoint,
   onSelect,
 }: EarthquakeMapProps) {
@@ -74,6 +82,9 @@ export function EarthquakeMap({
   const profileModeRef = useRef(profileMode);
   const onProfilePointRef = useRef(onProfilePoint);
   const lastFlownIdRef = useRef<string | null>(null);
+  const prefectureDataRef = useRef<FeatureCollection<
+    Polygon | MultiPolygon
+  > | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>(
     'loading',
@@ -177,7 +188,8 @@ export function EarthquakeMap({
     map.on('load', () => {
       void (async () => {
         try {
-          const [land, boundaries, plateBoundaries, slab2] = await Promise.all([
+          const [land, boundaries, plateBoundaries, slab2, prefectures] =
+            await Promise.all([
             fetchFeatureCollection(
               `${import.meta.env.BASE_URL}geo/ne_110m_land.geojson`,
             ),
@@ -190,10 +202,16 @@ export function EarthquakeMap({
             fetchFeatureCollection(
               `${import.meta.env.BASE_URL}geo/slab2_japan_depth_contours.geojson`,
             ),
+            fetchFeatureCollection(
+              `${import.meta.env.BASE_URL}geo/japan_prefectures.geojson`,
+            ),
           ]);
           if (cancelled) {
             return;
           }
+          prefectureDataRef.current = prefectures as FeatureCollection<
+            Polygon | MultiPolygon
+          >;
 
           map.addSource('land', {
             type: 'geojson',
@@ -280,6 +298,37 @@ export function EarthquakeMap({
             },
             paint: {
               'raster-opacity': 0.5,
+            },
+          });
+
+          map.addSource('intensity-prefectures', {
+            type: 'geojson',
+            data: { type: 'FeatureCollection', features: [] },
+            attribution: INTENSITY_ATTRIBUTION,
+          });
+          map.addLayer({
+            id: 'intensity-fill',
+            type: 'fill',
+            source: 'intensity-prefectures',
+            layout: {
+              visibility: 'none',
+            },
+            paint: {
+              'fill-color': ['get', 'intensityColor'],
+              'fill-opacity': 0.62,
+            },
+          });
+          map.addLayer({
+            id: 'intensity-outline',
+            type: 'line',
+            source: 'intensity-prefectures',
+            layout: {
+              visibility: 'none',
+            },
+            paint: {
+              'line-color': '#374151',
+              'line-width': 0.6,
+              'line-opacity': 0.65,
             },
           });
 
@@ -538,6 +587,36 @@ export function EarthquakeMap({
       map.setFilter('earthquakes-selected', selectedFilter);
     }
   }, [selectedId, mapReady]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!mapReady || map === null) {
+      return;
+    }
+    const selected =
+      selectedId === null
+        ? null
+        : events.find((event) => event.id === selectedId) ?? null;
+    const source = map.getSource('intensity-prefectures') as
+      | GeoJSONSource
+      | undefined;
+    source?.setData(
+      toIntensityFeatureCollection(prefectureDataRef.current, selected),
+    );
+    const visible =
+      showIntensity &&
+      selected !== null &&
+      selected.intensityAreas !== undefined &&
+      selected.intensityAreas.length > 0
+        ? 'visible'
+        : 'none';
+    if (map.getLayer('intensity-fill')) {
+      map.setLayoutProperty('intensity-fill', 'visibility', visible);
+    }
+    if (map.getLayer('intensity-outline')) {
+      map.setLayoutProperty('intensity-outline', 'visibility', visible);
+    }
+  }, [selectedId, events, showIntensity, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;

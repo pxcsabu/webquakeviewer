@@ -68,6 +68,8 @@ The JMA `bosai/quake/data/list.json` source is a JSON array of reports.
 - `mag` is a string and may be empty. Do not fabricate a magnitude when it is unavailable.
 - `maxi` is the maximum seismic intensity display value. Store display and ordinal rank separately.
 - Reports are deduplicated by `eid`. The latest complete report supplies the hypocenter/magnitude, while the latest available maximum intensity is retained.
+- `int` is an array of area-level intensity summaries. Each entry has a two-digit prefecture `code`, a `maxi`, and optional `city` entries with city codes and `maxi`. EarthScope stores these as `intensityAreas` while preserving the original display values.
+- `int` area codes are matched to prefecture-level geometry; they are not station coordinates and must not be rendered as point observations.
 - The source does not state its CRS. EarthScope stores `crs: UNKNOWN` and applies no datum transformation.
 
 ### 3.3 Slab2 depth contours
@@ -330,3 +332,14 @@ Maintain compatibility or provide explicit migration logic where necessary.
 - Tile template uses `{bbox-epsg-3857}`
 - Displayed as a raster overlay with attribution
 - Not a raw-data redistribution and not a real-time observation
+
+### 14.3 Japan prefecture boundaries
+
+- Format: GeoJSON `FeatureCollection` of `Polygon` / `MultiPolygon`
+- File: `public/geo/japan_prefectures.geojson`
+- Source: Natural Earth 1:10m Admin 1 – States, Provinces (public domain)
+- CRS: WGS84 longitude/latitude
+- Properties: `code` (two-digit JIS/ISO 3166-2 prefecture code), `name_ja`, `name`
+- Coordinates are rounded to four decimal places
+- Used only for the selected-event prefecture-level intensity fill
+- The polygons are not JMA observation areas and are not survey-grade administrative boundaries

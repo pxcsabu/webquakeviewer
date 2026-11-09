@@ -30,6 +30,8 @@ The project is designed to be hosted on GitHub Pages without requiring a dedicat
 - PB2002 plate-boundary overlay on the 2D map and 3D block
 - J-SHIS 2020 probabilistic seismic-hazard WMS raster overlay
 - Slab2 depth-contour overlay on the 2D map and 3D block
+- Selected-event prefecture-level JMA intensity fill (not a station distribution)
+- Clickable 3D hypocenters that select the event detail
 - User-provided CSV/JSON waveform import, time-series chart, simple filters, and amplitude statistics
 - Surface and hypocentral distance modules; Aki–Utsu b-value module
 - Depth histogram, cumulative magnitude-frequency, temporal statistics, DBSCAN spatial clusters, and b-value analysis panel
@@ -63,7 +65,9 @@ Technology choices may be adjusted when a demonstrable technical reason exists.
 
 The default catalog is the JMA earthquake information list (`bosai/quake/data/list.json`), marked `READY` with PDL1.0 attribution to 気象庁. It is a 30-day rolling list; the UI defaults to a 24-hour view and can show the full list. The USGS GeoJSON feed is also integrated and selectable; browser access, CORS, and 304 conditional requests have been verified. USGS is a U.S. federal agency and its works are generally public domain; attribution to the U.S. Geological Survey is retained.
 
-The Phase 2 map uses GSI standard/pale raster tiles with attribution and no API key, plus bundled Natural Earth 1:110m vectors as an offline fallback. GSI tiles are fetched directly from the Geospatial Information Authority of Japan and are not bundled by EarthScope. The 3D crust block is available inside the 地震分布図 panel only when the Slab2 overlay is enabled. The 2D map remains on GSI tiles. The 3D top surface uses GSI pale tiles in Web Mercator, with Natural Earth as a fallback, and draws PB2002 / Slab2 as model context.
+The Phase 2 map uses GSI standard/pale raster tiles with attribution and no API key, plus bundled Natural Earth 1:110m vectors as an offline fallback. GSI tiles are fetched directly from the Geospatial Information Authority of Japan and are not bundled by EarthScope. The 3D crust block is available inside the 地震分布図 panel only when the Slab2 overlay is enabled. The 2D map remains on GSI tiles. The 3D top surface uses GSI pale tiles in Web Mercator, with Natural Earth as a fallback, and draws PB2002 / Slab2 as model context. Clicking a 3D hypocenter selects the event.
+
+Selecting a JMA event displays its prefecture-level maximum intensity as a fill layer. JMA supplies area/city intensity summaries (`int`), not a station-by-station shaking field. The overlay is an area aggregation and does not interpolate intensity between prefectures. Prefecture polygons are from Natural Earth 1:10m (public domain).
 
 Waveform analysis currently accepts user-provided CSV/JSON files only. MiniSEED and binary waveforms, and NIED waveform feeds, are not connected. Amplitude units and station metadata are preserved as supplied; EarthScope does not verify them.
 

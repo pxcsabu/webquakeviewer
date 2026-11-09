@@ -124,6 +124,7 @@ Calculations have documented methods, assumptions, units, and automated tests.
 - [x] Implement permitted JMA earthquake information
 - [x] Implement Japanese seismic intensity display
 - [x] Display selected-event prefecture-level JMA intensity areas on the map
+- [x] Verify the intensity overlay on GitHub Pages
 - [x] Implement intensity ordinal ranking
 - [x] Implement JMA / USGS catalog source selector
 - [x] Verify JMA integration on GitHub Pages
@@ -151,6 +152,7 @@ Historical CRS note: the current JMA list JSON does not state a CRS, so EarthSco
 - [x] Add right-drag orbit, middle-drag pan, wheel zoom, and double-click reset
 - [x] Add PB2002 and Slab2 context in 3D
 - [x] Select events by clicking 3D hypocenters
+- [x] Verify 3D click selection on GitHub Pages
 - [x] Use GSI pale tiles on the 3D top surface with a Natural Earth fallback
 - [x] Embed the 3D block in the map panel behind a Slab2-gated option
 - [x] Implement 3D WebGL lifecycle management and resource disposal

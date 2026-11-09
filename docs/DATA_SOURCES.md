@@ -425,3 +425,4 @@ The selected-event intensity fill uses prefecture polygons, not JMA observation-
 - `properties.code` is the two-digit JIS/ISO 3166-2 `JP-xx` prefecture code. It is matched to the JMA `int` area code.
 - The boundaries are a geographic display aid. They are not JMA intensity observation areas, legal boundaries, or survey-grade administrative boundaries.
 - The fill shows the maximum intensity reported for each prefecture and must not be interpreted as a continuous shaking field.
+- The JMA intensity-area fill and 3D hypocenter click selection were verified on GitHub Pages on 2026-11-09.
